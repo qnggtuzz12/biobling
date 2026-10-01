@@ -15,16 +15,16 @@
   
   <style>
     .status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 5px;
-}
-.status-online { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.6); }
-.status-offline { background: #94a3b8; }
-.badge-online { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
-.badge-offline { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+    }
+    .status-online { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.6); }
+    .status-offline { background: #94a3b8; }
+    .badge-online { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
+    .badge-offline { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
     :root {
       --ink: #19342c;
       --muted: #71877d;
@@ -251,15 +251,16 @@
       align-items: center;
       position: relative;
       overflow: hidden;
-      min-height: 190px;
+      min-height: 280px;
       box-shadow: 0 16px 30px rgba(40,110,76,.13);
+      margin-bottom: 24px;
     }
     .hero:before, .hero:after {
       content: "";
       position: absolute;
       border: 1px solid rgba(255,255,255,.16);
       border-radius: 50%;
-      width: 330px;
+      width: 450px;
       height: 330px;
       right: -130px;
       top: -165px;
@@ -304,7 +305,7 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 14px;
-      margin: 20px 0 24px;
+      margin: 0 0 24px;
     }
     .stat {
       background: #fff;
@@ -864,7 +865,7 @@
       .nav button svg { width: 15px; height: 15px; }
       .topbar { height: 56px; padding: 0 16px; }
       .content { padding: 18px 14px 44px; }
-      .hero { padding: 24px; min-height: 160px; }
+      .hero { padding: 40px; min-height: 280px; }
       .hero-art { display: none; }
       .doc-viewer-box { width: 100vw; height: 100vh; border-radius: 0; }
     }
@@ -970,20 +971,20 @@
             Tài Liệu & Đề Thi
           </button>
 
+          <button id="navBtnPhonetics" data-page="phonetics" onclick="navigateTo('phonetics')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+            Thuật Ngữ & Danh Pháp
+          </button>
+
           <button id="navBtnNotes" data-page="notes" onclick="navigateTo('notes')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             Sổ Tay Sinh Học
           </button>
           
           <button id="navBtnMyClass" data-page="my_class" onclick="navigateTo('my_class')">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-    <circle cx="9" cy="7" r="4"></circle>
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-  </svg>
-  Lớp Học Của Tôi
-</button>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Lớp Học Của Tôi
+          </button>
 
           <button id="navBtnAdmin" data-page="class_admin" style="display:none;" onclick="navigateTo('class_admin')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -1029,25 +1030,78 @@
       </header>
 
       <div class="content">
-        <!-- TRANG: LỚP HỌC & BẠN CÙNG LỚP -->
-<section id="my_class" class="page">
-  <div class="page-header">
-    <div>
-      <h1 id="myClassPageTitle">Không Gian Lớp Học Sinh Học</h1>
-      <p id="myClassPageSubtitle">Danh sách học viên và tiến độ học tập tại trung tâm BioBling - 2B.</p>
-    </div>
-    <!-- Bộ chọn lớp dành riêng cho Giáo viên / Admin (Học sinh sẽ bị ẩn) -->
-    <div id="adminClassSelectorWrap" style="display:none; align-items:center; gap:8px;">
-      <label style="font-size:12px; font-weight:700; color:#23694b;">Chọn lớp sinh học:</label>
-      <select id="adminSelectClassView" onchange="renderClassMembersView(this.value)" style="padding:6px 12px; border-radius:10px; border:1px solid #dce8df; font-weight:600;"></select>
-    </div>
-  </div>
 
-  <!-- Danh sách học viên và bạn cùng lớp -->
-  <div id="classMembersGrid" class="grid-3"></div>
-</section>
+        <!-- 1. DASHBOARD TỔNG QUAN -->
+        <section id="dashboard" class="page active">
+          <div class="hero">
+            <div>
+              <span class="eyebrow">BIOBLING LEARNING HUB</span>
+              <h1>Không Gian Học Tập Sinh Học Chuyên Sâu</h1>
+              <p>Hệ thống bài giảng, video chuyên đề di truyền học, sinh thái học và kho tài liệu ôn thi trực tuyến.</p>
+            </div>
+            <div class="hero-art">🧬</div>
+          </div>
 
-        <!-- 1. PHÒNG NGỮ ÂM & SHADOWING STUDIO (ƯU TIÊN HÀNG ĐẦU) -->
+          <div class="stat-row">
+            <div class="stat">
+              <div class="stat-icon" style="background:#fef3c7;color:#b45309;">⏱</div>
+              <div>
+                <b id="dashStudyTimeToday">0 phút</b>
+                <span>Thời gian học hôm nay</span>
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-icon" style="background:#fee2e2;color:#b91c1c;">🔥</div>
+              <div>
+                <b id="dashStudyStreak">1 ngày</b>
+                <span>Chuỗi học (Streak)</span>
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-icon" style="background:#e0f2fe;color:#0369a1;">🏫</div>
+              <div>
+                <b id="dashCurrentClassName">Đang tải...</b>
+                <span>Lớp sinh học hiện tại</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="quote-box">
+            <div class="quote-content">
+              <div class="quote-fr" id="quoteFrenchText">"Omnis cellula e cellula." — Rudolf Virchow</div>
+              <div class="quote-vi" id="quoteVietText">Mọi tế bào đều sinh ra từ tế bào có trước — Nền tảng của sự sống và phát triển.</div>
+            </div>
+            <div class="quote-badge">
+              <i class="fa-solid fa-hourglass-half"></i> <span>Châm ngôn Sinh học</span>
+            </div>
+          </div>
+
+          <div class="section-head">
+            <div>
+              <h2>Chuyên Đề & Học Liệu Sinh Học Được Giao</h2>
+              <p>Danh sách các video bài giảng và tài liệu theo chuyên đề học tập mới nhất của bạn.</p>
+            </div>
+          </div>
+
+          <div id="dashboardAssignmentsContainer" class="grid-3" style="margin-bottom:28px;"></div>
+        </section>
+
+        <!-- 2. TRANG: LỚP HỌC & BẠN CÙNG LỚP -->
+        <section id="my_class" class="page">
+          <div class="page-header">
+            <div>
+              <h1 id="myClassPageTitle">Không Gian Lớp Học Sinh Học</h1>
+              <p id="myClassPageSubtitle">Danh sách học viên và tiến độ học tập tại trung tâm BioBling - 2B.</p>
+            </div>
+            <div id="adminClassSelectorWrap" style="display:none; align-items:center; gap:8px;">
+              <label style="font-size:12px; font-weight:700; color:#23694b;">Chọn lớp sinh học:</label>
+              <select id="adminSelectClassView" onchange="renderClassMembersView(this.value)" style="padding:6px 12px; border-radius:10px; border:1px solid #dce8df; font-weight:600;"></select>
+            </div>
+          </div>
+          <div id="classMembersGrid" class="grid-3"></div>
+        </section>
+
+        <!-- 3. PHÒNG NGỮ ÂM & DANH PHÁP QUỐC TẾ -->
         <section id="phonetics" class="page">
           <div class="page-header">
             <div>
@@ -1080,7 +1134,6 @@
 
           <!-- 14 Quy tắc ghép âm & Shadowing Studio -->
           <div id="phoneticsRulesView" class="two-col" style="margin-top:0">
-            <!-- Cột trái: Bộ chọn quy tắc & Danh sách từ vựng phong phú -->
             <div class="panel" style="padding:20px;">
               <div class="field" style="margin-top:0;">
                 <label for="patternSelect">1. Lựa chọn Quy tắc cấu tạo & phát âm thuật ngữ (14 nhóm chuẩn)</label>
@@ -1110,10 +1163,8 @@
                 </select>
               </div>
 
-              <!-- Hướng dẫn sư phạm & Khẩu hình -->
               <div id="ruleInfoText" class="notice" style="margin-top:10px;text-align:left;line-height:1.55;"></div>
 
-              <!-- Ô tìm kiếm nhanh trong danh sách từ -->
               <div style="display:flex;align-items:center;gap:8px;margin-top:14px;">
                 <input type="text" id="phoneticSearchInput" placeholder="🔍 Tìm nhanh thuật ngữ trong nhóm này..." oninput="handleSearchWords(this.value)" style="border:1px solid #dce8df;padding:8px 12px;border-radius:10px;font-size:12px;flex:1;">
                 <button class="secondary" onclick="document.getElementById('phoneticSearchInput').value=''; handleSearchWords('');" style="padding:8px 10px;font-size:11px;" title="Xóa tìm kiếm">Xóa</button>
@@ -1124,11 +1175,9 @@
                 <span id="patternProgressBadge" class="tag status-pending">Đã thuộc: 0/16</span>
               </div>
 
-              <!-- Cuộn danh sách từ -->
               <div id="patternWordsList" style="max-height:420px;overflow-y:auto;display:grid;gap:6px;" class="stack"></div>
             </div>
 
-            <!-- Cột phải: Shadowing Studio & Luyện nói -->
             <div class="studio-card">
               <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
                 <span id="stCategoryBadge" class="tag" style="background:#edf7ef;color:#246f4b;">Đuôi -ure</span>
@@ -1155,7 +1204,6 @@
                 </p>
               </div>
 
-              <!-- Khu vực tương tác âm thanh & Shadowing -->
               <div style="width:100%;background:#f8fbf8;border:1px solid #dce8df;border-radius:18px;padding:18px;display:grid;gap:12px;">
                 <div style="display:flex;gap:8px;">
                   <button id="btnListenNative" class="primary" style="flex:1;justify-content:center;padding:12px;font-size:13px;" onclick="speakCurrentStudioWord()">
@@ -1166,7 +1214,6 @@
                   </button>
                 </div>
 
-                <!-- Ghi âm trực tiếp để đối chiếu giọng nói -->
                 <div style="display:flex;gap:8px;">
                   <button id="btnRecordMic" class="primary" style="flex:1;justify-content:center;padding:12px;background:#c93b3b;border-color:#c93b3b;font-size:13px;" onclick="toggleRecordUserVoice()">
                     <span id="recordMicIcon">🎙️</span> <span id="recordMicLabel">2. Bấm để nhại giọng (Shadowing)</span>
@@ -1181,7 +1228,6 @@
                 </div>
               </div>
 
-              <!-- Đánh giá mức độ thành thạo -->
               <div style="width:100%;margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                 <button class="secondary" style="justify-content:center;padding:12px;border:1.5px solid #287c54;color:#1e5b3c;background:#edf8f0;" onclick="rateCurrentStudioWord('mastered')">
                   <b>[ 1 ] Đã thuộc ✓</b>
@@ -1204,52 +1250,7 @@
           </div>
         </section>
 
-        <!-- 2. DASHBOARD -->
-        <div class="stat-row">
-  <div class="stat">
-    <div class="stat-icon" style="background:#fef3c7;color:#b45309;">⏱</div>
-    <div>
-      <b id="dashStudyTimeToday">0 phút</b>
-      <span>Thời gian học hôm nay</span>
-    </div>
-  </div>
-  <div class="stat">
-    <div class="stat-icon" style="background:#fee2e2;color:#b91c1c;">🔥</div>
-    <div>
-      <b id="dashStudyStreak">1 ngày</b>
-      <span>Chuỗi học (Streak)</span>
-    </div>
-  </div>
-  <div class="stat">
-    <div class="stat-icon" style="background:#e0f2fe;color:#0369a1;">🏫</div>
-    <div>
-      <b id="dashCurrentClassName">Đang tải...</b>
-      <span>Lớp sinh học hiện tại</span>
-    </div>
-  </div>
-</div>
-
-          <div class="quote-box">
-            <div class="quote-content">
-              <div class="quote-fr" id="quoteFrenchText">"Omnis cellula e cellula." — Rudolf Virchow</div>
-              <div class="quote-vi" id="quoteVietText">Mọi tế bào đều sinh ra từ tế bào có trước — Nền tảng của sự sống và phát triển.</div>
-            </div>
-            <div class="quote-badge">
-              <i class="fa-solid fa-hourglass-half"></i> <span>Châm ngôn Sinh học</span>
-            </div>
-          </div>
-
-          <div class="section-head">
-            <div>
-              <h2>Chuyên Đề & Học Liệu Sinh Học Được Giao</h2>
-              <p>Danh sách các video bài giảng và tài liệu theo chuyên đề học tập mới nhất của bạn.</p>
-            </div>
-          </div>
-
-          <div id="dashboardAssignmentsContainer" class="grid-3" style="margin-bottom:28px;"></div>
-        </section>
-
-        <!-- 3. VIDEO BÀI GIẢNG (GOOGLE DRIVE VIDEO) -->
+        <!-- 4. VIDEO BÀI GIẢNG (GOOGLE DRIVE VIDEO) -->
         <section id="videos" class="page">
           <div class="page-header">
             <div>
@@ -1279,7 +1280,7 @@
           </div>
         </section>
 
-        <!-- 4. TÀI LIỆU THEO BUỔI -->
+        <!-- 5. TÀI LIỆU THEO BUỔI -->
         <section id="documents" class="page">
           <div class="page-header">
             <div>
@@ -1293,7 +1294,7 @@
           <div class="grid-3" id="docCardsContainer"></div>
         </section>
 
-        <!-- 5. QUẢN LÝ LỚP & HỌC LIỆU (ADMIN) -->
+        <!-- 6. QUẢN LÝ LỚP & HỌC LIỆU (ADMIN) -->
         <section id="class_admin" class="page">
           <div class="page-header">
             <div>
@@ -1359,7 +1360,7 @@
           </div>
         </section>
 
-        <!-- 6. SỔ TAY GHI CHÚ -->
+        <!-- 7. SỔ TAY GHI CHÚ -->
         <section id="notes" class="page">
           <div class="page-header">
             <div>
@@ -1375,7 +1376,7 @@
           <div id="notesContainer" class="stack" style="margin-top:20px;"></div>
         </section>
 
-        <!-- 7. CÀI ĐẶT TÀI KHOẢN & AVATAR CROPPER -->
+        <!-- 8. CÀI ĐẶT TÀI KHOẢN -->
         <section id="account_settings" class="page">
           <div class="page-header">
             <div>
@@ -1394,7 +1395,6 @@
                 </div>
               </div>
 
-              <!-- Input File Ẩn -->
               <input type="file" id="avatarUploadInput" accept="image/png, image/jpeg, image/webp" style="display:none;" onchange="handleAvatarFileSelect(event)">
               
               <button class="secondary" style="margin-bottom:16px;width:100%;justify-content:center;border:1px dashed #287c54;" onclick="document.getElementById('avatarUploadInput').click()">
@@ -1506,7 +1506,7 @@
   </div>
 
   <!-- MODALS QUẢN LÝ ADMIN -->
-   <div id="assignMemberModal" class="modal-wrap">
+  <div id="assignMemberModal" class="modal-wrap">
     <div class="modal-box" style="width: min(100%, 500px);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <h2 style="margin:0; font-size:18px; color:#183d2e;" id="assignModalTitle">➕ Thêm học viên vào lớp</h2>
@@ -1516,87 +1516,109 @@
         Chọn học viên bên dưới để thêm vào lớp học hiện tại:
       </p>
       
-      <div id="assignCandidateList" style="display:grid; gap:8px; max-height:360px; overflow-y:auto; padding-right:4px;">
-        <!-- Danh sách học viên có thể thêm -->
-      </div>
+      <div id="assignCandidateList" style="display:grid; gap:8px; max-height:360px; overflow-y:auto; padding-right:4px;"></div>
 
       <div style="text-align:right; margin-top:18px;">
         <button class="secondary" onclick="closeAssignMemberModal()">Đóng</button>
       </div>
     </div>
   </div>
-  <div id="sessionManagerModal" class="modal-wrap"><div class="modal-box"><h2 style="font-size:18px;">📅 Quản Lý Buổi Học / Chuyên Đề</h2><form onsubmit="handleCreateSession(event)"><div class="field"><input type="text" id="newSessionTitle" required placeholder="Tên buổi (ví dụ: Chuyên đề 01 - Cấu trúc tế bào & Di truyền ADN)"></div><button type="submit" class="primary">Lưu buổi học</button></form><div id="sessionListDisplay" style="margin-top:16px;"></div><div style="text-align:right;margin-top:10px;"><button class="secondary" onclick="document.getElementById('sessionManagerModal').classList.remove('open')">Đóng</button></div></div></div>
-  <div id="classManagerModal" class="modal-wrap"><div class="modal-box"><h2 style="font-size:18px;">🏫 Quản Lý Lớp Học Sinh Học</h2><form onsubmit="handleCreateClass(event)"><div class="field"><input type="text" id="newClassName" required placeholder="Tên lớp (ví dụ: Lớp Di Truyền 2B - Tối Thứ 3 & 5)"></div><button type="submit" class="primary">Tạo lớp</button></form><div id="classListContainer" style="margin-top:16px;"></div><div style="text-align:right;margin-top:10px;"><button class="secondary" onclick="document.getElementById('classManagerModal').classList.remove('open')">Đóng</button></div></div></div>
-  <div id="approvalModal" class="modal-wrap"><div class="modal-box"><h2 style="font-size:18px;">Duyệt Học Viên</h2><div id="approvalUsersList" style="margin-top:16px;"></div><div style="text-align:right;margin-top:10px;"><button class="secondary" onclick="document.getElementById('approvalModal').classList.remove('open')">Đóng</button></div></div></div>
+
+  <div id="sessionManagerModal" class="modal-wrap">
+    <div class="modal-box">
+      <h2 style="font-size:18px;">📅 Quản Lý Buổi Học / Chuyên Đề</h2>
+      <form onsubmit="handleCreateSession(event)">
+        <div class="field"><input type="text" id="newSessionTitle" required placeholder="Tên buổi (ví dụ: Chuyên đề 01 - Cấu trúc tế bào & Di truyền ADN)"></div>
+        <button type="submit" class="primary">Lưu buổi học</button>
+      </form>
+      <div id="sessionListDisplay" style="margin-top:16px;"></div>
+      <div style="text-align:right;margin-top:10px;"><button class="secondary" onclick="document.getElementById('sessionManagerModal').classList.remove('open')">Đóng</button></div>
+    </div>
+  </div>
+
+  <div id="classManagerModal" class="modal-wrap">
+    <div class="modal-box">
+      <h2 style="font-size:18px;">🏫 Quản Lý Lớp Học Sinh Học</h2>
+      <form onsubmit="handleCreateClass(event)">
+        <div class="field"><input type="text" id="newClassName" required placeholder="Tên lớp (ví dụ: Lớp Di Truyền 2B - Tối Thứ 3 & 5)"></div>
+        <button type="submit" class="primary">Tạo lớp</button>
+      </form>
+      <div id="classListContainer" style="margin-top:16px;"></div>
+      <div style="text-align:right;margin-top:10px;"><button class="secondary" onclick="document.getElementById('classManagerModal').classList.remove('open')">Đóng</button></div>
+    </div>
+  </div>
+
+  <div id="approvalModal" class="modal-wrap">
+    <div class="modal-box">
+      <h2 style="font-size:18px;">Duyệt Học Viên</h2>
+      <div id="approvalUsersList" style="margin-top:16px;"></div>
+      <div style="text-align:right;margin-top:10px;"><button class="secondary" onclick="document.getElementById('approvalModal').classList.remove('open')">Đóng</button></div>
+    </div>
+  </div>
 
   <div id="toast" class="toast"></div>
 
   <!-- LOGIC HỆ THỐNG TOÀN DIỆN -->
   <script>
     const firebaseConfig = {
-  apiKey: "AIzaSyB3WQ7dd_0JIqxTyVVFi8hpK8eLtPtwMdA",
-  databaseURL: "https://biobling-default-rtdb.firebaseio.com",
-  projectId: "biobling"
-};
+      apiKey: "AIzaSyB3WQ7dd_0JIqxTyVVFi8hpK8eLtPtwMdA",
+      databaseURL: "https://biobling-default-rtdb.firebaseio.com",
+      projectId: "biobling"
+    };
 
-firebase.initializeApp(firebaseConfig);
-const rtdb = firebase.database();
+    firebase.initializeApp(firebaseConfig);
+    const rtdb = firebase.database();
 
-// Biến lưu trạng thái online của tất cả mọi người từ Firebase
-let liveOnlineStatus = {};
+    let liveOnlineStatus = {};
 
-// Lắng nghe trạng thái Online/Offline của mọi tài khoản theo thời gian thực
-rtdb.ref('/status').on('value', (snapshot) => {
-  liveOnlineStatus = snapshot.val() || {};
-  // Nếu đang mở trang Lớp học, tự động cập nhật lại giao diện ngay tức thì
-  const activePage = document.querySelector('.page.active');
-  if (activePage && activePage.id === 'my_class' && typeof renderClassMembersView === 'function') {
-    const sel = document.getElementById('adminSelectClassView');
-    const currentCls = sel ? sel.value : (currentUser ? currentUser.classId : 'all_users');
-    renderClassMembersView(currentCls);
-  }
-});
-
-// Hàm phát tín hiệu Online cho tài khoản đang mở web
-function setupLivePresence(user) {
-  if (!user) return;
-  const userStatusRef = rtdb.ref('/status/' + user.username.toLowerCase());
-  const connectedRef = rtdb.ref('.info/connected');
-
-  connectedRef.on('value', (snap) => {
-    if (snap.val() === false) return;
-    
-    // Khi tắt tab / mất kết nối -> Tự động chuyển Offline
-    userStatusRef.onDisconnect().set({ 
-      state: 'offline', 
-      lastChanged: firebase.database.ServerValue.TIMESTAMP 
-    }).then(() => {
-      // Khi đang kết nối -> Đặt là Online
-      userStatusRef.set({ 
-        state: 'online', 
-        lastChanged: firebase.database.ServerValue.TIMESTAMP 
-      });
+    rtdb.ref('/status').on('value', (snapshot) => {
+      liveOnlineStatus = snapshot.val() || {};
+      const activePage = document.querySelector('.page.active');
+      if (activePage && activePage.id === 'my_class' && typeof renderClassMembersView === 'function') {
+        const sel = document.getElementById('adminSelectClassView');
+        const currentCls = sel ? sel.value : (currentUser ? currentUser.classId : 'all_users');
+        renderClassMembersView(currentCls);
+      }
     });
-  });
-}
+
+    function setupLivePresence(user) {
+      if (!user) return;
+      const userStatusRef = rtdb.ref('/status/' + user.username.toLowerCase());
+      const connectedRef = rtdb.ref('.info/connected');
+
+      connectedRef.on('value', (snap) => {
+        if (snap.val() === false) return;
+        userStatusRef.onDisconnect().set({ 
+          state: 'offline', 
+          lastChanged: firebase.database.ServerValue.TIMESTAMP 
+        }).then(() => {
+          userStatusRef.set({ 
+            state: 'online', 
+            lastChanged: firebase.database.ServerValue.TIMESTAMP 
+          });
+        });
+      });
+    }
+
     const DEVICE_ID_KEY = "biobling_auth_users_v1";
 
-function getOrCreateDeviceId() {
-  let devId = localStorage.getItem(DEVICE_ID_KEY);
-  if (!devId) {
-    devId = "dev_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now();
-    localStorage.setItem(DEVICE_ID_KEY, devId);
-  }
-  return devId;
-}
+    function getOrCreateDeviceId() {
+      let devId = localStorage.getItem(DEVICE_ID_KEY);
+      if (!devId) {
+        devId = "dev_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now();
+        localStorage.setItem(DEVICE_ID_KEY, devId);
+      }
+      return devId;
+    }
 
-function getDeviceName() {
-  const ua = navigator.userAgent;
-  if (/mobile/i.test(ua)) return "Điện thoại (" + (ua.includes("iPhone") ? "iOS" : "Android") + ")";
-  if (/iPad|tablet/i.test(ua)) return "Máy tính bảng";
-  if (/Mac/i.test(ua)) return "Máy tính Mac";
-  return "Máy tính Windows / PC";
-}
+    function getDeviceName() {
+      const ua = navigator.userAgent;
+      if (/mobile/i.test(ua)) return "Điện thoại (" + (ua.includes("iPhone") ? "iOS" : "Android") + ")";
+      if (/iPad|tablet/i.test(ua)) return "Máy tính bảng";
+      if (/Mac/i.test(ua)) return "Máy tính Mac";
+      return "Máy tính Windows / PC";
+    }
+
     /* ================= STORAGE & STATE ================= */
     const AUTH_STORAGE_KEY = "atelier_auth_users_v9";
     const SESSION_STORAGE_KEY = "atelier_current_session_v9";
@@ -1605,44 +1627,13 @@ function getDeviceName() {
     const SESSIONS_STORAGE_KEY = "atelier_sessions_v9";
     const WORD_PROGRESS_KEY = "atelier_phonetic_progress_v9";
     const NOTES_STORAGE_KEY = "atelier_user_notes_v9";
+    const STUDY_LOG_KEY = "atelier_study_logs_v1";
+
     let userDatabase = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY)) || [
-  { 
-    id: 1, 
-    username: "admin1", 
-    fullName: "Casta Nguyễn", 
-    password: "Meocon@123", 
-    role: "admin", 
-    status: "approved", 
-    classId: "all", 
-    avatar: "", 
-    bio: "BioBling - 2B", 
-    createdAt: "2026-10-01" 
-  },
-  { 
-    id: 2, 
-    username: "tranducanh", 
-    fullName: "Trần Đức Anh", 
-    password: "12345678", 
-    role: "admin", 
-    status: "approved", 
-    classId: "all", 
-    avatar: "", 
-    bio: "Giảng viên Sinh học BioBling - 2B", 
-    createdAt: "2026-10-01" 
-  },
-  { 
-    id: 3, 
-    username: "admin2", 
-    fullName: "Admin BioBling", 
-    password: "05012009", 
-    role: "admin", 
-    status: "approved", 
-    classId: "all", 
-    avatar: "", 
-    bio: "Trợ giảng chuyên đề BioBling - 2B", 
-    createdAt: "2026-10-01" 
-  }
-];
+      { id: 1, username: "admin1", fullName: "Casta Nguyễn", password: "Meocon@123", role: "admin", status: "approved", classId: "all", avatar: "", bio: "BioBling - 2B", createdAt: "2026-10-01" },
+      { id: 2, username: "tranducanh", fullName: "Trần Đức Anh", password: "12345678", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Giảng viên Sinh học BioBling - 2B", createdAt: "2026-10-01" },
+      { id: 3, username: "admin2", fullName: "Admin BioBling", password: "05012009", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Trợ giảng chuyên đề BioBling - 2B", createdAt: "2026-10-01" }
+    ];
     let classDatabase = JSON.parse(localStorage.getItem(CLASSES_STORAGE_KEY)) || [{ id: "cls_a1", name: "Lớp Sinh Học Chuyên Sâu - BioBling 2B" }];
     let sessionDatabase = JSON.parse(localStorage.getItem(SESSIONS_STORAGE_KEY)) || [
       { id: "ses_1", title: "Chuyên đề 01: Cơ sở vật chất & Cơ chế di truyền ADN" },
@@ -1658,22 +1649,34 @@ function getDeviceName() {
     /* ================= UTILITIES ================= */
     function setElText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
     function escapeHTML(str) { return String(str||'').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]); }
+    
     let toastTimer;
     function showToast(msg) {
-      const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-      clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+      const t = document.getElementById('toast'); 
+      if(!t) return;
+      t.textContent = msg; 
+      t.classList.add('show');
+      clearTimeout(toastTimer); 
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
     }
+
     function navigateTo(pageId) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
-      document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.getAttribute('data-page') === pageId));
+      const targetPage = document.getElementById(pageId);
+      if (targetPage) {
+        targetPage.classList.add('active');
+      }
+      
+      document.querySelectorAll('.nav button').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-page') === pageId);
+      });
       window.scrollTo({ top: 0, behavior: 'smooth' });
       
       const crumbMap = {
-        phonetics: "Thuật Ngữ & Danh Pháp Sinh Học",
         dashboard: "Tổng quan cá nhân",
         videos: "Kho Video Bài Giảng BioBling",
         documents: "Thư Viện Tài Liệu & Đề Thi",
+        phonetics: "Thuật Ngữ & Danh Pháp Sinh Học",
         notes: "Sổ Tay Sinh Học Cá Nhân",
         class_admin: "Quản Lý Lớp & Học Liệu",
         account_settings: "Cài Đặt Hồ Sơ Cá Nhân",
@@ -1688,321 +1691,112 @@ function getDeviceName() {
       if(pageId==='class_admin') renderAdminClassDashboard();
       if(pageId==='notes') renderNotesView();
       if(pageId==='account_settings') initAccountSettingsView();
-      if (pageId === 'my_class') initMyClassView();
+      if(pageId==='my_class') initMyClassView();
     }
 
-    /* ================= KHO TỪ VỰNG NGỮ ÂM ĐỒ SỘ (224 TỪ THEO 14 QUY TẮC) ================= */
+    /* ================= KHO TỪ VỰNG NGỮ ÂM & DANH PHÁP (14 QUY TẮC) ================= */
     const phoneticsData = {
-      // 1. Đuôi -ure / -ur [yʁ]
       tail_ure: [
-        { word: "nature", ipa: "[na.tyʁ]", type: "nf", mean: "tự nhiên, thiên nhiên", hint: "u chu môi + r sâu trong họng" },
-        { word: "voiture", ipa: "[vwa.tyʁ]", type: "nf", mean: "xe hơi, ô tô", hint: "oi đọc là [wa] + ture [tyʁ]" },
-        { word: "lecture", ipa: "[lɛk.tyʁ]", type: "nf", mean: "sự đọc sách, bài đọc", hint: "lec- đọc là [lɛk]" },
-        { word: "culture", ipa: "[kyl.tyʁ]", type: "nf", mean: "văn hóa", hint: "cul- phát âm [kyl]" },
-        { word: "peinture", ipa: "[pɛ̃.tyʁ]", type: "nf", mean: "tranh vẽ, hội họa", hint: "ein là âm mũi [ɛ̃]" },
-        { word: "ceinture", ipa: "[sɛ̃.tyʁ]", type: "nf", mean: "thắt lưng, dây an toàn", hint: "c đứng trước e đọc là [s]" },
-        { word: "facture", ipa: "[fak.tyʁ]", type: "nf", mean: "hóa đơn thanh toán", hint: "fac- đọc dứt khoát [fak]" },
-        { word: "mesure", ipa: "[mə.zyʁ]", type: "nf", mean: "kích thước, biện pháp", hint: "s giữa 2 nguyên âm đọc là [z]" },
-        { word: "figure", ipa: "[fi.ɡyʁ]", type: "nf", mean: "khuôn mặt, hình bóng", hint: "g trước u đọc là [ɡ]" },
-        { word: "aventure", ipa: "[a.vɑ̃.tyʁ]", type: "nf", mean: "cuộc phiêu lưu", hint: "en là âm mũi [ɑ̃]" },
-        { word: "confiture", ipa: "[kɔ̃.fi.tyʁ]", type: "nf", mean: "mứt hoa quả", hint: "on là âm mũi [ɔ̃]" },
-        { word: "ouverture", ipa: "[u.vɛʁ.tyʁ]", type: "nf", mean: "sự mở cửa, khai mạc", hint: "ou đọc là [u]" },
-        { word: "blessure", ipa: "[blɛ.syʁ]", type: "nf", mean: "vết thương", hint: "ss kẹp giữa đọc là [s]" },
-        { word: "futur", ipa: "[fy.tyʁ]", type: "nm/adj", mean: "tương lai", hint: "cả 2 âm u đều chu môi [y]" },
-        { word: "mur", ipa: "[myʁ]", type: "nm", mean: "bức tường", hint: "phát âm [m] + [yʁ]" },
-        { word: "pur", ipa: "[pyʁ]", type: "adj", mean: "tinh khiết, nguyên chất", hint: "bật nhẹ âm [p] rồi chu môi" }
+        { word: "nature", ipa: "[na.tyʁ]", type: "nf", mean: "tự nhiên, bản chất", hint: "u chu môi + r sâu trong họng" },
+        { word: "structure", ipa: "[stʁyk.tyʁ]", type: "nf", mean: "cấu trúc, thể cấu tạo", hint: "cấu trúc ADN/NST" },
+        { word: "culture", ipa: "[kyl.tyʁ]", type: "nf", mean: "nuôi cấy (mô/tế bào)", hint: "nuôi cấy mô sinh học" },
+        { word: "mesure", ipa: "[mə.zyʁ]", type: "nf", mean: "phép đo, kích thước", hint: "s kẹp giữa đọc [z]" },
+        { word: "ouverture", ipa: "[u.vɛʁ.tyʁ]", type: "nf", mean: "sự mở (tháo xoắn)", hint: "mở chẽ ba tái bản" },
+        { word: "blessure", ipa: "[blɛ.syʁ]", type: "nf", mean: "tổn thương, vết rách", hint: "tổn thương tế bào" },
+        { word: "futur", ipa: "[fy.tyʁ]", type: "nm/adj", mean: "tương lai", hint: "chu môi [y]" },
+        { word: "pur", ipa: "[pyʁ]", type: "adj", mean: "thuần chủng, nguyên chất", hint: "dòng thuần chủng Menđen" }
       ],
-
-      // 2. Đuôi -eur / -euvre [œʁ]
       tail_eur: [
-        { word: "fleur", ipa: "[flœʁ]", type: "nf", mean: "bông hoa", hint: "âm ơ mở, môi tròn thả lỏng" },
-        { word: "couleur", ipa: "[ku.lœʁ]", type: "nf", mean: "màu sắc", hint: "cou- là [ku], -leur là [lœʁ]" },
-        { word: "bonheur", ipa: "[bɔ.nœʁ]", type: "nm", mean: "niềm hạnh phúc", hint: "chữ h câm hoàn toàn" },
-        { word: "malheur", ipa: "[ma.lœʁ]", type: "nm", mean: "nỗi bất hạnh", hint: "h câm, nối âm [ma.lœʁ]" },
-        { word: "chanteur", ipa: "[ʃɑ̃.tœʁ]", type: "nm", mean: "nam ca sĩ", hint: "ch đọc [ʃ] + an mũi [ɑ̃]" },
-        { word: "acteur", ipa: "[ak.tœʁ]", type: "nm", mean: "nam diễn viên", hint: "ac- đọc dứt khoát [ak]" },
-        { word: "docteur", ipa: "[dɔk.tœʁ]", type: "nm", mean: "bác sĩ, tiến sĩ", hint: "doc- phát âm [dɔk]" },
-        { word: "professeur", ipa: "[pʁɔ.fɛ.sœʁ]", type: "nm", mean: "giáo sư, thầy giáo", hint: "ss đọc là âm [s] gió" },
-        { word: "directeur", ipa: "[di.ʁɛk.tœʁ]", type: "nm", mean: "giám đốc, hiệu trưởng", hint: "di-rec-teur rõ ràng 3 âm tiết" },
-        { word: "chaleur", ipa: "[ʃa.lœʁ]", type: "nf", mean: "sức nóng, hơi ấm", hint: "ch đọc là [ʃ] uốn lưỡi nhẹ" },
-        { word: "douleur", ipa: "[du.lœʁ]", type: "nf", mean: "cơn đau, nỗi đau đớn", hint: "ou đọc là [u]" },
-        { word: "peur", ipa: "[pœʁ]", type: "nf", mean: "nỗi sợ hãi", hint: "bật nhẹ âm [p] + [œʁ]" },
-        { word: "sœur", ipa: "[sœʁ]", type: "nf", mean: "chị gái, em gái", hint: "oeu viết dính (œ) đọc [œ]" },
-        { word: "cœur", ipa: "[kœʁ]", type: "nm", mean: "trái tim, tấm lòng", hint: "c đứng trước oeu đọc là [k]" },
-        { word: "heure", ipa: "[œʁ]", type: "nf", mean: "giờ giấc, thời khắc", hint: "h câm, đọc thẳng vào [œʁ]" },
-        { word: "œuvre", ipa: "[œvʁ]", type: "nf", mean: "tác phẩm, công trình", hint: "kết thúc bằng âm [vʁ]" }
+        { word: "facteur", ipa: "[fak.tœʁ]", type: "nm", mean: "nhân tố, hệ số", hint: "nhân tố di truyền Menđen" },
+        { word: "acteur", ipa: "[ak.tœʁ]", type: "nm", mean: "tác tử, nhân tố tham gia", hint: "chất xúc tác enzym" },
+        { word: "docteur", ipa: "[dɔk.tœʁ]", type: "nm", mean: "bác sĩ, tiến sĩ y sinh", hint: "doc- phát âm [dɔk]" },
+        { word: "chaleur", ipa: "[ʃa.lœʁ]", type: "nf", mean: "nhiệt độ, năng lượng nhiệt", hint: "nhiệt biến tính ADN" },
+        { word: "douleur", ipa: "[du.lœʁ]", type: "nf", mean: "cảm giác đau", hint: "thần kinh cảm giác" },
+        { word: "cœur", ipa: "[kœʁ]", type: "nm", mean: "quả tim, hệ tuần hoàn", hint: "chu kỳ hoạt động tim" }
       ],
-
-      // 3. Đuôi -er / -ir / -ire [e] / [iʁ]
       tail_er_ir: [
-        { word: "parler", ipa: "[paʁ.le]", type: "v", mean: "nói chuyện", hint: "đuôi -er đọc là [e] (ê tiếng Việt)" },
-        { word: "manger", ipa: "[mɑ̃.ʒe]", type: "v", mean: "ăn uống", hint: "g trước e đọc là [ʒ]" },
-        { word: "aimer", ipa: "[ɛ.me]", type: "v", mean: "yêu, thích", hint: "ai đọc là [ɛ] mở" },
-        { word: "habiter", ipa: "[a.bi.te]", type: "v", mean: "sinh sống, cư trú", hint: "h câm, đọc từ âm a" },
-        { word: "écouter", ipa: "[e.ku.te]", type: "v", mean: "lắng nghe", hint: "é có dấu sắc đọc [e]" },
-        { word: "regarder", ipa: "[ʁə.ɡaʁ.de]", type: "v", mean: "ngắm nhìn, xem", hint: "e không dấu đọc [ə] lướt nhẹ" },
-        { word: "travailler", ipa: "[tʁa.va.je]", type: "v", mean: "làm việc", hint: "-ailler đọc là [a.je]" },
-        { word: "voyager", ipa: "[vwa.ja.ʒe]", type: "v", mean: "đi du lịch", hint: "y đóng vai trò 2 chữ i" },
-        { word: "finir", ipa: "[fi.niʁ]", type: "v", mean: "kết thúc, hoàn thành", hint: "đuôi -ir đọc rõ [iʁ]" },
-        { word: "choisir", ipa: "[ʃwa.ziʁ]", type: "v", mean: "chọn lựa", hint: "s giữa 2 nguyên âm đọc là [z]" },
-        { word: "partir", ipa: "[paʁ.tiʁ]", type: "v", mean: "khởi hành, rời đi", hint: "r ở giữa rung nhẹ cuống họng" },
-        { word: "dormir", ipa: "[dɔʁ.miʁ]", type: "v", mean: "ngủ", hint: "o đọc là [ɔ] mở" },
-        { word: "venir", ipa: "[və.niʁ]", type: "v", mean: "đến, đi tới", hint: "e lướt nhẹ [ə]" },
-        { word: "lire", ipa: "[liʁ]", type: "v", mean: "đọc sách", hint: "đuôi -ire đọc kéo dài [iʁ]" },
-        { word: "écrire", ipa: "[e.kʁiʁ]", type: "v", mean: "viết", hint: "kết hợp âm [kʁ] mượt mà" },
-        { word: "dire", ipa: "[diʁ]", type: "v", mean: "nói rằng, bảo là", hint: "phát âm [diʁ] dứt khoát" }
+        { word: "cellule", ipa: "[sɛ.lyl]", type: "nf", mean: "tế bào sống", hint: "đơn vị cơ bản của sự sống" },
+        { word: "respirer", ipa: "[ʁɛs.pi.ʁe]", type: "v", mean: "hô hấp tế bào", hint: "quá trình trao đổi khí" },
+        { word: "diviser", ipa: "[di.vi.ze]", type: "v", mean: "phân chia, phân bào", hint: "nguyên phân & giảm phân" },
+        { word: "muter", ipa: "[my.te]", type: "v", mean: "đột biến gen", hint: "biến đổi cấu trúc ADN" }
       ],
-
-      // 4. Đuôi -air / -aire / -elle [ɛʁ] / [ɛl]
       tail_air_elle: [
-        { word: "air", ipa: "[ɛʁ]", type: "nm", mean: "không khí, điệu bộ", hint: "ai đọc là e mở [ɛ] + r họng" },
-        { word: "claire", ipa: "[klɛʁ]", type: "adj", mean: "trong sáng, rõ ràng", hint: "kết thúc bằng âm [ɛʁ]" },
-        { word: "faire", ipa: "[fɛʁ]", type: "v", mean: "làm, thực hiện", hint: "động từ nhóm 3 căn bản" },
-        { word: "affaire", ipa: "[a.fɛʁ]", type: "nf", mean: "công việc, thương vụ", hint: "ff đọc như một âm [f]" },
-        { word: "mère", ipa: "[mɛʁ]", type: "nf", mean: "người mẹ", hint: "è dấu huyền đọc [ɛ] mở" },
-        { word: "père", ipa: "[pɛʁ]", type: "nm", mean: "người cha", hint: "bật nhẹ âm [p] + [ɛʁ]" },
-        { word: "frère", ipa: "[fʁɛʁ]", type: "nm", mean: "anh trai, em trai", hint: "kết hợp f + r họng" },
-        { word: "paire", ipa: "[pɛʁ]", type: "nf", mean: "một đôi, một cặp", hint: "une paire de chaussures" },
-        { word: "salaire", ipa: "[sa.lɛʁ]", type: "nm", mean: "tiền lương", hint: "đuôi -aire đọc [ɛʁ]" },
-        { word: "elle", ipa: "[ɛl]", type: "pron", mean: "cô ấy, bà ấy", hint: "đọc là [ɛl] đưa đầu lưỡi chạm lợi trên" },
-        { word: "belle", ipa: "[bɛl]", type: "adj", mean: "xinh đẹp (giống cái)", hint: "b + [ɛl]" },
-        { word: "mademoiselle", ipa: "[mad.mwa.zɛl]", type: "nf", mean: "quý cô, cô gái trẻ", hint: "oi đọc là [wa] + zelle [zɛl]" },
-        { word: "nouvelle", ipa: "[nu.vɛl]", type: "nf/adj", mean: "tin tức / mới mẻ", hint: "ou là [u] + velle [vɛl]" },
-        { word: "poubelle", ipa: "[pu.bɛl]", type: "nf", mean: "thùng rác", hint: "ou là [u] + belle [bɛl]" },
-        { word: "vaisselle", ipa: "[vɛ.sɛl]", type: "nf", mean: "chén đĩa, đồ ăn", hint: "ai đọc [ɛ], ss đọc [s]" },
-        { word: "dentelle", ipa: "[dɑ̃.tɛl]", type: "nf", mean: "vải ren, đăng ten", hint: "en là âm mũi [ɑ̃]" }
+        { word: "nucléaire", ipa: "[ny.kle.ɛʁ]", type: "adj", mean: "thuộc nhân tế bào", hint: "màng nhân, gen trong nhân" },
+        { word: "cellulaire", ipa: "[sɛ.ly.lɛʁ]", type: "adj", mean: "thuộc cấp độ tế bào", hint: "cấu trúc tế bào" },
+        { word: "paire", ipa: "[pɛʁ]", type: "nf", mean: "cặp (nhiễm sắc thể tương đồng)", hint: "cặp alen tương ứng" }
       ],
-
-      // 5. Đuôi -ique / -aque [ik] / [ak]
       tail_ique_aque: [
-        { word: "musique", ipa: "[my.zik]", type: "nf", mean: "âm nhạc", hint: "u chu môi [y], que đọc là [k]" },
-        { word: "magique", ipa: "[ma.ʒik]", type: "adj", mean: "kỳ diệu, ma thuật", hint: "g trước i đọc [ʒ]" },
-        { word: "boutique", ipa: "[bu.tik]", type: "nf", mean: "cửa hàng, tiệm nhỏ", hint: "ou đọc [u] + tique [tik]" },
-        { word: "république", ipa: "[ʁe.py.blik]", type: "nf", mean: "nền cộng hòa", hint: "é đọc [e], u đọc [y]" },
-        { word: "magnifique", ipa: "[ma.ɲi.fik]", type: "adj", mean: "tráng lệ, tuyệt vời", hint: "gn đọc là [ɲ] như 'nh' tiếng Việt" },
-        { word: "dynamique", ipa: "[di.na.mik]", type: "adj", mean: "năng động, hoạt bát", hint: "y phát âm như chữ i [i]" },
-        { word: "classique", ipa: "[kla.sik]", type: "adj", mean: "cổ điển", hint: "ss đọc âm [s] gió" },
-        { word: "pratique", ipa: "[pʁa.tik]", type: "adj/nf", mean: "tiện lợi, thực hành", hint: "kết thúc bằng âm ngắt [k]" },
-        { word: "panique", ipa: "[pa.nik]", type: "nf", mean: "sự hoảng loạn", hint: "đọc dứt khoát 2 âm [pa.nik]" },
-        { word: "pique-nique", ipa: "[pik.nik]", type: "nm", mean: "chuyến dã ngoại", hint: "hai lần kết thúc bằng đuôi -ique" },
-        { word: "public", ipa: "[py.blik]", type: "nm/adj", mean: "công cộng, khán giả", hint: "chữ c cuối phát âm là [k]" },
-        { word: "attaque", ipa: "[a.tak]", type: "nf", mean: "cuộc tấn công", hint: "-aque đọc dứt khoát [ak]" },
-        { word: "plaque", ipa: "[plak]", type: "nf", mean: "tấm biển, biển số xe", hint: "pl + [ak]" },
-        { word: "lac", ipa: "[lak]", type: "nm", mean: "hồ nước", hint: "chữ c cuối phát âm là [k]" },
-        { word: "sac", ipa: "[sak]", type: "nm", mean: "chiếc túi xách", hint: "s đầu từ đọc rõ [s] + [ak]" },
-        { word: "bac", ipa: "[bak]", type: "nm", mean: "phà / kỳ thi tú tài", hint: "b + [ak]" }
+        { word: "génétique", ipa: "[ʒe.ne.tik]", type: "nf/adj", mean: "di truyền học", hint: "môn học cốt lõi BioBling" },
+        { word: "biologique", ipa: "[bjɔ.lɔ.ʒik]", type: "adj", mean: "thuộc sinh học", hint: "khoa học sự sống" },
+        { word: "chromosomique", ipa: "[kʁo.mo.zo.mik]", type: "adj", mean: "thuộc nhiễm sắc thể", hint: "đột biến cấu trúc NST" }
       ],
-
-      // 6. Cụm âm giữa từ: er / ir / ur [ɛʁ] / [iʁ] / [yʁ]
       mid_er_ir_ur: [
-        { word: "merci", ipa: "[mɛʁ.si]", type: "interj", mean: "cảm ơn", hint: "er giữa từ đọc là [ɛʁ]" },
-        { word: "personne", ipa: "[pɛʁ.sɔn]", type: "nf/pron", mean: "con người / không ai cả", hint: "er đứng trước phụ âm đọc [ɛʁ]" },
-        { word: "perdre", ipa: "[pɛʁdʁ]", type: "v", mean: "đánh mất, thất bại", hint: "er đọc [ɛʁ] rồi đến [dʁ]" },
-        { word: "service", ipa: "[sɛʁ.vis]", type: "nm", mean: "dịch vụ", hint: "c trước e đọc là [s]" },
-        { word: "ferme", ipa: "[fɛʁm]", type: "nf/adj", mean: "nông trại / kiên cố", hint: "er đọc là [ɛʁ]" },
-        { word: "cercle", ipa: "[sɛʁkl]", type: "nm", mean: "vòng tròn, nhóm hội", hint: "c đầu đọc [s], c sau đọc [k]" },
-        { word: "terminer", ipa: "[tɛʁ.mi.ne]", type: "v", mean: "kết thúc, làm xong", hint: "ter- đọc là [tɛʁ]" },
-        { word: "cerveau", ipa: "[sɛʁ.vo]", type: "nm", mean: "não bộ, trí óc", hint: "eau đọc là [o]" },
-        { word: "cirque", ipa: "[siʁk]", type: "nm", mean: "rạp xiếc", hint: "ir giữa từ đọc là [iʁ]" },
-        { word: "firme", ipa: "[fiʁm]", type: "nf", mean: "công ty, hãng", hint: "ir phát âm rõ [iʁ]" },
-        { word: "miroir", ipa: "[mi.ʁwaʁ]", type: "nm", mean: "tấm gương soi", hint: "oir đọc là [waʁ]" },
-        { word: "virtuel", ipa: "[viʁ.tɥɛl]", type: "adj", mean: "ảo, kỹ thuật số", hint: "ir đọc [iʁ], uel đọc [ɥɛl]" },
-        { word: "urgence", ipa: "[yʁ.ʒɑ̃s]", type: "nf", mean: "sự khẩn cấp", hint: "ur đọc là [yʁ] chu môi" },
-        { word: "surprenant", ipa: "[syʁ.pʁə.nɑ̃]", type: "adj", mean: "bất ngờ, ngạc nhiên", hint: "sur- đọc là [syʁ]" },
-        { word: "certain", ipa: "[sɛʁ.tɛ̃]", type: "adj", mean: "chắc chắn, nào đó", hint: "ain cuối là âm mũi [ɛ̃]" },
-        { word: "avertir", ipa: "[a.vɛʁ.tiʁ]", type: "v", mean: "cảnh báo, báo trước", hint: "er ở giữa [ɛʁ], ir cuối [iʁ]" }
+        { word: "enzyme", ipa: "[ɑ̃.zim]", type: "nf", mean: "chất xúc tác sinh học", hint: "protein xúc tác phản ứng" },
+        { word: "service", ipa: "[sɛʁ.vis]", type: "nm", mean: "hoạt động chức năng", hint: "chức năng nội quan" }
       ],
-
-      // 7. Cụm âm giữa từ: ar / or / oi [aʁ] / [ɔʁ] / [wa]
       mid_ar_or_oi: [
-        { word: "jardin", ipa: "[ʒaʁ.dɛ̃]", type: "nm", mean: "khu vườn", hint: "ar đọc [aʁ], in là mũi [ɛ̃]" },
-        { word: "mardi", ipa: "[maʁ.di]", type: "nm", mean: "thứ ba", hint: "ar đọc rõ [aʁ]" },
-        { word: "carte", ipa: "[kaʁt]", type: "nf", mean: "bản đồ, tấm thẻ", hint: "c trước a đọc [k]" },
-        { word: "partir", ipa: "[paʁ.tiʁ]", type: "v", mean: "ra đi, rời bến", hint: "par- đọc là [paʁ]" },
-        { word: "porte", ipa: "[pɔʁt]", type: "nf", mean: "cánh cửa", hint: "or đọc là [ɔʁ] o mở" },
-        { word: "dormir", ipa: "[dɔʁ.miʁ]", type: "v", mean: "ngủ", hint: "dor- đọc là [dɔʁ]" },
-        { word: "fort", ipa: "[fɔʁ]", type: "adj", mean: "mạnh mẽ, giỏi giang", hint: "chữ t cuối là phụ âm câm" },
-        { word: "sortir", ipa: "[sɔʁ.tiʁ]", type: "v", mean: "đi ra ngoài", hint: "sor- phát âm [sɔʁ]" },
-        { word: "corps", ipa: "[kɔʁ]", type: "nm", mean: "cơ thể, thân thể", hint: "ps ở cuối là chữ câm" },
-        { word: "soir", ipa: "[swaʁ]", type: "nm", mean: "buổi tối", hint: "oi đọc là [wa] + r họng" },
-        { word: "voir", ipa: "[vwaʁ]", type: "v", mean: "nhìn thấy", hint: "v + [waʁ]" },
-        { word: "noir", ipa: "[nwaʁ]", type: "adj", mean: "màu đen", hint: "n + [waʁ]" },
-        { word: "boire", ipa: "[bwaʁ]", type: "v", mean: "uống nước", hint: "b + [waʁ]" },
-        { word: "froid", ipa: "[fʁwa]", type: "adj", mean: "lạnh buốt", hint: "chữ d cuối là âm câm" },
-        { word: "droit", ipa: "[dʁwa]", type: "nm/adj", mean: "luật pháp / thẳng / bên phải", hint: "chữ t cuối là âm câm" },
-        { word: "étoile", ipa: "[e.twal]", type: "nf", mean: "ngôi sao", hint: "oi đọc là [wa] + le [l]" }
+        { word: "organe", ipa: "[ɔʁ.ɡan]", type: "nm", mean: "cơ quan sinh học", hint: "hệ cơ quan tuần hoàn/tiêu hóa" },
+        { word: "corps", ipa: "[kɔʁ]", type: "nm", mean: "thể (thể truyền plasmit)", hint: "vector plasmit" }
       ],
-
-      // 8. Cụm đuôi -tion / -sion [sjɔ̃] / [zjɔ̃]
       mid_tion: [
-        { word: "nation", ipa: "[na.sjɔ̃]", type: "nf", mean: "quốc gia, dân tộc", hint: "-tion đọc là [sjɔ̃] (xi-ông mũi)" },
-        { word: "attention", ipa: "[a.tɑ̃.sjɔ̃]", type: "nf", mean: "sự chú ý, cẩn thận", hint: "en là [ɑ̃], tion là [sjɔ̃]" },
-        { word: "invitation", ipa: "[ɛ̃.vi.ta.sjɔ̃]", type: "nf", mean: "lời mời, thiệp mời", hint: "in là âm mũi [ɛ̃]" },
-        { word: "conversation", ipa: "[kɔ̃.vɛʁ.sa.sjɔ̃]", type: "nf", mean: "cuộc trò chuyện", hint: "on mũi [ɔ̃] + tion [sjɔ̃]" },
-        { word: "information", ipa: "[ɛ̃.fɔʁ.ma.sjɔ̃]", type: "nf", mean: "thông tin", hint: "in mũi [ɛ̃] + tion [sjɔ̃]" },
-        { word: "situation", ipa: "[si.tɥa.sjɔ̃]", type: "nf", mean: "hoàn cảnh, tình huống", hint: "u đọc lướt bán nguyên âm [ɥ]" },
-        { word: "émotion", ipa: "[e.mo.sjɔ̃]", type: "nf", mean: "cảm xúc", hint: "é đọc [e] + tion [sjɔ̃]" },
-        { word: "station", ipa: "[sta.sjɔ̃]", type: "nf", mean: "nhà ga, trạm dừng", hint: "st đọc liền không chèn nguyên âm" },
-        { word: "action", ipa: "[ak.sjɔ̃]", type: "nf", mean: "hành động, bộ phim hành động", hint: "ac- đọc dứt khoát [ak]" },
-        { word: "natation", ipa: "[na.ta.sjɔ̃]", type: "nf", mean: "môn bơi lội", hint: "na-ta-tion 3 âm tiết đều đặn" },
-        { word: "tradition", ipa: "[tʁa.di.sjɔ̃]", type: "nf", mean: "truyền thống", hint: "tra- đọc [tʁa]" },
-        { word: "décision", ipa: "[de.si.zjɔ̃]", type: "nf", mean: "sự quyết định", hint: "-sion kẹp giữa đọc là [zjɔ̃]" },
-        { word: "révision", ipa: "[ʁe.vi.zjɔ̃]", type: "nf", mean: "sự ôn tập bài học", hint: "-sion đọc là [zjɔ̃]" },
-        { word: "profession", ipa: "[pʁɔ.fɛ.sjɔ̃]", type: "nf", mean: "nghề nghiệp", hint: "-ssion đọc là âm [sjɔ̃] gió" },
-        { word: "passion", ipa: "[pa.sjɔ̃]", type: "nf", mean: "niềm đam mê", hint: "-ssion đọc là âm [sjɔ̃] gió" },
-        { word: "question", ipa: "[kɛs.tjɔ̃]", type: "nf", mean: "câu hỏi", hint: "⚠️ Ngoại lệ đặc biệt: đọc là [tjɔ̃]" }
+        { word: "traduction", ipa: "[tʁa.dyk.sjɔ̃]", type: "nf", mean: "dịch mã tổng hợp chuỗi polipeptit", hint: "tại bào quan ribôxôm" },
+        { word: "transcription", ipa: "[tʁɑ̃s.kʁip.sjɔ̃]", type: "nf", mean: "phiên mã tổng hợp ARN", hint: "enzym ARN polimeraza" },
+        { word: "réplication", ipa: "[ʁe.pli.ka.sjɔ̃]", type: "nf", mean: "nhân đôi / tái bản ADN", hint: "nguyên tắc bán bảo tồn" },
+        { word: "mutation", ipa: "[my.ta.sjɔ̃]", type: "nf", mean: "đột biến gen / đột biến NST", hint: "phát sinh biến dị" }
       ],
-
-      // 9. Âm mũi in, im, ain, ein [ɛ̃] (bẹt môi)
       nasal_in_ain: [
-        { word: "matin", ipa: "[ma.tɛ̃]", type: "nm", mean: "buổi sáng", hint: "môi bẹt ngang như mỉm cười" },
-        { word: "vin", ipa: "[vɛ̃]", type: "nm", mean: "rượu vang", hint: "âm mũi [ɛ̃] vang ra đường mũi" },
-        { word: "jardin", ipa: "[ʒaʁ.dɛ̃]", type: "nm", mean: "khu vườn", hint: "din- phát âm là [dɛ̃]" },
-        { word: "pain", ipa: "[pɛ̃]", type: "nm", mean: "bánh mì", hint: "ain đọc y hệt in là [ɛ̃]" },
-        { word: "main", ipa: "[mɛ̃]", type: "nf", mean: "bàn tay", hint: "ain đọc là âm mũi [ɛ̃]" },
-        { word: "train", ipa: "[tʁɛ̃]", type: "nm", mean: "chuyến tàu hỏa", hint: "tr đọc [tʁ] + ain [ɛ̃]" },
-        { word: "bain", ipa: "[bɛ̃]", type: "nm", mean: "bồn tắm, sự tắm rửa", hint: "b + [ɛ̃]" },
-        { word: "plein", ipa: "[plɛ̃]", type: "adj", mean: "đầy ắp, no đủ", hint: "ein phát âm là [ɛ̃]" },
-        { word: "faim", ipa: "[fɛ̃]", type: "nf", mean: "cơn đói bụng", hint: "aim đọc là [ɛ̃], m câm" },
-        { word: "timbre", ipa: "[tɛ̃bʁ]", type: "nm", mean: "con tem thư", hint: "im trước b/p đọc là [ɛ̃]" },
-        { word: "simple", ipa: "[sɛ̃pl]", type: "adj", mean: "đơn giản", hint: "im trước p đọc là [ɛ̃]" },
-        { word: "impossible", ipa: "[ɛ̃.pɔ.sibl]", type: "adj", mean: "không thể nào", hint: "im đầu đọc là âm mũi [ɛ̃]" },
-        { word: "dessin", ipa: "[de.sɛ̃]", type: "nm", mean: "bức tranh vẽ", hint: "ss đọc [s] + in [ɛ̃]" },
-        { word: "chemin", ipa: "[ʃə.mɛ̃]", type: "nm", mean: "con đường đi", hint: "ch đọc [ʃ] + min [mɛ̃]" },
-        { word: "copain", ipa: "[kɔ.pɛ̃]", type: "nm", mean: "bạn thân, bạn trai", hint: "pain đọc là [pɛ̃]" },
-        { word: "fin", ipa: "[fɛ̃]", type: "nf", mean: "hồi kết, kết thúc", hint: "f + [ɛ̃]" }
+        { word: "bassin", ipa: "[ba.sɛ̃]", type: "nm", mean: "xương chậu, bể chứa", hint: "giải phẫu học" },
+        { word: "timbre", ipa: "[tɛ̃bʁ]", type: "nm", mean: "dấu vết, đặc tính", hint: "âm mũi [ɛ̃]" }
       ],
-
-      // 10. Âm mũi an, am, en, em [ɑ̃] (họng sâu)
       nasal_an_en: [
-        { word: "enfant", ipa: "[ɑ̃.fɑ̃]", type: "nm/nf", mean: "đứa trẻ con", hint: "cả en và ant đều là âm mũi [ɑ̃]" },
-        { word: "vent", ipa: "[vɑ̃]", type: "nm", mean: "cơn gió", hint: "en đọc là [ɑ̃], t câm" },
-        { word: "temps", ipa: "[tɑ̃]", type: "nm", mean: "thời gian, thời tiết", hint: "em đọc là [ɑ̃], ps câm" },
-        { word: "maman", ipa: "[ma.mɑ̃]", type: "nf", mean: "mẹ yêu", hint: "an đọc là âm mũi [ɑ̃]" },
-        { word: "France", ipa: "[fʁɑ̃s]", type: "nf", mean: "nước Pháp", hint: "an là [ɑ̃], ce đọc là [s]" },
-        { word: "chanson", ipa: "[ʃɑ̃.sɔ̃]", type: "nf", mean: "bài hát", hint: "an mũi [ɑ̃] + on mũi [ɔ̃]" },
-        { word: "grand", ipa: "[ɡʁɑ̃]", type: "adj", mean: "to lớn, cao", hint: "an là [ɑ̃], d câm" },
-        { word: "blanc", ipa: "[blɑ̃]", type: "adj", mean: "màu trắng", hint: "an là [ɑ̃], c câm" },
-        { word: "chanter", ipa: "[ʃɑ̃.te]", type: "v", mean: "ca hát", hint: "an đọc là [ɑ̃]" },
-        { word: "danser", ipa: "[dɑ̃.se]", type: "v", mean: "khiêu vũ, nhảy múa", hint: "an đọc là [ɑ̃]" },
-        { word: "attendre", ipa: "[a.tɑ̃dʁ]", type: "v", mean: "chờ đợi", hint: "en đọc là âm mũi [ɑ̃]" },
-        { word: "entrer", ipa: "[ɑ̃.tʁe]", type: "v", mean: "bước vào", hint: "en đầu từ đọc là [ɑ̃]" },
-        { word: "prendre", ipa: "[pʁɑ̃dʁ]", type: "v", mean: "cầm, lấy, ăn uống", hint: "en đọc là âm mũi [ɑ̃]" },
-        { word: "souvent", ipa: "[su.vɑ̃]", type: "adv", mean: "thường xuyên", hint: "ou là [u], ent là [ɑ̃]" },
-        { word: "parent", ipa: "[pa.ʁɑ̃]", type: "nm", mean: "cha mẹ, phụ huynh", hint: "ent cuối danh từ đọc [ɑ̃]" },
-        { word: "client", ipa: "[kli.jɑ̃]", type: "nm", mean: "khách hàng", hint: "ent cuối đọc là [ɑ̃]" }
+        { word: "sang", ipa: "[sɑ̃]", type: "nm", mean: "máu & hệ tuần hoàn", hint: "nhóm máu A, B, AB, O" },
+        { word: "parent", ipa: "[pa.ʁɑ̃]", type: "nm", mean: "thế hệ bố mẹ P", hint: "phép lai phân tích" }
       ],
-
-      // 11. Âm mũi on, om [ɔ̃] (chu tròn môi)
       nasal_on: [
-        { word: "bonbon", ipa: "[bɔ̃.bɔ̃]", type: "nm", mean: "viên kẹo ngọt", hint: "môi chu tròn xoe, hơi đẩy lên mũi" },
-        { word: "garçon", ipa: "[ɡaʁ.sɔ̃]", type: "nm", mean: "cậu bé, bồi bàn", hint: "ç đọc [s] + on mũi [ɔ̃]" },
-        { word: "maison", ipa: "[mɛ.zɔ̃]", type: "nf", mean: "ngôi nhà", hint: "ai là [ɛ], son là [zɔ̃]" },
-        { word: "saison", ipa: "[sɛ.zɔ̃]", type: "nf", mean: "mùa màng trong năm", hint: "ai là [ɛ], son là [zɔ̃]" },
-        { word: "ballon", ipa: "[ba.lɔ̃]", type: "nm", mean: "quả bóng bay, quả bóng", hint: "ll đọc là một âm l" },
-        { word: "poisson", ipa: "[pwa.sɔ̃]", type: "nm", mean: "con cá", hint: "ss đọc [s] gió + on [ɔ̃]" },
-        { word: "boisson", ipa: "[bwa.sɔ̃]", type: "nf", mean: "đồ uống, thức uống", hint: "oi là [wa] + sson [sɔ̃]" },
-        { word: "pont", ipa: "[pɔ̃]", type: "nm", mean: "cây cầu", hint: "t câm, phát âm [pɔ̃]" },
-        { word: "rond", ipa: "[ʁɔ̃]", type: "adj", mean: "hình tròn", hint: "d câm, phát âm [ʁɔ̃]" },
-        { word: "long", ipa: "[lɔ̃]", type: "adj", mean: "dài", hint: "g câm, phát âm [lɔ̃]" },
-        { word: "monde", ipa: "[mɔ̃d]", type: "nm", mean: "thế giới, mọi người", hint: "on đọc là âm mũi [ɔ̃]" },
-        { word: "ombre", ipa: "[ɔ̃bʁ]", type: "nf", mean: "bóng râm, bóng tối", hint: "om trước b đọc là [ɔ̃]" },
-        { word: "tomber", ipa: "[tɔ̃.be]", type: "v", mean: "rơi ngã", hint: "om trước b đọc là [ɔ̃]" },
-        { word: "réponse", ipa: "[ʁe.pɔ̃s]", type: "nf", mean: "câu trả lời", hint: "on đọc là âm mũi [ɔ̃]" },
-        { word: "nom", ipa: "[nɔ̃]", type: "nm", mean: "tên, họ tên", hint: "om cuối từ đọc là [ɔ̃]" },
-        { word: "bon", ipa: "[bɔ̃]", type: "adj", mean: "ngon, tốt lành", hint: "b + âm mũi [ɔ̃]" }
+        { word: "codon", ipa: "[kɔ.dɔ̃]", type: "nm", mean: "bộ ba mã sao trên mARN", hint: "mã mở đầu AUG, mã kết thúc" },
+        { word: "anticodon", ipa: "[ɑ̃.ti.kɔ.dɔ̃]", type: "nm", mean: "bộ ba đối mã trên tARN", hint: "khớp bổ sung tại ribôxôm" }
       ],
-
-      // 12. Phụ âm [s] (ss, ç) vs [z] (s kẹp)
       consonant_s_z: [
-        { word: "sac", ipa: "[sak]", type: "nm", mean: "cái túi xách", hint: "chữ s đầu từ luôn đọc là [s]" },
-        { word: "tasse", ipa: "[tɑs]", type: "nf", mean: "cái tách, chén uống trà", hint: "hai chữ ss luôn đọc là [s]" },
-        { word: "leçon", ipa: "[lə.sɔ̃]", type: "nf", mean: "bài học", hint: "chữ ç có móc đọc là [s]" },
-        { word: "français", ipa: "[fʁɑ̃.sɛ]", type: "nm/adj", mean: "tiếng Pháp / người Pháp", hint: "ç đọc là [s], ais đọc là [ɛ]" },
-        { word: "poisson", ipa: "[pwa.sɔ̃]", type: "nm", mean: "con cá", hint: "ss đọc là [s] (khác poison [z])" },
-        { word: "passer", ipa: "[pa.se]", type: "v", mean: "đi ngang qua, trải qua", hint: "ss đọc là âm [s] gió" },
-        { word: "maison", ipa: "[mɛ.zɔ̃]", type: "nf", mean: "ngôi nhà", hint: "s đứng giữa 2 nguyên âm rung [z]" },
-        { word: "poison", ipa: "[pwa.zɔ̃]", type: "nm", mean: "thuốc độc, chất độc", hint: "s kẹp giữa đọc là [z] rung" },
-        { word: "rose", ipa: "[ʁoz]", type: "nf/adj", mean: "bông hoa hồng / màu hồng", hint: "s kẹp giữa đọc là [z]" },
-        { word: "musique", ipa: "[my.zik]", type: "nf", mean: "âm nhạc", hint: "s kẹp giữa đọc là [z]" },
-        { word: "visiter", ipa: "[vi.zi.te]", type: "v", mean: "tham quan, ghé thăm", hint: "s kẹp giữa đọc là [z]" },
-        { word: "oiseau", ipa: "[wa.zo]", type: "nm", mean: "chú chim non", hint: "s kẹp giữa đọc là [z]" },
-        { word: "zéro", ipa: "[ze.ʁo]", type: "nm", mean: "số không", hint: "chữ z luôn đọc là [z]" },
-        { word: "choisir", ipa: "[ʃwa.ziʁ]", type: "v", mean: "lựa chọn", hint: "s kẹp giữa đọc là [z]" },
-        { word: "cuisine", ipa: "[kɥi.zin]", type: "nf", mean: "nhà bếp, ẩm thực", hint: "s kẹp giữa đọc là [z]" },
-        { word: "valise", ipa: "[va.liz]", type: "nf", mean: "chiếc va li", hint: "s kẹp giữa đọc là [z]" }
+        { word: "mitose", ipa: "[mi.toz]", type: "nf", mean: "nguyên phân", hint: "phân chia tế bào sinh dưỡng" },
+        { word: "méiose", ipa: "[me.joz]", type: "nf", mean: "giảm phân sinh giao tử", hint: "giảm một nửa bộ NST" }
       ],
-
-      // 13. Phụ âm ch [ʃ], j/ge [ʒ], gn [ɲ]
       consonant_ch_j_gn: [
-        { word: "chocolat", ipa: "[ʃɔ.kɔ.la]", type: "nm", mean: "sô-cô-la", hint: "ch đọc là [ʃ] (như x tiếng Việt)" },
-        { word: "chat", ipa: "[ʃa]", type: "nm", mean: "con mèo", hint: "ch đọc là [ʃ], t câm" },
-        { word: "chaud", ipa: "[ʃo]", type: "adj", mean: "nóng ấm", hint: "au đọc là [o], d câm" },
-        { word: "chercher", ipa: "[ʃɛʁ.ʃe]", type: "v", mean: "tìm kiếm", hint: "cả 2 cụm ch đều đọc là [ʃ]" },
-        { word: "chambre", ipa: "[ʃɑ̃bʁ]", type: "nf", mean: "căn phòng", hint: "ch đọc [ʃ] + am mũi [ɑ̃]" },
-        { word: "jour", ipa: "[ʒuʁ]", type: "nm", mean: "ngày, ban ngày", hint: "chữ j luôn đọc là [ʒ] rung môi" },
-        { word: "journal", ipa: "[ʒuʁ.nal]", type: "nm", mean: "tờ báo, nhật ký", hint: "j đọc là [ʒ] + our [uʁ]" },
-        { word: "jeune", ipa: "[ʒœn]", type: "adj", mean: "trẻ tuổi", hint: "j đọc [ʒ] + eu [œ]" },
-        { word: "manger", ipa: "[mɑ̃.ʒe]", type: "v", mean: "ăn uống", hint: "g trước e đọc là [ʒ]" },
-        { word: "voyager", ipa: "[vwa.ja.ʒe]", type: "v", mean: "du lịch", hint: "g trước e đọc là [ʒ]" },
-        { word: "girafe", ipa: "[ʒi.ʁaf]", type: "nf", mean: "hươu cao cổ", hint: "g trước i đọc là [ʒ]" },
-        { word: "gagner", ipa: "[ɡa.ɲe]", type: "v", mean: "chiến thắng, kiếm tiền", hint: "gn đọc là [ɲ] (như 'nh')" },
-        { word: "montagne", ipa: "[mɔ̃.taɲ]", type: "nf", mean: "ngọn núi", hint: "gn đọc là âm [ɲ]" },
-        { word: "campagne", ipa: "[kɑ̃.paɲ]", type: "nf", mean: "vùng nông thôn", hint: "gn đọc là âm [ɲ]" },
-        { word: "signer", ipa: "[si.ɲe]", type: "v", mean: "ký tên", hint: "gn đọc là âm [ɲ]" },
-        { word: "ligne", ipa: "[liɲ]", type: "nf", mean: "đường kẻ, tuyến đường", hint: "gn đọc là âm [ɲ]" }
+        { word: "lignée", ipa: "[li.ɲe]", type: "nf", mean: "dòng, dòng thuần", hint: "dòng tế bào vô tính" },
+        { word: "gène", ipa: "[ʒɛn]", type: "nm", mean: "gen (đoạn ADN mang thông tin)", hint: "trung tâm di truyền học" }
       ],
-
-      // 14. Bán nguyên âm il/ill [j], ui [ɥi], oi [wa]
       semi_vowels: [
-        { word: "soleil", ipa: "[sɔ.lɛj]", type: "nm", mean: "mặt trời", hint: "-eil đọc là âm lướt [ɛj]" },
-        { word: "travail", ipa: "[tʁa.vaj]", type: "nm", mean: "công việc", hint: "-ail đọc là âm lướt [aj]" },
-        { word: "fille", ipa: "[fij]", type: "nf", mean: "cô gái, con gái", hint: "-ille đọc là [ij]" },
-        { word: "famille", ipa: "[fa.mij]", type: "nf", mean: "gia đình", hint: "-ille đọc là [ij]" },
-        { word: "billet", ipa: "[bi.jɛ]", type: "nm", mean: "vé xe, tờ tiền", hint: "ill đọc là [j] + et [ɛ]" },
-        { word: "bouteille", ipa: "[bu.tɛj]", type: "nf", mean: "cái chai nước", hint: "-eille đọc là [ɛj]" },
-        { word: "feuille", ipa: "[fœj]", type: "nf", mean: "chiếc lá, tờ giấy", hint: "-euille đọc là [œj]" },
-        { word: "oiseau", ipa: "[wa.zo]", type: "nm", mean: "con chim", hint: "oi đọc là [wa]" },
-        { word: "toi", ipa: "[twa]", type: "pron", mean: "bạn, cậu", hint: "t + oi [wa]" },
-        { word: "roi", ipa: "[ʁwa]", type: "nm", mean: "nhà vua", hint: "r + oi [wa]" },
-        { word: "huit", ipa: "[ɥit]", type: "num", mean: "số tám", hint: "ui đọc là bán nguyên âm lướt [ɥi]" },
-        { word: "nuit", ipa: "[nɥi]", type: "nf", mean: "màn đêm, buổi tối", hint: "n + ui [ɥi]" },
-        { word: "cuisine", ipa: "[kɥi.zin]", type: "nf", mean: "nhà bếp", hint: "cui- đọc là [kɥi]" },
-        { word: "pluie", ipa: "[plɥi]", type: "nf", mean: "cơn mưa", hint: "pl + ui [ɥi]" },
-        { word: "oui", ipa: "[wi]", type: "adv", mean: "vâng, đồng ý", hint: "ou đứng trước i đọc lướt [wi]" },
-        { word: "voyage", ipa: "[vwa.jaʒ]", type: "nm", mean: "chuyến hành trình", hint: "oi đọc [wa], y đọc [j]" }
+        { word: "noyau", ipa: "[nwa.jo]", type: "nm", mean: "nhân tế bào", hint: "chứa vật chất di truyền ADN" },
+        { word: "feuille", ipa: "[fœj]", type: "nf", mean: "lá cây (quang hợp)", hint: "bào quan lục lạp" }
       ]
     };
 
     const phoneticsRulesDesc = {
-      tail_ure: "👉 <strong>Đuôi -ure / -ur:</strong> Luôn đọc là <code>[yʁ]</code>. Môi chu tròn nhọn về phía trước như thổi sáo để tạo âm [y], sau đó tạo luồng ma sát nhẹ ở cuống họng để tạo âm [ʁ].",
-      tail_eur: "👉 <strong>Đuôi -eur / -euvre:</strong> Đọc là <code>[œʁ]</code>. Khẩu hình miệng mở rộng tự nhiên (âm ơ mở), hạ quai hàm hơn so với âm [y].",
-      tail_er_ir: "👉 <strong>Đuôi động từ -er / -ir / -ire:</strong> Động từ nhóm 1 đuôi <code>-er</code> luôn phát âm là <code>[e]</code>. Động từ nhóm 2 đuôi <code>-ir</code> phát âm rõ cả âm i và r <code>[iʁ]</code>.",
-      tail_air_elle: "👉 <strong>Đuôi -air / -aire / -elle:</strong> Đuôi <code>-air / -aire</code> đọc là <code>[ɛʁ]</code> (âm e mở). Đuôi đôi phụ âm <code>-elle</code> đọc là <code>[ɛl]</code>.",
-      tail_ique_aque: "👉 <strong>Đuôi -ique / -aque:</strong> Cụm <code>-ique</code> luôn đọc dứt khoát là <code>[ik]</code>; cụm <code>-aque</code> đọc là <code>[ak]</code>.",
-      mid_er_ir_ur: "👉 <strong>er / ir / ur giữa từ:</strong> Khi đứng trước một phụ âm khác trong lòng từ, <code>er</code> đọc là <code>[ɛʁ]</code>; <code>ir</code> đọc là <code>[iʁ]</code> và <code>ur</code> đọc là <code>[yʁ]</code>.",
-      mid_ar_or_oi: "👉 <strong>ar / or / oi giữa từ:</strong> <code>ar</code> đọc là <code>[aʁ]</code>; <code>or</code> đọc là <code>[ɔʁ]</code>; <code>oi</code> luôn là bán nguyên âm <code>[wa]</code>.",
-      mid_tion: "👉 <strong>Cụm đuôi -tion / -sion:</strong> Thường đọc là <code>[sjɔ̃]</code> với nguyên âm mũi [ɔ̃] chu tròn môi.",
-      nasal_in_ain: "👉 <strong>Âm mũi [ɛ̃] (in, im, ain, ein):</strong> Khẩu hình môi bẹt ngang sang 2 bên như đang mỉm cười. Luồng hơi chia đều 50% qua mũi và 50% qua miệng.",
-      nasal_an_en: "👉 <strong>Âm mũi [ɑ̃] (an, am, en, em):</strong> Mở rộng hàm dưới theo chiều dọc hình oval, vòm họng mở sâu, âm thanh trầm ấm phát ra từ khoang mũi.",
-      nasal_on: "👉 <strong>Âm mũi [ɔ̃] (on, om):</strong> Môi chu tròn xoe về phía trước, cuống lưỡi nâng nhẹ, đẩy hơi mạnh lên hốc mũi.",
+      tail_ure: "👉 <strong>Đuôi -ure / -ur:</strong> Đọc là <code>[yʁ]</code>. Môi chu tròn nhọn về phía trước để tạo âm [y], sau đó tạo luồng ma sát nhẹ ở cuống họng tạo âm [ʁ].",
+      tail_eur: "👉 <strong>Đuôi -eur / -euvre:</strong> Đọc là <code>[œʁ]</code>. Mở miệng tự nhiên, phát âm hạ quai hàm.",
+      tail_er_ir: "👉 <strong>Đuôi động từ -er / -ir:</strong> Đuôi <code>-er</code> phát âm là <code>[e]</code>. Đuôi <code>-ir</code> phát âm rõ cả âm i và r <code>[iʁ]</code>.",
+      tail_air_elle: "👉 <strong>Đuôi -air / -aire / -elle:</strong> Đọc là <code>[ɛʁ]</code> hoặc <code>[ɛl]</code> với đầu lưỡi nâng nhẹ chạm lợi trên.",
+      tail_ique_aque: "👉 <strong>Đuôi -ique / -aque:</strong> Cụm <code>-ique</code> luôn đọc dứt khoát là <code>[ik]</code>.",
+      mid_er_ir_ur: "👉 <strong>er / ir / ur giữa từ:</strong> Khi đứng trước một phụ âm khác trong lòng từ, <code>er</code> đọc là <code>[ɛʁ]</code>; <code>ir</code> đọc là <code>[iʁ]</code>.",
+      mid_ar_or_oi: "👉 <strong>ar / or / oi giữa từ:</strong> <code>ar</code> đọc là <code>[aʁ]</code>; <code>or</code> đọc là <code>[ɔʁ]</code>; <code>oi</code> là bán nguyên âm <code>[wa]</code>.",
+      mid_tion: "👉 <strong>Cụm đuôi -tion / -sion:</strong> Đọc là <code>[sjɔ̃]</code> với nguyên âm mũi chu tròn môi.",
+      nasal_in_ain: "👉 <strong>Âm mũi [ɛ̃] (in, im, ain):</strong> Khẩu hình môi bẹt ngang sang 2 bên như đang mỉm cười.",
+      nasal_an_en: "👉 <strong>Âm mũi [ɑ̃] (an, am, en):</strong> Mở rộng vòm họng theo chiều dọc hình oval, âm thanh trầm ấm từ khoang mũi.",
+      nasal_on: "👉 <strong>Âm mũi [ɔ̃] (on, om):</strong> Môi chu tròn xoe về phía trước, đẩy hơi mạnh lên hốc mũi.",
       consonant_s_z: "👉 <strong>Phụ âm [s] vs [z]:</strong> Chữ <code>s</code> đứng giữa 2 nguyên âm bắt buộc phải phát âm rung dây thanh quản thành <code>[z]</code>.",
-      consonant_ch_j_gn: "👉 <strong>ch [ʃ], j [ʒ], gn [ɲ]:</strong> Cụm <code>ch</code> đọc như 'x' nhẹ <code>[ʃ]</code>; chữ <code>j</code> hoặc <code>ge/gi</code> đọc rung môi <code>[ʒ]</code>; cụm <code>gn</code> đọc như âm 'nh' mềm mại <code>[ɲ]</code>.",
-      semi_vowels: "👉 <strong>Bán nguyên âm (Semi-voyelles):</strong> Cụm <code>-il / -ille</code> sau nguyên âm tạo âm trượt <code>[j]</code>; cụm <code>ui</code> lướt nhanh từ u sang i <code>[ɥi]</code>; cụm <code>oi</code> lướt thành <code>[wa]</code>."
+      consonant_ch_j_gn: "👉 <strong>ch [ʃ], j [ʒ], gn [ɲ]:</strong> Cụm <code>gn</code> đọc như âm 'nh' mềm mại.",
+      semi_vowels: "👉 <strong>Bán nguyên âm:</strong> Cụm <code>-il / -ille</code> tạo âm trượt <code>[j]</code>; <code>ui</code> lướt nhanh sang [ɥi]."
     };
 
-    /* ================= PHONETICS INTERACTION STATE ================= */
     let isAlphabetMode = false;
     let currentVoiceSpeed = 0.85;
     let currentStudioWord = null;
     let currentWordFilterText = "";
 
-    // Web Speech Synthesis
     function cycleVoiceSpeed() {
       if(currentVoiceSpeed === 0.85) currentVoiceSpeed = 1.0;
       else if(currentVoiceSpeed === 1.0) currentVoiceSpeed = 0.65;
       else currentVoiceSpeed = 0.85;
-      document.getElementById('speedLabelText').textContent = currentVoiceSpeed + "x";
+      setElText('speedLabelText', currentVoiceSpeed + "x");
       showToast(`Tốc độ phát âm: ${currentVoiceSpeed}x`);
     }
 
@@ -2012,11 +1806,6 @@ function getDeviceName() {
       const msg = new SpeechSynthesisUtterance(text);
       msg.lang = 'fr-FR';
       msg.rate = customRate || currentVoiceSpeed;
-
-      const voices = window.speechSynthesis.getVoices();
-      const frenchVoice = voices.find(v => v.lang.startsWith('fr') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Thomas') || v.name.includes('Amelie')));
-      if(frenchVoice) msg.voice = frenchVoice;
-
       window.speechSynthesis.speak(msg);
     }
 
@@ -2032,7 +1821,7 @@ function getDeviceName() {
       isAlphabetMode = !isAlphabetMode;
       document.getElementById('phoneticsAlphabetView').style.display = isAlphabetMode ? 'block' : 'none';
       document.getElementById('phoneticsRulesView').style.display = isAlphabetMode ? 'none' : 'grid';
-      document.getElementById('phoneticTabToggleLabel').textContent = isAlphabetMode ? 'Chuyển sang: Ghép vần & Shadowing' : 'Chuyển sang: Bảng chữ cái A-Z';
+      setElText('phoneticTabToggleLabel', isAlphabetMode ? 'Chuyển sang: Ghép vần & Shadowing' : 'Chuyển sang: Bảng chữ cái A-Z');
     }
 
     function handleSearchWords(query) {
@@ -2041,7 +1830,9 @@ function getDeviceName() {
     }
 
     function renderPatternWords() {
-      const rule = document.getElementById('patternSelect').value;
+      const ruleSelect = document.getElementById('patternSelect');
+      if(!ruleSelect) return;
+      const rule = ruleSelect.value;
       const allWords = phoneticsData[rule] || [];
       const filteredWords = allWords.filter(w => 
         !currentWordFilterText || 
@@ -2055,12 +1846,14 @@ function getDeviceName() {
       setElText('patternWordsCountBadge', `Danh sách (${filteredWords.length}/${allWords.length} từ)`);
 
       const listContainer = document.getElementById('patternWordsList');
+      if(!listContainer) return;
+
       if(!filteredWords.length) {
         listContainer.innerHTML = `<div class="notice" style="text-align:center;">Không tìm thấy thuật ngữ phù hợp với "${escapeHTML(currentWordFilterText)}"</div>`;
         return;
       }
 
-      listContainer.innerHTML = filteredWords.map((w, index) => {
+      listContainer.innerHTML = filteredWords.map((w) => {
         const isMastered = wordMasteryMap[w.word] === 'mastered';
         const isReview = wordMasteryMap[w.word] === 'review';
         const isCurrent = currentStudioWord && currentStudioWord.word === w.word;
@@ -2091,9 +1884,10 @@ function getDeviceName() {
       `;
       }).join('');
 
-      document.getElementById('ruleInfoText').innerHTML = phoneticsRulesDesc[rule] || "";
-      const selectEl = document.getElementById('patternSelect');
-      document.getElementById('stCategoryBadge').textContent = selectEl.options[selectEl.selectedIndex].text.split(' ')[1] || "Quy tắc";
+      const infoEl = document.getElementById('ruleInfoText');
+      if (infoEl) infoEl.innerHTML = phoneticsRulesDesc[rule] || "";
+      const catBadge = document.getElementById('stCategoryBadge');
+      if (catBadge) catBadge.textContent = ruleSelect.options[ruleSelect.selectedIndex].text.split(' ')[1] || "Quy tắc";
     }
 
     function selectStudioWordByWord(wordText) {
@@ -2110,26 +1904,28 @@ function getDeviceName() {
 
     function updateStudioCardUI() {
       if(!currentStudioWord) return;
-      document.getElementById('stWordDisplay').textContent = currentStudioWord.word;
-      document.getElementById('stIpaDisplay').textContent = currentStudioWord.ipa;
-      document.getElementById('stHintDisplay').textContent = "💡 " + (currentStudioWord.hint || "Luyện phát âm chuẩn danh pháp");
-      document.getElementById('stMeanDisplay').textContent = "Nghĩa: " + currentStudioWord.mean;
-      document.getElementById('stTypeBadge').textContent = currentStudioWord.type || "thuật ngữ";
+      setElText('stWordDisplay', currentStudioWord.word);
+      setElText('stIpaDisplay', currentStudioWord.ipa);
+      setElText('stHintDisplay', "💡 " + (currentStudioWord.hint || "Luyện phát âm chuẩn danh pháp"));
+      setElText('stMeanDisplay', "Nghĩa: " + currentStudioWord.mean);
+      setElText('stTypeBadge', currentStudioWord.type || "thuật ngữ");
 
       const status = wordMasteryMap[currentStudioWord.word];
       const statusBadge = document.getElementById('stStatusBadge');
-      if(status === 'mastered') {
-        statusBadge.className = 'tag status-done';
-        statusBadge.textContent = '✓ Đã thuộc';
-      } else if(status === 'review') {
-        statusBadge.className = 'tag';
-        statusBadge.style.background = '#fef2f2';
-        statusBadge.style.color = '#b91c1c';
-        statusBadge.style.borderColor = '#fecaca';
-        statusBadge.textContent = '↺ Cần ôn lại';
-      } else {
-        statusBadge.className = 'tag status-pending';
-        statusBadge.textContent = 'Chưa học';
+      if(statusBadge) {
+        if(status === 'mastered') {
+          statusBadge.className = 'tag status-done';
+          statusBadge.textContent = '✓ Đã thuộc';
+        } else if(status === 'review') {
+          statusBadge.className = 'tag';
+          statusBadge.style.background = '#fef2f2';
+          statusBadge.style.color = '#b91c1c';
+          statusBadge.style.borderColor = '#fecaca';
+          statusBadge.textContent = '↺ Cần ôn lại';
+        } else {
+          statusBadge.className = 'tag status-pending';
+          statusBadge.textContent = 'Chưa học';
+        }
       }
     }
 
@@ -2174,7 +1970,7 @@ function getDeviceName() {
       setTimeout(() => pickSequentialWord(1), 350);
     }
 
-    /* ================= SHADOWING RECORDING (MICROPHONE) ================= */
+    /* ================= SHADOWING RECORDING ================= */
     let mediaRecorder = null;
     let audioChunks = [];
     let recordedAudioBlob = null;
@@ -2201,8 +1997,8 @@ function getDeviceName() {
         mediaRecorder.onstop = () => {
           isRecording = false;
           stream.getTracks().forEach(track => track.stop());
-          document.getElementById('recordMicIcon').textContent = "🎙️";
-          document.getElementById('recordMicLabel').textContent = "2. Bấm để nhại giọng (Shadowing)";
+          setElText('recordMicIcon', "🎙️");
+          setElText('recordMicLabel', "2. Bấm để nhại giọng (Shadowing)");
           document.getElementById('btnRecordMic').style.background = "#c93b3b";
 
           recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
@@ -2214,8 +2010,8 @@ function getDeviceName() {
 
         mediaRecorder.start();
         isRecording = true;
-        document.getElementById('recordMicIcon').textContent = "⏹️";
-        document.getElementById('recordMicLabel').textContent = "Đang thu âm... Bấm để dừng";
+        setElText('recordMicIcon', "⏹️");
+        setElText('recordMicLabel', "Đang thu âm... Bấm để dừng");
         document.getElementById('btnRecordMic').style.background = "#b91c1c";
         document.getElementById('btnPlayUserVoice').style.display = 'none';
       } catch(err) {
@@ -2229,12 +2025,12 @@ function getDeviceName() {
       audio.play();
     }
 
-    /* ================= KHỞI TẠO PHÒNG THUẬT NGỮ ================= */
     function initPhoneticsView() {
-      if(!document.getElementById('alphabetInteractiveGrid').innerHTML) {
+      const grid = document.getElementById('alphabetInteractiveGrid');
+      if(grid && !grid.innerHTML) {
         const alphabet = "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z".split(",");
         const ipaAlpha = ["a","be","se","de","ə","ɛf","ʒe","aʃ","i","ʒi","ka","ɛl","ɛm","ɛn","o","pe","ky","ɛʁ","ɛs","te","y","ve","dublə.ve","iks","i.ɡʁɛk","zɛd"];
-        document.getElementById('alphabetInteractiveGrid').innerHTML = alphabet.map((letter, i) => `
+        grid.innerHTML = alphabet.map((letter, i) => `
             <div class="alpha-box" onclick="playAudioText('${letter}')">
               <b>${letter}</b>
               <span>[${ipaAlpha[i]}]</span>
@@ -2257,7 +2053,6 @@ function getDeviceName() {
       }
     }
 
-    // Phím tắt bàn phím tiện lợi
     window.addEventListener('keydown', (e) => {
       const activePage = document.querySelector('.page.active');
       if(activePage && activePage.id === 'phonetics' && !isAlphabetMode) {
@@ -2271,7 +2066,7 @@ function getDeviceName() {
       }
     });
 
-    /* ================= IN-APP DOCUMENT VIEWER ================= */
+    /* ================= DOC VIEWER ================= */
     function convertToDrivePreviewUrl(rawUrl) {
       if (!rawUrl) return '';
       let url = rawUrl.trim();
@@ -2290,11 +2085,8 @@ function getDeviceName() {
     function openDocViewer(rawUrl, title) {
       const modal = document.getElementById('docViewerModal');
       const iframe = document.getElementById('docViewerIframe');
-      const titleEl = document.getElementById('docViewerTitle');
-      const btnNewTab = document.getElementById('btnDocViewerNewTab');
-      
-      titleEl.textContent = title || "Xem Tài Liệu";
-      btnNewTab.href = rawUrl;
+      setElText('docViewerTitle', title || "Xem Tài Liệu");
+      document.getElementById('btnDocViewerNewTab').href = rawUrl;
       iframe.src = convertToDrivePreviewUrl(rawUrl);
       modal.classList.add('open');
       document.body.style.overflow = 'hidden'; 
@@ -2302,13 +2094,12 @@ function getDeviceName() {
 
     function closeDocViewer() {
       const modal = document.getElementById('docViewerModal');
-      const iframe = document.getElementById('docViewerIframe');
-      iframe.src = ""; 
+      document.getElementById('docViewerIframe').src = ""; 
       modal.classList.remove('open');
       document.body.style.overflow = '';
     }
 
-    /* ================= AVATAR CROPPER ENGINE ================= */
+    /* ================= AVATAR CROPPER ================= */
     let cropImgObj = new Image();
     let cropScale = 1, cropPanX = 0, cropPanY = 0;
     let isDraggingCrop = false, startDragX = 0, startDragY = 0;
@@ -2334,14 +2125,18 @@ function getDeviceName() {
     function closeCropModal() { document.getElementById('avatarCropModal').classList.remove('open'); }
     function updateCropTransform() {
       const el = document.getElementById('cropImage');
-      el.style.left = `calc(50% + ${cropPanX}px)`; el.style.top = `calc(50% + ${cropPanY}px)`;
+      el.style.left = `calc(50% + ${cropPanX}px)`; 
+      el.style.top = `calc(50% + ${cropPanY}px)`;
       el.style.transform = `translate(-50%, -50%) scale(${cropScale})`;
     }
 
     const cropContainer = document.getElementById('cropContainer');
-    cropContainer.addEventListener('mousedown', startCropDrag); cropContainer.addEventListener('touchstart', startCropDrag, {passive: false});
-    window.addEventListener('mousemove', doCropDrag); window.addEventListener('touchmove', doCropDrag, {passive: false});
-    window.addEventListener('mouseup', endCropDrag); window.addEventListener('touchend', endCropDrag);
+    cropContainer.addEventListener('mousedown', startCropDrag); 
+    cropContainer.addEventListener('touchstart', startCropDrag, {passive: false});
+    window.addEventListener('mousemove', doCropDrag); 
+    window.addEventListener('touchmove', doCropDrag, {passive: false});
+    window.addEventListener('mouseup', endCropDrag); 
+    window.addEventListener('touchend', endCropDrag);
 
     function startCropDrag(e) {
       if(e.type === 'touchstart') e.preventDefault();
@@ -2359,7 +2154,10 @@ function getDeviceName() {
     }
     function endCropDrag() { isDraggingCrop = false; }
 
-    document.getElementById('cropZoomSlider').addEventListener('input', (e) => { cropScale = parseFloat(e.target.value); updateCropTransform(); });
+    document.getElementById('cropZoomSlider').addEventListener('input', (e) => { 
+      cropScale = parseFloat(e.target.value); 
+      updateCropTransform(); 
+    });
 
     function applyAvatarCrop() {
       const canvas = document.getElementById('cropCanvas');
@@ -2379,77 +2177,74 @@ function getDeviceName() {
       const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
       const previewBox = document.getElementById('settingAvatarPreview');
       previewBox.innerHTML = `<img src="${dataUrl}">`;
-      document.getElementById('settingAvatarPreview').setAttribute('data-temp-avatar', dataUrl);
+      previewBox.setAttribute('data-temp-avatar', dataUrl);
       
       closeCropModal();
       showToast("Đã căn chỉnh ảnh. Nhấn 'Lưu hồ sơ' để hoàn tất!");
     }
-      
+
     /* ================= AUTHENTICATION ================= */
     function checkAuthSession() {
-  if (!currentUser) { 
-    document.getElementById('authOverlay').style.display = 'grid'; 
-  } else { 
-    document.getElementById('authOverlay').style.display = 'none'; 
-    setupLivePresence(currentUser); // <-- Kích hoạt gửi trạng thái online lên Firebase
-    updateUserUI(); 
-    navigateTo('dashboard'); 
-  }
-}
-    if (currentUser) {
-  rtdb.ref('/status/' + currentUser.username.toLowerCase()).set({
-    state: 'offline',
-    lastChanged: Date.now()
-  });
-}
+      if (!currentUser) { 
+        document.getElementById('authOverlay').style.display = 'grid'; 
+      } else { 
+        document.getElementById('authOverlay').style.display = 'none'; 
+        setupLivePresence(currentUser);
+        updateUserUI(); 
+        navigateTo('dashboard'); 
+      }
+    }
+
     function switchAuthTab(tab) {
       document.getElementById('btnTabLogin').classList.toggle('active', tab==='login');
       document.getElementById('btnTabRegister').classList.toggle('active', tab==='register');
       document.getElementById('formLogin').style.display = tab==='login' ? 'block' : 'none';
       document.getElementById('formRegister').style.display = tab==='register' ? 'block' : 'none';
     }
+
     function handleLogin(e) {
-  e.preventDefault();
-  const enteredUsername = document.getElementById('loginUsername').value.trim().toLowerCase();
-  const enteredPassword = document.getElementById('loginPassword').value;
+      e.preventDefault();
+      const enteredUsername = document.getElementById('loginUsername').value.trim().toLowerCase();
+      const enteredPassword = document.getElementById('loginPassword').value;
 
-  const userIdx = userDatabase.findIndex(u => u.username.toLowerCase() === enteredUsername && u.password === enteredPassword);
-  if (userIdx === -1) return alert("Sai tên đăng nhập hoặc mật khẩu!");
-  
-  const user = userDatabase[userIdx];
-  if (user.status === "pending") return alert("Tài khoản đang chờ duyệt từ Quản trị viên BioBling!");
+      const userIdx = userDatabase.findIndex(u => u.username.toLowerCase() === enteredUsername && u.password === enteredPassword);
+      if (userIdx === -1) return alert("Sai tên đăng nhập hoặc mật khẩu!");
+      
+      const user = userDatabase[userIdx];
+      if (user.status === "pending") return alert("Tài khoản đang chờ duyệt từ Quản trị viên BioBling!");
 
-  if (!user.activeSessions) user.activeSessions = [];
-  const currentDevId = getOrCreateDeviceId();
-  const existingSessionIdx = user.activeSessions.findIndex(s => s.deviceId === currentDevId);
+      if (!user.activeSessions) user.activeSessions = [];
+      const currentDevId = getOrCreateDeviceId();
+      const existingSessionIdx = user.activeSessions.findIndex(s => s.deviceId === currentDevId);
 
-  if (existingSessionIdx !== -1) {
-    user.activeSessions[existingSessionIdx].lastActive = new Date().toLocaleString('vi-VN');
-  } else {
-    if (user.activeSessions.length >= 2) {
-      const confirmReplace = confirm(
-        "⚠️ TÀI KHOẢN ĐÃ ĐẠT GIỚI HẠN 2 THIẾT BỊ!\n\n" +
-        "Thiết bị cũ nhất sẽ bị đăng xuất để nhường chỗ cho thiết bị này.\n" +
-        "Bạn có muốn tiếp tục đăng nhập không?"
-      );
-      if (!confirmReplace) return;
-      user.activeSessions.shift();
+      if (existingSessionIdx !== -1) {
+        user.activeSessions[existingSessionIdx].lastActive = new Date().toLocaleString('vi-VN');
+      } else {
+        if (user.activeSessions.length >= 2) {
+          const confirmReplace = confirm(
+            "⚠️ TÀI KHOẢN ĐÃ ĐẠT GIỚI HẠN 2 THIẾT BỊ!\n\n" +
+            "Thiết bị cũ nhất sẽ bị đăng xuất để nhường chỗ cho thiết bị này.\n" +
+            "Bạn có muốn tiếp tục đăng nhập không?"
+          );
+          if (!confirmReplace) return;
+          user.activeSessions.shift();
+        }
+
+        user.activeSessions.push({
+          deviceId: currentDevId,
+          deviceName: getDeviceName(),
+          lastActive: new Date().toLocaleString('vi-VN')
+        });
+      }
+
+      userDatabase[userIdx] = user;
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+
+      currentUser = user;
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
+      checkAuthSession();
     }
 
-    user.activeSessions.push({
-      deviceId: currentDevId,
-      deviceName: getDeviceName(),
-      lastActive: new Date().toLocaleString('vi-VN')
-    });
-  }
-
-  userDatabase[userIdx] = user;
-  localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-
-  currentUser = user;
-  localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
-  checkAuthSession();
-    }
     function handleRegister(e) {
       e.preventDefault();
       const un = document.getElementById('regUsername').value.trim().toLowerCase();
@@ -2471,481 +2266,150 @@ function getDeviceName() {
       alert("Đăng ký thành công! Vui lòng chờ Giảng viên BioBling duyệt."); 
       switchAuthTab('login');
     }
+
     function handleLogout() {
-  if (confirm("Bạn có chắc chắn muốn đăng xuất?")) {
-    if (currentUser) {
-      const currentDevId = getOrCreateDeviceId();
-      const user = userDatabase.find(u => u.id === currentUser.id);
-      if (user && user.activeSessions) {
-        user.activeSessions = user.activeSessions.filter(s => s.deviceId !== currentDevId);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      if (confirm("Bạn có chắc chắn muốn đăng xuất?")) {
+        if (currentUser) {
+          rtdb.ref('/status/' + currentUser.username.toLowerCase()).set({
+            state: 'offline',
+            lastChanged: firebase.database.ServerValue.TIMESTAMP
+          });
+          const currentDevId = getOrCreateDeviceId();
+          const user = userDatabase.find(u => u.id === currentUser.id);
+          if (user && user.activeSessions) {
+            user.activeSessions = user.activeSessions.filter(s => s.deviceId !== currentDevId);
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+          }
+        }
+        currentUser = null;
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+        checkAuthSession();
       }
     }
-    currentUser = null;
-    localStorage.removeItem(SESSION_STORAGE_KEY);
-    checkAuthSession();
-  }
-}
 
     function updateUserUI() {
       if (!currentUser) return;
 
-  // Lấy dữ liệu mới nhất của user từ userDatabase để đảm bảo nếu vừa xếp lớp là nhận ngay
-  const freshUser = userDatabase.find(u => u.id === currentUser.id);
-  if (freshUser) {
-    currentUser = freshUser;
-    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
-  }
-
-  const name = currentUser.fullName || currentUser.username;
-  setElText('userNameDisplay', name);
-  
-  // Xác định tên lớp hiện tại
-  let currentClassName = "Chưa xếp lớp";
-  if (currentUser.role === 'admin') {
-    currentClassName = "Ban Giảng Viên BioBling";
-  } else if (currentUser.classId) {
-    const userClass = classDatabase.find(c => c.id === currentUser.classId);
-    if (userClass) currentClassName = userClass.name;
-  }
-  
-  // Cập nhật đúng vai trò của tài khoản đang đăng nhập
-  const roleTextEl = document.getElementById('userRoleDisplay');
-  if (roleTextEl) {
-    if (currentUser.role === 'admin') {
-      roleTextEl.textContent = "Quản trị viên / Giảng viên";
-    } else {
-      // Tìm tên lớp học sinh đang tham gia (nếu có)
-      const userClass = classDatabase.find(c => c.id === currentUser.classId);
-      roleTextEl.textContent = userClass ? `Học viên · ${userClass.name}` : "Học viên";
-    }
-  }
-
-  document.getElementById('navBtnAdmin').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
-  
-  const initChar = name.charAt(0).toUpperCase();
-  const drawAvatar = (elId) => {
-    const el = document.getElementById(elId);
-    if (el) {
-      if (currentUser.avatar) el.innerHTML = `<img src="${currentUser.avatar}">`;
-      else el.textContent = initChar;
-    }
-  };
-  drawAvatar('userAvatarSmall'); 
-  drawAvatar('topbarAvatar');
-}
-
-    const classEl = document.getElementById('dashCurrentClassName');
-  if (classEl) {
-    classEl.textContent = currentClassName;
-  }
-
-  const userData = getUserStudyData();
-  const todayKey = getTodayKey();
-  const todayMinutes = (userData.dates && userData.dates[todayKey]) ? userData.dates[todayKey] : 0;
-  setElText('dashStudyTimeToday', `${todayMinutes} phút`);
-
-  const currentStreak = calculateAndUpdateStreak();
-  setElText('dashStudyStreak', `${currentStreak} ngày liên tiếp`);
-    /* ================= LỚP HỌC & QUẢN LÝ THÀNH VIÊN THEO LỚP ================= */
-function isUserOnline(user) {
-  if (!user || !user.username) return false;
-  const statusObj = liveOnlineStatus[user.username.toLowerCase()];
-  return statusObj && statusObj.state === 'online';
-}
-    
-
-function initMyClassView() {
-  const isAdmin = currentUser.role === 'admin';
-  const selectorWrap = document.getElementById('adminClassSelectorWrap');
-  const selector = document.getElementById('adminSelectClassView');
-
-  if (isAdmin) {
-    selectorWrap.style.display = 'flex';
-    selector.innerHTML = `
-      <option value="all_users">-- Tất cả học viên (${userDatabase.filter(u=>u.role!=='admin').length}) --</option>
-    ` + classDatabase.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join('');
-    
-    currentClassViewId = selector.value || "all_users";
-    renderClassMembersView(currentClassViewId);
-  } else {
-    selectorWrap.style.display = 'none';
-    currentClassViewId = currentUser.classId;
-    renderClassMembersView(currentClassViewId);
-  }
-}
-
-function renderClassMembersView(classId) {
-  currentClassViewId = classId;
-  const container = document.getElementById('classMembersGrid');
-  const isAdmin = currentUser.role === 'admin';
-  let members = [];
-
-  const classMap = {};
-  classDatabase.forEach(c => classMap[c.id] = c.name);
-
-  const oldAddBtn = document.getElementById('btnOpenAddMemberModal');
-  if (oldAddBtn) oldAddBtn.remove();
-
-  if (classId === 'all_users') {
-    setElText('myClassPageTitle', 'Toàn Bộ Thành Viên BioBling');
-    setElText('myClassPageSubtitle', 'Danh sách tổng hợp tất cả tài khoản trong hệ thống BioBling - 2B.');
-    members = userDatabase;
-  } else {
-    const targetClass = classDatabase.find(c => c.id === classId);
-    const className = targetClass ? targetClass.name : "Chưa phân lớp";
-    setElText('myClassPageTitle', `Lớp: ${className}`);
-    setElText('myClassPageSubtitle', `Danh sách học viên đang theo học tại lớp này.`);
-
-    members = userDatabase.filter(u => u.classId === classId);
-
-    if (isAdmin && targetClass) {
-      const addBtn = document.createElement('button');
-      addBtn.id = 'btnOpenAddMemberModal';
-      addBtn.className = 'primary';
-      addBtn.style.cssText = 'padding: 6px 12px; font-size: 12px; margin-left: 10px;';
-      addBtn.innerHTML = `➕ Thêm học viên vào lớp`;
-      addBtn.onclick = () => openAssignMemberModal(classId);
-      document.getElementById('adminClassSelectorWrap').appendChild(addBtn);
-    }
-  }
-
-  if (!members.length) {
-    container.innerHTML = `
-      <div class="notice" style="grid-column: 1/-1; text-align:center; padding: 30px;">
-        Chưa có thành viên nào trong lớp này. 
-        ${isAdmin && classId !== 'all_users' ? '<br><button class="primary" style="margin-top:10px; font-size:12px;" onclick="openAssignMemberModal(\''+classId+'\')">➕ Thêm học viên ngay</button>' : ''}
-      </div>`;
-    return;
-  }
-
-  container.innerHTML = members.map(m => {
-    const online = isUserOnline(m);
-    const isMe = m.id === currentUser.id;
-    const initial = (m.fullName || m.username).charAt(0).toUpperCase();
-    const userClassName = m.classId === 'all' 
-      ? 'Toàn hệ thống' 
-      : (classMap[m.classId] || (m.role === 'admin' ? 'Ban Giảng Viên BioBling' : 'Chưa xếp lớp'));
-    const isPending = m.status === 'pending';
-
-    let actionBtnHtml = '';
-    if (isAdmin && m.role !== 'admin' && m.classId) {
-      actionBtnHtml = `
-        <button onclick="removeUserFromClass(${m.id})" class="del-btn" style="color:#b91c1c; font-size:11px; padding:4px 8px; border:1px solid #fecaca; background:#fff5f5; border-radius:8px; display:inline-flex; align-items:center; gap:4px;" title="Gỡ học viên khỏi lớp này">
-          ✕ Gỡ khỏi lớp
-        </button>
-      `;
-    }
-
-    return `
-      <div class="card" style="padding: 16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div class="user-avatar-small" style="width:40px; height:40px; font-size:14px;">
-              ${m.avatar ? `<img src="${m.avatar}">` : initial}
-            </div>
-            <div>
-              <b style="font-size:13.5px; color:#173d2e;">${escapeHTML(m.fullName || m.username)} ${isMe ? '(Tôi)' : ''}</b>
-              <span style="display:block; font-size:11px; color:#71877d;">@${escapeHTML(m.username)} · ${m.role === 'admin' ? 'Giảng viên' : 'Học viên'}</span>
-            </div>
-          </div>
-          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
-            <span class="${online ? 'badge-online' : 'badge-offline'}">
-              <span class="status-dot ${online ? 'status-online' : 'status-offline'}"></span>
-              ${online ? 'Online' : 'Offline'}
-            </span>
-            ${isPending ? '<span class="tag" style="background:#fef3c7;color:#92400e;font-size:9.5px;">Chờ duyệt</span>' : ''}
-          </div>
-        </div>
-        
-        <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:11px; color:#23694b; background:#f0f8f2; padding:3px 8px; border-radius:6px; font-weight:600;">
-            🏫 ${escapeHTML(userClassName)}
-          </span>
-          ${actionBtnHtml}
-        </div>
-
-        <p style="margin-top:8px; font-size:12px; color:#567061; line-height:1.4;">
-          ${escapeHTML(m.bio || 'Chưa cập nhật mục tiêu học tập.')}
-        </p>
-      </div>
-    `;
-  }).join('');
-}
-
-/* ================= THAO TÁC ADD & GỠ HỌC VIÊN ================= */
-let targetClassForAdd = null;
-
-function openAssignMemberModal(classId) {
-  targetClassForAdd = classId;
-  const targetClass = classDatabase.find(c => c.id === classId);
-  if (!targetClass) return;
-
-  setElText('assignModalTitle', `➕ Thêm học viên vào "${targetClass.name}"`);
-
-  const candidates = userDatabase.filter(u => u.role !== 'admin' && u.status === 'approved' && u.classId !== classId);
-  const listEl = document.getElementById('assignCandidateList');
-
-  const classMap = {};
-  classDatabase.forEach(c => classMap[c.id] = c.name);
-
-  if (!candidates.length) {
-    listEl.innerHTML = `<div class="notice" style="text-align:center;">Không có học viên nào khả dụng để thêm vào lớp.</div>`;
-  } else {
-    listEl.innerHTML = candidates.map(u => {
-      const currentClassStr = u.classId ? `(Đang ở: ${classMap[u.classId] || 'Lớp khác'})` : `(Chưa có lớp)`;
-      return `
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fbf8; border:1px solid #dce8df; border-radius:12px; padding:10px 14px;">
-          <div>
-            <b style="font-size:13px; color:#173d2e;">${escapeHTML(u.fullName || u.username)}</b>
-            <span style="font-size:11px; color:#6b8275; margin-left:6px;">@${escapeHTML(u.username)}</span>
-            <div style="font-size:10.5px; color:#23694b; margin-top:2px;">${escapeHTML(currentClassStr)}</div>
-          </div>
-          <button class="primary" style="padding:6px 12px; font-size:11.5px;" onclick="addCandidateToClass(${u.id})">
-            Thêm vào lớp
-          </button>
-        </div>
-      `;
-    }).join('');
-  }
-
-  document.getElementById('assignMemberModal').classList.add('open');
-}
-
-function closeAssignMemberModal() {
-  document.getElementById('assignMemberModal').classList.remove('open');
-}
-
-function addCandidateToClass(userId) {
-  const user = userDatabase.find(u => u.id === userId);
-  if (!user || !targetClassForAdd) return;
-
-  user.classId = targetClassForAdd;
-  localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-
-  const targetClass = classDatabase.find(c => c.id === targetClassForAdd);
-  showToast(`Đã thêm @${user.username} vào lớp ${targetClass ? targetClass.name : ''}`);
-
-  openAssignMemberModal(targetClassForAdd);
-  renderClassMembersView(targetClassForAdd);
-}
-
-function removeUserFromClass(userId) {
-  const user = userDatabase.find(u => u.id === userId);
-  if (!user) return;
-
-  if (confirm(`Bạn có chắc muốn gỡ học viên @${user.username} khỏi lớp hiện tại không?`)) {
-    user.classId = "";
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-
-    showToast(`Đã gỡ @${user.username} khỏi lớp.`);
-    renderClassMembersView(currentClassViewId);
-  }
-}
-
-    /* ================= ACCOUNT SETTINGS ================= */
-    function initAccountSettingsView() {
-      setElText('settingUsernameLabel', `@${currentUser.username}`);
-      setElText('settingRoleLabel', currentUser.role==='admin' ? "Quản trị viên / Giảng viên BioBling" : "Học viên");
-      document.getElementById('settingFullName').value = currentUser.fullName || "";
-      document.getElementById('settingBio').value = currentUser.bio || "";
-      const prevBox = document.getElementById('settingAvatarPreview');
-      prevBox.removeAttribute('data-temp-avatar'); 
-      if(currentUser.avatar) prevBox.innerHTML = `<img src="${currentUser.avatar}">`;
-      else prevBox.textContent = (currentUser.fullName||currentUser.username).charAt(0).toUpperCase();
-    }
-
-    function handleUpdateProfile(e) {
-      e.preventDefault();
-      currentUser.fullName = document.getElementById('settingFullName').value.trim();
-      currentUser.bio = document.getElementById('settingBio').value.trim();
-      const tempAvatar = document.getElementById('settingAvatarPreview').getAttribute('data-temp-avatar');
-      if (tempAvatar) currentUser.avatar = tempAvatar;
-
-      const idx = userDatabase.findIndex(u=>u.id===currentUser.id);
-      if(idx > -1) {
-        userDatabase[idx].fullName = currentUser.fullName;
-        userDatabase[idx].bio = currentUser.bio;
-        userDatabase[idx].avatar = currentUser.avatar;
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      const freshUser = userDatabase.find(u => u.id === currentUser.id);
+      if (freshUser) {
+        currentUser = freshUser;
+        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
       }
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
-      updateUserUI(); 
-      showToast("Đã lưu thông tin hồ sơ thành công!");
-    }
-    
-    function handleChangePassword(e) {
-      e.preventDefault();
-      if(document.getElementById('pwdOld').value !== currentUser.password) return alert("Mật khẩu cũ không chính xác!");
-      if(document.getElementById('pwdNew').value !== document.getElementById('pwdConfirm').value) return alert("Xác nhận mật khẩu mới không khớp!");
-      currentUser.password = document.getElementById('pwdNew').value;
-      userDatabase.find(u=>u.id===currentUser.id).password = currentUser.password;
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
-      e.target.reset(); 
-      showToast("Đổi mật khẩu thành công!");
-    }
 
-    /* ================= SỔ TAY GHI CHÚ (NOTES) ================= */
-    function renderNotesView() {
-      const container = document.getElementById('notesContainer');
-      if(!notesDatabase.length) {
-        container.innerHTML = `<div class="notice">Chưa có ghi chú nào. Hãy ghi lại công thức hay kiến thức Sinh học bạn vừa học được!</div>`;
-        return;
+      const name = currentUser.fullName || currentUser.username;
+      setElText('userNameDisplay', name);
+      
+      const roleTextEl = document.getElementById('userRoleDisplay');
+      if (roleTextEl) {
+        if (currentUser.role === 'admin') {
+          roleTextEl.textContent = "Quản trị viên / Giảng viên";
+        } else {
+          const userClass = classDatabase.find(c => c.id === currentUser.classId);
+          roleTextEl.textContent = userClass ? `Học viên · ${userClass.name}` : "Học viên";
+        }
       }
-      container.innerHTML = notesDatabase.map(n => `
-        <div style="background:#fff;border:1px solid #dce8df;padding:14px 18px;border-radius:14px;display:flex;justify-content:space-between;align-items:flex-start;box-shadow:0 2px 6px rgba(0,0,0,.02);">
-          <div>
-            <div style="font-size:13.5px;color:#183e2e;line-height:1.6;white-space:pre-wrap;">${escapeHTML(n.content)}</div>
-            <span style="font-size:11px;color:#859a8c;margin-top:6px;display:block;">🕒 ${escapeHTML(n.time)}</span>
-          </div>
-          <button onclick="deleteNote('${n.id}')" class="del-btn" title="Xóa ghi chú">🗑️</button>
-        </div>
-      `).join('');
+
+      document.getElementById('navBtnAdmin').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+      
+      const initChar = name.charAt(0).toUpperCase();
+      const drawAvatar = (elId) => {
+        const el = document.getElementById(elId);
+        if (el) {
+          if (currentUser.avatar) el.innerHTML = `<img src="${currentUser.avatar}">`;
+          else el.textContent = initChar;
+        }
+      };
+      drawAvatar('userAvatarSmall'); 
+      drawAvatar('topbarAvatar');
     }
 
-    function addNewNote() {
-      const val = document.getElementById('newNoteContent').value.trim();
-      if(!val) return alert("Vui lòng nhập nội dung ghi chú!");
-      notesDatabase.unshift({
-        id: "note_" + Date.now(),
-        content: val,
-        time: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + " - " + new Date().toLocaleDateString('vi-VN')
-      });
-      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesDatabase));
-      document.getElementById('newNoteContent').value = "";
-      renderNotesView();
-      showToast("Đã lưu ghi chú vào sổ tay sinh học!");
+    /* ================= TIME TRACKING & STREAK ================= */
+    function getTodayKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    function deleteNote(id) {
-      notesDatabase = notesDatabase.filter(n => n.id !== id);
-      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesDatabase));
-      renderNotesView();
-      showToast("Đã xóa ghi chú!");
+    function getYesterdayKey() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    /* ================= HỆ THỐNG THEO DÕI THỜI GIAN HỌC & STREAK ================= */
-const STUDY_LOG_KEY = "atelier_study_logs_v1";
-
-function getTodayKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function getYesterdayKey() {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function getUserStudyData() {
-  if (!currentUser) return { minutesToday: 0, streak: 1, lastStudyDate: "" };
-  const allLogs = JSON.parse(localStorage.getItem(STUDY_LOG_KEY)) || {};
-  const userKey = `user_${currentUser.id}`;
-  if (!allLogs[userKey]) {
-    allLogs[userKey] = {
-      dates: {},      // Lưu số phút theo từng ngày: { "2026-10-02": 15 }
-      streak: 1,
-      lastStudyDate: getTodayKey()
-    };
-    localStorage.setItem(STUDY_LOG_KEY, JSON.stringify(allLogs));
-  }
-  return allLogs[userKey];
-}
-
-function saveUserStudyData(userData) {
-  if (!currentUser) return;
-  const allLogs = JSON.parse(localStorage.getItem(STUDY_LOG_KEY)) || {};
-  allLogs[`user_${currentUser.id}`] = userData;
-  localStorage.setItem(STUDY_LOG_KEY, JSON.stringify(allLogs));
-}
-
-// Tính lại Streak (Chuỗi học liên tiếp)
-function calculateAndUpdateStreak() {
-  const userData = getUserStudyData();
-  const today = getTodayKey();
-  const yesterday = getYesterdayKey();
-
-  if (userData.lastStudyDate !== today) {
-    if (userData.lastStudyDate === yesterday) {
-      // Học liên tục ngày hôm qua và hôm nay
-      userData.streak = (userData.streak || 0) + 1;
-    } else if (userData.lastStudyDate && userData.lastStudyDate < yesterday) {
-      // Đã đứt chuỗi > 1 ngày
-      userData.streak = 1;
+    function getUserStudyData() {
+      if (!currentUser) return { dates: {}, streak: 1, lastStudyDate: "" };
+      const allLogs = JSON.parse(localStorage.getItem(STUDY_LOG_KEY)) || {};
+      const userKey = `user_${currentUser.id}`;
+      if (!allLogs[userKey]) {
+        allLogs[userKey] = {
+          dates: {},
+          streak: 1,
+          lastStudyDate: getTodayKey()
+        };
+        localStorage.setItem(STUDY_LOG_KEY, JSON.stringify(allLogs));
+      }
+      return allLogs[userKey];
     }
-    userData.lastStudyDate = today;
-    saveUserStudyData(userData);
-  }
-  return userData.streak || 1;
-}
 
-// Tích lũy 1 phút học mỗi 60 giây mở trang
-setInterval(() => {
-  if (!currentUser) return;
-  const userData = getUserStudyData();
-  const today = getTodayKey();
+    function saveUserStudyData(userData) {
+      if (!currentUser) return;
+      const allLogs = JSON.parse(localStorage.getItem(STUDY_LOG_KEY)) || {};
+      allLogs[`user_${currentUser.id}`] = userData;
+      localStorage.setItem(STUDY_LOG_KEY, JSON.stringify(allLogs));
+    }
 
-  userData.dates[today] = (userData.dates[today] || 0) + 1;
-  saveUserStudyData(userData);
+    function calculateAndUpdateStreak() {
+      const userData = getUserStudyData();
+      const today = getTodayKey();
+      const yesterday = getYesterdayKey();
 
-  // Nếu đang ở màn hình Dashboard thì cập nhật ngay số phút lên giao diện
-  const dashTimeEl = document.getElementById('dashStudyTimeToday');
-  if (dashTimeEl) {
-    dashTimeEl.textContent = `${userData.dates[today]} phút`;
-  }
-}, 60 * 1000);
-    
-    /* ================= DASHBOARD & RESOURCES ================= */
-    /* ================= DASHBOARD & RESOURCES ================= */
+      if (userData.lastStudyDate !== today) {
+        if (userData.lastStudyDate === yesterday) {
+          userData.streak = (userData.streak || 0) + 1;
+        } else if (userData.lastStudyDate && userData.lastStudyDate < yesterday) {
+          userData.streak = 1;
+        }
+        userData.lastStudyDate = today;
+        saveUserStudyData(userData);
+      }
+      return userData.streak || 1;
+    }
+
+    setInterval(() => {
+      if (!currentUser) return;
+      const userData = getUserStudyData();
+      const today = getTodayKey();
+
+      userData.dates[today] = (userData.dates[today] || 0) + 1;
+      saveUserStudyData(userData);
+
+      const dashTimeEl = document.getElementById('dashStudyTimeToday');
+      if (dashTimeEl) {
+        dashTimeEl.textContent = `${userData.dates[today]} phút`;
+      }
+    }, 60 * 1000);
+
+    /* ================= DASHBOARD VIEW ================= */
     function initDashboardView() {
       if (!currentUser) return;
       updateUserUI();
 
-  const container = document.getElementById('dashboardAssignmentsContainer');
-  const visible = mediaDatabase.filter(m => currentUser.role==='admin' || m.classId===currentUser.classId || m.classId==='all').slice(0,6);
-  if(!visible.length) { 
-    container.innerHTML = `<div class="notice" style="grid-column:1/-1;">Chưa có tài liệu hay video nào được đăng tải cho lớp sinh học của bạn.</div>`; 
-    return; 
-  }
-  
-  container.innerHTML = visible.map(m => {
-    const isVid = m.type==='drive_video';
-    return `
-    <div class="card">
-      <div class="card-top"><div class="file-icon">${isVid?'🎬':'📄'}</div><span class="tag session-badge">${escapeHTML(m.sessionName)}</span></div>
-      <h3>${escapeHTML(m.title)}</h3><p>${escapeHTML(m.note || "Học liệu theo chuyên đề.")}</p>
-      <div class="card-foot">
-        <span class="tag ${isVid?'status-done':'status-class'}">${isVid?'Video Bài Giảng':'Tài Liệu / Đề Thi'}</span>
-        <button class="text-btn" onclick="navigateTo('${isVid?'videos':'documents'}')">Xem chi tiết</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-      // 1. LẤY & HIỂN THỊ THỜI GIAN HỌC HÔM NAY
       const userData = getUserStudyData();
       const todayKey = getTodayKey();
       const todayMinutes = (userData.dates && userData.dates[todayKey]) ? userData.dates[todayKey] : 0;
       setElText('dashStudyTimeToday', `${todayMinutes} phút`);
 
-      // 2. LẤY & HIỂN THỊ CHUỖI STREAK THỰC TẾ
       const currentStreak = calculateAndUpdateStreak();
-      setElText('dashStudyStreak', `${currentStreak} ngày liên tiếp`);
+      setElText('dashStudyStreak', `${currentStreak} ngày`);
 
-      // 3. HIỂN THỊ ĐÚNG TÊN LỚP CỦA TÀI KHOẢN ĐANG ĐĂNG NHẬP
-      let classNameDisplay = "Chưa xếp lớp";
+      let currentClassName = "Chưa xếp lớp";
       if (currentUser.role === 'admin') {
-        classNameDisplay = "Toàn hệ thống (Giảng viên)";
+        currentClassName = "Ban Giảng Viên BioBling";
       } else if (currentUser.classId) {
-        const matchedClass = classDatabase.find(c => c.id === currentUser.classId);
-        if (matchedClass) {
-          classNameDisplay = matchedClass.name;
-        }
+        const userClass = classDatabase.find(c => c.id === currentUser.classId);
+        if (userClass) currentClassName = userClass.name;
       }
-      setElText('dashCurrentClassName', classNameDisplay);
+      setElText('dashCurrentClassName', currentClassName);
 
-      // 4. DANH SÁCH HỌC LIỆU / BÀI TẬP THEO LỚP
       const container = document.getElementById('dashboardAssignmentsContainer');
       const visible = mediaDatabase.filter(m => currentUser.role==='admin' || m.classId===currentUser.classId || m.classId==='all').slice(0,6);
       if(!visible.length) { 
@@ -2967,6 +2431,203 @@ setInterval(() => {
       }).join('');
     }
 
+    /* ================= LỚP HỌC CỦA TÔI ================= */
+    let currentClassViewId = 'all_users';
+
+    function isUserOnline(user) {
+      if (!user || !user.username) return false;
+      const statusObj = liveOnlineStatus[user.username.toLowerCase()];
+      return statusObj && statusObj.state === 'online';
+    }
+
+    function initMyClassView() {
+      const isAdmin = currentUser.role === 'admin';
+      const selectorWrap = document.getElementById('adminClassSelectorWrap');
+      const selector = document.getElementById('adminSelectClassView');
+
+      if (isAdmin) {
+        selectorWrap.style.display = 'flex';
+        selector.innerHTML = `
+          <option value="all_users">-- Tất cả học viên (${userDatabase.filter(u=>u.role!=='admin').length}) --</option>
+        ` + classDatabase.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join('');
+        
+        currentClassViewId = selector.value || "all_users";
+        renderClassMembersView(currentClassViewId);
+      } else {
+        selectorWrap.style.display = 'none';
+        currentClassViewId = currentUser.classId;
+        renderClassMembersView(currentClassViewId);
+      }
+    }
+
+    function renderClassMembersView(classId) {
+      currentClassViewId = classId;
+      const container = document.getElementById('classMembersGrid');
+      const isAdmin = currentUser.role === 'admin';
+      let members = [];
+
+      const classMap = {};
+      classDatabase.forEach(c => classMap[c.id] = c.name);
+
+      const oldAddBtn = document.getElementById('btnOpenAddMemberModal');
+      if (oldAddBtn) oldAddBtn.remove();
+
+      if (classId === 'all_users') {
+        setElText('myClassPageTitle', 'Toàn Bộ Thành Viên BioBling');
+        setElText('myClassPageSubtitle', 'Danh sách tổng hợp tất cả tài khoản trong hệ thống BioBling - 2B.');
+        members = userDatabase;
+      } else {
+        const targetClass = classDatabase.find(c => c.id === classId);
+        const className = targetClass ? targetClass.name : "Chưa phân lớp";
+        setElText('myClassPageTitle', `Lớp: ${className}`);
+        setElText('myClassPageSubtitle', `Danh sách học viên đang theo học tại lớp này.`);
+
+        members = userDatabase.filter(u => u.classId === classId);
+
+        if (isAdmin && targetClass) {
+          const addBtn = document.createElement('button');
+          addBtn.id = 'btnOpenAddMemberModal';
+          addBtn.className = 'primary';
+          addBtn.style.cssText = 'padding: 6px 12px; font-size: 12px; margin-left: 10px;';
+          addBtn.innerHTML = `➕ Thêm học viên vào lớp`;
+          addBtn.onclick = () => openAssignMemberModal(classId);
+          document.getElementById('adminClassSelectorWrap').appendChild(addBtn);
+        }
+      }
+
+      if (!members.length) {
+        container.innerHTML = `
+          <div class="notice" style="grid-column: 1/-1; text-align:center; padding: 30px;">
+            Chưa có thành viên nào trong lớp này. 
+            ${isAdmin && classId !== 'all_users' ? '<br><button class="primary" style="margin-top:10px; font-size:12px;" onclick="openAssignMemberModal(\''+classId+'\')">➕ Thêm học viên ngay</button>' : ''}
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = members.map(m => {
+        const online = isUserOnline(m);
+        const isMe = m.id === currentUser.id;
+        const initial = (m.fullName || m.username).charAt(0).toUpperCase();
+        const userClassName = m.classId === 'all' 
+          ? 'Toàn hệ thống' 
+          : (classMap[m.classId] || (m.role === 'admin' ? 'Ban Giảng Viên BioBling' : 'Chưa xếp lớp'));
+        const isPending = m.status === 'pending';
+
+        let actionBtnHtml = '';
+        if (isAdmin && m.role !== 'admin' && m.classId) {
+          actionBtnHtml = `
+            <button onclick="removeUserFromClass(${m.id})" class="del-btn" style="color:#b91c1c; font-size:11px; padding:4px 8px; border:1px solid #fecaca; background:#fff5f5; border-radius:8px; display:inline-flex; align-items:center; gap:4px;" title="Gỡ học viên khỏi lớp này">
+              ✕ Gỡ khỏi lớp
+            </button>
+          `;
+        }
+
+        return `
+          <div class="card" style="padding: 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="user-avatar-small" style="width:40px; height:40px; font-size:14px;">
+                  ${m.avatar ? `<img src="${m.avatar}">` : initial}
+                </div>
+                <div>
+                  <b style="font-size:13.5px; color:#173d2e;">${escapeHTML(m.fullName || m.username)} ${isMe ? '(Tôi)' : ''}</b>
+                  <span style="display:block; font-size:11px; color:#71877d;">@${escapeHTML(m.username)} · ${m.role === 'admin' ? 'Giảng viên' : 'Học viên'}</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                <span class="${online ? 'badge-online' : 'badge-offline'}">
+                  <span class="status-dot ${online ? 'status-online' : 'status-offline'}"></span>
+                  ${online ? 'Online' : 'Offline'}
+                </span>
+                ${isPending ? '<span class="tag" style="background:#fef3c7;color:#92400e;font-size:9.5px;">Chờ duyệt</span>' : ''}
+              </div>
+            </div>
+            
+            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:#23694b; background:#f0f8f2; padding:3px 8px; border-radius:6px; font-weight:600;">
+                🏫 ${escapeHTML(userClassName)}
+              </span>
+              ${actionBtnHtml}
+            </div>
+
+            <p style="margin-top:8px; font-size:12px; color:#567061; line-height:1.4;">
+              ${escapeHTML(m.bio || 'Chưa cập nhật mục tiêu học tập.')}
+            </p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    let targetClassForAdd = null;
+
+    function openAssignMemberModal(classId) {
+      targetClassForAdd = classId;
+      const targetClass = classDatabase.find(c => c.id === classId);
+      if (!targetClass) return;
+
+      setElText('assignModalTitle', `➕ Thêm học viên vào "${targetClass.name}"`);
+
+      const candidates = userDatabase.filter(u => u.role !== 'admin' && u.status === 'approved' && u.classId !== classId);
+      const listEl = document.getElementById('assignCandidateList');
+
+      const classMap = {};
+      classDatabase.forEach(c => classMap[c.id] = c.name);
+
+      if (!candidates.length) {
+        listEl.innerHTML = `<div class="notice" style="text-align:center;">Không có học viên nào khả dụng để thêm vào lớp.</div>`;
+      } else {
+        listEl.innerHTML = candidates.map(u => {
+          const currentClassStr = u.classId ? `(Đang ở: ${classMap[u.classId] || 'Lớp khác'})` : `(Chưa có lớp)`;
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fbf8; border:1px solid #dce8df; border-radius:12px; padding:10px 14px;">
+              <div>
+                <b style="font-size:13px; color:#173d2e;">${escapeHTML(u.fullName || u.username)}</b>
+                <span style="font-size:11px; color:#6b8275; margin-left:6px;">@${escapeHTML(u.username)}</span>
+                <div style="font-size:10.5px; color:#23694b; margin-top:2px;">${escapeHTML(currentClassStr)}</div>
+              </div>
+              <button class="primary" style="padding:6px 12px; font-size:11.5px;" onclick="addCandidateToClass(${u.id})">
+                Thêm vào lớp
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('assignMemberModal').classList.add('open');
+    }
+
+    function closeAssignMemberModal() {
+      document.getElementById('assignMemberModal').classList.remove('open');
+    }
+
+    function addCandidateToClass(userId) {
+      const user = userDatabase.find(u => u.id === userId);
+      if (!user || !targetClassForAdd) return;
+
+      user.classId = targetClassForAdd;
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+
+      const targetClass = classDatabase.find(c => c.id === targetClassForAdd);
+      showToast(`Đã thêm @${user.username} vào lớp ${targetClass ? targetClass.name : ''}`);
+
+      openAssignMemberModal(targetClassForAdd);
+      renderClassMembersView(targetClassForAdd);
+    }
+
+    function removeUserFromClass(userId) {
+      const user = userDatabase.find(u => u.id === userId);
+      if (!user) return;
+
+      if (confirm(`Bạn có chắc muốn gỡ học viên @${user.username} khỏi lớp hiện tại không?`)) {
+        user.classId = "";
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+
+        showToast(`Đã gỡ @${user.username} khỏi lớp.`);
+        renderClassMembersView(currentClassViewId);
+      }
+    }
+
+    /* ================= VIDEOS ================= */
     let currentVidFilter = 'all';
     function initVideosView() {
       document.getElementById('videoSessionToolbar').innerHTML = `<button class="pill active" onclick="currentVidFilter='all'; initVideosView();">Tất cả chuyên đề</button>` + sessionDatabase.map(s => `<button class="pill ${currentVidFilter===s.id?'active':''}" onclick="currentVidFilter='${s.id}'; initVideosView();">${escapeHTML(s.title)}</button>`).join('');
@@ -2999,6 +2660,40 @@ setInterval(() => {
         </div>`).join('');
       
       window.loadDriveVideoPlayer = (id) => loadVid(filtered.find(v=>v.id===id));
+    }
+
+    /* ================= TÀI LIỆU & ĐỀ THI (DOCUMENTS) ================= */
+    let currentDocFilter = 'all';
+    function initDocumentsView() {
+      const toolbar = document.getElementById('docSessionToolbar');
+      toolbar.innerHTML = `<button class="pill ${currentDocFilter==='all'?'active':''}" onclick="currentDocFilter='all'; initDocumentsView();">Tất cả chuyên đề</button>` + 
+        sessionDatabase.map(s => `<button class="pill ${currentDocFilter===s.id?'active':''}" onclick="currentDocFilter='${s.id}'; initDocumentsView();">${escapeHTML(s.title)}</button>`).join('');
+
+      const docs = mediaDatabase.filter(m => m.type==='drive_doc' && (currentUser.role==='admin' || m.classId===currentUser.classId || m.classId==='all'));
+      const filtered = docs.filter(d => currentDocFilter==='all' || d.sessionId===currentDocFilter);
+      const container = document.getElementById('docCardsContainer');
+
+      if (!filtered.length) {
+        container.innerHTML = `<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Chưa có tài liệu hay đề thi nào trong chuyên đề này.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(doc => `
+        <div class="card">
+          <div class="card-top">
+            <div class="file-icon">📄</div>
+            <span class="tag session-badge">${escapeHTML(doc.sessionName)}</span>
+          </div>
+          <h3>${escapeHTML(doc.title)}</h3>
+          <p>${escapeHTML(doc.note || "Tài liệu học tập và đề ôn luyện chuẩn cấu trúc.")}</p>
+          <div class="card-foot">
+            <span class="tag status-class">Word / PPTX / PDF</span>
+            <button class="primary" style="padding:6px 12px;font-size:11.5px;" onclick="openDocViewer('${escapeHTML(doc.url)}', '${escapeHTML(doc.title)}')">
+              👁️ Xem tài liệu
+            </button>
+          </div>
+        </div>
+      `).join('');
     }
 
     /* ================= ADMIN & SESSION MANAGEMENT ================= */
@@ -3111,6 +2806,88 @@ setInterval(() => {
         renderAdminClassDashboard();
         openApprovalModal();
       }
+    }
+
+    /* ================= NOTES ================= */
+    function renderNotesView() {
+      const container = document.getElementById('notesContainer');
+      if(!notesDatabase.length) {
+        container.innerHTML = `<div class="notice">Chưa có ghi chú nào. Hãy ghi lại công thức hay kiến thức Sinh học bạn vừa học được!</div>`;
+        return;
+      }
+      container.innerHTML = notesDatabase.map(n => `
+        <div style="background:#fff;border:1px solid #dce8df;padding:14px 18px;border-radius:14px;display:flex;justify-content:space-between;align-items:flex-start;box-shadow:0 2px 6px rgba(0,0,0,.02);">
+          <div>
+            <div style="font-size:13.5px;color:#183e2e;line-height:1.6;white-space:pre-wrap;">${escapeHTML(n.content)}</div>
+            <span style="font-size:11px;color:#859a8c;margin-top:6px;display:block;">🕒 ${escapeHTML(n.time)}</span>
+          </div>
+          <button onclick="deleteNote('${n.id}')" class="del-btn" title="Xóa ghi chú">🗑️</button>
+        </div>
+      `).join('');
+    }
+
+    function addNewNote() {
+      const val = document.getElementById('newNoteContent').value.trim();
+      if(!val) return alert("Vui lòng nhập nội dung ghi chú!");
+      notesDatabase.unshift({
+        id: "note_" + Date.now(),
+        content: val,
+        time: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + " - " + new Date().toLocaleDateString('vi-VN')
+      });
+      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesDatabase));
+      document.getElementById('newNoteContent').value = "";
+      renderNotesView();
+      showToast("Đã lưu ghi chú vào sổ tay sinh học!");
+    }
+
+    function deleteNote(id) {
+      notesDatabase = notesDatabase.filter(n => n.id !== id);
+      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesDatabase));
+      renderNotesView();
+      showToast("Đã xóa ghi chú!");
+    }
+
+    /* ================= ACCOUNT SETTINGS ================= */
+    function initAccountSettingsView() {
+      setElText('settingUsernameLabel', `@${currentUser.username}`);
+      setElText('settingRoleLabel', currentUser.role==='admin' ? "Quản trị viên / Giảng viên BioBling" : "Học viên");
+      document.getElementById('settingFullName').value = currentUser.fullName || "";
+      document.getElementById('settingBio').value = currentUser.bio || "";
+      const prevBox = document.getElementById('settingAvatarPreview');
+      prevBox.removeAttribute('data-temp-avatar'); 
+      if(currentUser.avatar) prevBox.innerHTML = `<img src="${currentUser.avatar}">`;
+      else prevBox.textContent = (currentUser.fullName||currentUser.username).charAt(0).toUpperCase();
+    }
+
+    function handleUpdateProfile(e) {
+      e.preventDefault();
+      currentUser.fullName = document.getElementById('settingFullName').value.trim();
+      currentUser.bio = document.getElementById('settingBio').value.trim();
+      const tempAvatar = document.getElementById('settingAvatarPreview').getAttribute('data-temp-avatar');
+      if (tempAvatar) currentUser.avatar = tempAvatar;
+
+      const idx = userDatabase.findIndex(u=>u.id===currentUser.id);
+      if(idx > -1) {
+        userDatabase[idx].fullName = currentUser.fullName;
+        userDatabase[idx].bio = currentUser.bio;
+        userDatabase[idx].avatar = currentUser.avatar;
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      }
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+      updateUserUI(); 
+      showToast("Đã lưu thông tin hồ sơ thành công!");
+    }
+    
+    function handleChangePassword(e) {
+      e.preventDefault();
+      if(document.getElementById('pwdOld').value !== currentUser.password) return alert("Mật khẩu cũ không chính xác!");
+      if(document.getElementById('pwdNew').value !== document.getElementById('pwdConfirm').value) return alert("Xác nhận mật khẩu mới không khớp!");
+      currentUser.password = document.getElementById('pwdNew').value;
+      userDatabase.find(u=>u.id===currentUser.id).password = currentUser.password;
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+      e.target.reset(); 
+      showToast("Đổi mật khẩu thành công!");
     }
 
     /* ================= INITIALIZATION ================= */
