@@ -1,43 +1,4 @@
-{
-  const extraAdmins = [
-    { 
-      id: 4, 
-      username: "tranducanh", 
-      fullName: "Trần Đức Anh", 
-      password: "12345678", 
-      role: "admin", 
-      status: "approved", 
-      classId: "all", 
-      avatar: "", 
-      bio: "Quản trị viên BioBling - 2B", 
-      createdAt: "2026-10-02" 
-    },
-    { 
-      id: 5, 
-      username: "castanguyen", 
-      fullName: "Casta Nguyễn", 
-      password: "12345678", 
-      role: "admin", 
-      status: "approved", 
-      classId: "all", 
-      avatar: "", 
-      bio: "Quản trị viên BioBling - 2B", 
-      createdAt: "2026-10-02" 
-    }
-  ];
-
-  extraAdmins.forEach(admin => {
-    const idx = userDatabase.findIndex(u => u.username.toLowerCase() === admin.username.toLowerCase());
-    if (idx !== -1) {
-      userDatabase[idx] = admin;
-    } else {
-      userDatabase.push(admin);
-    }
-  });
-
-  localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-  location.reload();
-}<!doctype html>
+<!doctype html>
 <html lang="vi">
 <head>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
