@@ -2499,17 +2499,33 @@ function getDeviceName() {
 
     function updateUserUI() {
       const name = currentUser.fullName || currentUser.username;
-      setElText('userNameDisplay', name);
-      document.getElementById('navBtnAdmin').style.display = currentUser.role==='admin' ? 'flex' : 'none';
-      const initChar = name.charAt(0).toUpperCase();
-      const drawAvatar = (elId) => {
-        const el = document.getElementById(elId);
-        if(currentUser.avatar) el.innerHTML = `<img src="${currentUser.avatar}">`;
-        else el.textContent = initChar;
-      };
-      drawAvatar('userAvatarSmall'); 
-      drawAvatar('topbarAvatar');
+  setElText('userNameDisplay', name);
+  
+  // Cập nhật đúng vai trò của tài khoản đang đăng nhập
+  const roleTextEl = document.getElementById('userRoleDisplay');
+  if (roleTextEl) {
+    if (currentUser.role === 'admin') {
+      roleTextEl.textContent = "Quản trị viên / Giảng viên";
+    } else {
+      // Tìm tên lớp học sinh đang tham gia (nếu có)
+      const userClass = classDatabase.find(c => c.id === currentUser.classId);
+      roleTextEl.textContent = userClass ? `Học viên · ${userClass.name}` : "Học viên";
     }
+  }
+
+  document.getElementById('navBtnAdmin').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+  
+  const initChar = name.charAt(0).toUpperCase();
+  const drawAvatar = (elId) => {
+    const el = document.getElementById(elId);
+    if (el) {
+      if (currentUser.avatar) el.innerHTML = `<img src="${currentUser.avatar}">`;
+      else el.textContent = initChar;
+    }
+  };
+  drawAvatar('userAvatarSmall'); 
+  drawAvatar('topbarAvatar');
+}
     /* ================= LỚP HỌC & QUẢN LÝ THÀNH VIÊN THEO LỚP ================= */
 function isUserOnline(user) {
   if (!user || !user.username) return false;
