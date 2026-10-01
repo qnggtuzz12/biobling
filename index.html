@@ -2488,8 +2488,26 @@ function getDeviceName() {
 }
 
     function updateUserUI() {
-      const name = currentUser.fullName || currentUser.username;
+      if (!currentUser) return;
+
+  // Lấy dữ liệu mới nhất của user từ userDatabase để đảm bảo nếu vừa xếp lớp là nhận ngay
+  const freshUser = userDatabase.find(u => u.id === currentUser.id);
+  if (freshUser) {
+    currentUser = freshUser;
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+  }
+
+  const name = currentUser.fullName || currentUser.username;
   setElText('userNameDisplay', name);
+  
+  // Xác định tên lớp hiện tại
+  let currentClassName = "Chưa xếp lớp";
+  if (currentUser.role === 'admin') {
+    currentClassName = "Ban Giảng Viên BioBling";
+  } else if (currentUser.classId) {
+    const userClass = classDatabase.find(c => c.id === currentUser.classId);
+    if (userClass) currentClassName = userClass.name;
+  }
   
   // Cập nhật đúng vai trò của tài khoản đang đăng nhập
   const roleTextEl = document.getElementById('userRoleDisplay');
@@ -2516,6 +2534,19 @@ function getDeviceName() {
   drawAvatar('userAvatarSmall'); 
   drawAvatar('topbarAvatar');
 }
+
+    const classEl = document.getElementById('dashCurrentClassName');
+  if (classEl) {
+    classEl.textContent = currentClassName;
+  }
+
+  const userData = getUserStudyData();
+  const todayKey = getTodayKey();
+  const todayMinutes = (userData.dates && userData.dates[todayKey]) ? userData.dates[todayKey] : 0;
+  setElText('dashStudyTimeToday', `${todayMinutes} phút`);
+
+  const currentStreak = calculateAndUpdateStreak();
+  setElText('dashStudyStreak', `${currentStreak} ngày liên tiếp`);
     /* ================= LỚP HỌC & QUẢN LÝ THÀNH VIÊN THEO LỚP ================= */
 function isUserOnline(user) {
   if (!user || !user.username) return false;
