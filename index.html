@@ -2901,7 +2901,28 @@ setInterval(() => {
     /* ================= DASHBOARD & RESOURCES ================= */
     function initDashboardView() {
       if (!currentUser) return;
+      updateUserUI();
 
+  const container = document.getElementById('dashboardAssignmentsContainer');
+  const visible = mediaDatabase.filter(m => currentUser.role==='admin' || m.classId===currentUser.classId || m.classId==='all').slice(0,6);
+  if(!visible.length) { 
+    container.innerHTML = `<div class="notice" style="grid-column:1/-1;">Chưa có tài liệu hay video nào được đăng tải cho lớp sinh học của bạn.</div>`; 
+    return; 
+  }
+  
+  container.innerHTML = visible.map(m => {
+    const isVid = m.type==='drive_video';
+    return `
+    <div class="card">
+      <div class="card-top"><div class="file-icon">${isVid?'🎬':'📄'}</div><span class="tag session-badge">${escapeHTML(m.sessionName)}</span></div>
+      <h3>${escapeHTML(m.title)}</h3><p>${escapeHTML(m.note || "Học liệu theo chuyên đề.")}</p>
+      <div class="card-foot">
+        <span class="tag ${isVid?'status-done':'status-class'}">${isVid?'Video Bài Giảng':'Tài Liệu / Đề Thi'}</span>
+        <button class="text-btn" onclick="navigateTo('${isVid?'videos':'documents'}')">Xem chi tiết</button>
+      </div>
+    </div>`;
+  }).join('');
+}
       // 1. LẤY & HIỂN THỊ THỜI GIAN HỌC HÔM NAY
       const userData = getUserStudyData();
       const todayKey = getTodayKey();
