@@ -2804,6 +2804,78 @@ function removeUserFromClass(userId) {
       showToast("Đã xóa ghi chú!");
     }
 
+    /* ================= HỆ THỐNG THEO DÕI THỜI GIAN HỌC & STREAK ================= */
+const STUDY_LOG_KEY = "atelier_study_logs_v1";
+
+function getTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function getYesterdayKey() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function getUserStudyData() {
+  if (!currentUser) return { minutesToday: 0, streak: 1, lastStudyDate: "" };
+  const allLogs = JSON.parse(localStorage.getItem(STUDY_LOG_KEY)) || {};
+  const userKey = `user_${currentUser.id}`;
+  if (!allLogs[userKey]) {
+    allLogs[userKey] = {
+      dates: {},      // Lưu số phút theo từng ngày: { "2026-10-02": 15 }
+      streak: 1,
+      lastStudyDate: getTodayKey()
+    };
+    localStorage.setItem(STUDY_LOG_KEY, JSON.stringify(allLogs));
+  }
+  return allLogs[userKey];
+}
+
+function saveUserStudyData(userData) {
+  if (!currentUser) return;
+  const allLogs = JSON.parse(localStorage.getItem(STUDY_LOG_KEY)) || {};
+  allLogs[`user_${currentUser.id}`] = userData;
+  localStorage.setItem(STUDY_LOG_KEY, JSON.stringify(allLogs));
+}
+
+// Tính lại Streak (Chuỗi học liên tiếp)
+function calculateAndUpdateStreak() {
+  const userData = getUserStudyData();
+  const today = getTodayKey();
+  const yesterday = getYesterdayKey();
+
+  if (userData.lastStudyDate !== today) {
+    if (userData.lastStudyDate === yesterday) {
+      // Học liên tục ngày hôm qua và hôm nay
+      userData.streak = (userData.streak || 0) + 1;
+    } else if (userData.lastStudyDate && userData.lastStudyDate < yesterday) {
+      // Đã đứt chuỗi > 1 ngày
+      userData.streak = 1;
+    }
+    userData.lastStudyDate = today;
+    saveUserStudyData(userData);
+  }
+  return userData.streak || 1;
+}
+
+// Tích lũy 1 phút học mỗi 60 giây mở trang
+setInterval(() => {
+  if (!currentUser) return;
+  const userData = getUserStudyData();
+  const today = getTodayKey();
+
+  userData.dates[today] = (userData.dates[today] || 0) + 1;
+  saveUserStudyData(userData);
+
+  // Nếu đang ở màn hình Dashboard thì cập nhật ngay số phút lên giao diện
+  const dashTimeEl = document.getElementById('dashStudyTimeToday');
+  if (dashTimeEl) {
+    dashTimeEl.textContent = `${userData.dates[today]} phút`;
+  }
+}, 60 * 1000);
+    
     /* ================= DASHBOARD & RESOURCES ================= */
     function initDashboardView() {
       const container = document.getElementById('dashboardAssignmentsContainer');
