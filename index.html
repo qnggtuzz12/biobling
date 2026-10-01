@@ -1205,39 +1205,29 @@
         </section>
 
         <!-- 2. DASHBOARD -->
-        <section id="dashboard" class="page active">
-          <div class="hero">
-            <div>
-              <span class="eyebrow" id="heroClassBadge">TRUNG TÂM BIOBLING - 2B</span>
-              <h1 id="heroGreetingTitle">Chinh phục Sinh học đỉnh cao.<br>Vững vàng kiến thức cùng BioBling.</h1>
-              <p>Hệ thống học tập chuyên sâu: theo dõi tiến độ, nắm vững cơ chế di truyền - sinh thái - tế bào và tiếp cận học liệu độc quyền từ BioBling - 2B.</p>
-            </div>
-            <div class="hero-art" aria-hidden="true">🧬</div>
-          </div>
-
-          <div class="stat-row">
-            <div class="stat">
-              <div class="stat-icon" style="background:#fef3c7;color:#b45309;">⏱</div>
-              <div>
-                <b id="dashStudyTimeToday">25 phút</b>
-                <span>Thời gian học hôm nay</span>
-              </div>
-            </div>
-            <div class="stat">
-              <div class="stat-icon" style="background:#fee2e2;color:#b91c1c;">🔥</div>
-              <div>
-                <b id="dashStudyStreak">3 ngày liên tiếp</b>
-                <span>Chuỗi học (Streak)</span>
-              </div>
-            </div>
-            <div class="stat">
-              <div class="stat-icon" style="background:#e0f2fe;color:#0369a1;">🏫</div>
-              <div>
-                <b id="dashCurrentClassName">Sinh Học 12 Chuyên Sâu</b>
-                <span>Lớp sinh học hiện tại</span>
-              </div>
-            </div>
-          </div>
+        <div class="stat-row">
+  <div class="stat">
+    <div class="stat-icon" style="background:#fef3c7;color:#b45309;">⏱</div>
+    <div>
+      <b id="dashStudyTimeToday">0 phút</b>
+      <span>Thời gian học hôm nay</span>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat-icon" style="background:#fee2e2;color:#b91c1c;">🔥</div>
+    <div>
+      <b id="dashStudyStreak">1 ngày</b>
+      <span>Chuỗi học (Streak)</span>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat-icon" style="background:#e0f2fe;color:#0369a1;">🏫</div>
+    <div>
+      <b id="dashCurrentClassName">Đang tải...</b>
+      <span>Lớp sinh học hiện tại</span>
+    </div>
+  </div>
+</div>
 
           <div class="quote-box">
             <div class="quote-content">
@@ -2877,7 +2867,33 @@ setInterval(() => {
 }, 60 * 1000);
     
     /* ================= DASHBOARD & RESOURCES ================= */
+    /* ================= DASHBOARD & RESOURCES ================= */
     function initDashboardView() {
+      if (!currentUser) return;
+
+      // 1. LẤY & HIỂN THỊ THỜI GIAN HỌC HÔM NAY
+      const userData = getUserStudyData();
+      const todayKey = getTodayKey();
+      const todayMinutes = (userData.dates && userData.dates[todayKey]) ? userData.dates[todayKey] : 0;
+      setElText('dashStudyTimeToday', `${todayMinutes} phút`);
+
+      // 2. LẤY & HIỂN THỊ CHUỖI STREAK THỰC TẾ
+      const currentStreak = calculateAndUpdateStreak();
+      setElText('dashStudyStreak', `${currentStreak} ngày liên tiếp`);
+
+      // 3. HIỂN THỊ ĐÚNG TÊN LỚP CỦA TÀI KHOẢN ĐANG ĐĂNG NHẬP
+      let classNameDisplay = "Chưa xếp lớp";
+      if (currentUser.role === 'admin') {
+        classNameDisplay = "Toàn hệ thống (Giảng viên)";
+      } else if (currentUser.classId) {
+        const matchedClass = classDatabase.find(c => c.id === currentUser.classId);
+        if (matchedClass) {
+          classNameDisplay = matchedClass.name;
+        }
+      }
+      setElText('dashCurrentClassName', classNameDisplay);
+
+      // 4. DANH SÁCH HỌC LIỆU / BÀI TẬP THEO LỚP
       const container = document.getElementById('dashboardAssignmentsContainer');
       const visible = mediaDatabase.filter(m => currentUser.role==='admin' || m.classId===currentUser.classId || m.classId==='all').slice(0,6);
       if(!visible.length) { 
@@ -2897,28 +2913,6 @@ setInterval(() => {
           </div>
         </div>`;
       }).join('');
-    }
-
-    let currentDocFilter = 'all';
-    function initDocumentsView() {
-      const tb = document.getElementById('docSessionToolbar');
-      tb.innerHTML = `<button class="pill active" onclick="currentDocFilter='all'; initDocumentsView();">Tất cả chuyên đề</button>` + 
-                     sessionDatabase.map(s => `<button class="pill ${currentDocFilter===s.id?'active':''}" onclick="currentDocFilter='${s.id}'; initDocumentsView();">${escapeHTML(s.title)}</button>`).join('');
-      
-      const container = document.getElementById('docCardsContainer');
-      const docs = mediaDatabase.filter(m => m.type==='drive_doc' && (currentUser.role==='admin' || m.classId===currentUser.classId || m.classId==='all'));
-      const filtered = docs.filter(d => currentDocFilter==='all' || d.sessionId===currentDocFilter);
-      
-      if(!filtered.length) { container.innerHTML=`<div class="notice" style="grid-column:1/-1;">Chưa có tài liệu trong chuyên đề này.</div>`; return; }
-      
-      container.innerHTML = filtered.map(d => `
-        <div class="card">
-          <div class="card-top"><div class="file-icon">📄</div><span class="tag session-badge">${escapeHTML(d.sessionName)}</span></div>
-          <h3>${escapeHTML(d.title)}</h3><p>${escapeHTML(d.note || "Tài liệu học tập trực tuyến BioBling.")}</p>
-          <div class="card-foot">
-            <button onclick="openDocViewer('${d.url}', '${escapeHTML(d.title)}')" class="primary" style="font-size:11.5px;padding:6px 10px;">Mở xem trực tiếp ↗</button>
-          </div>
-        </div>`).join('');
     }
 
     let currentVidFilter = 'all';
