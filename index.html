@@ -1565,10 +1565,42 @@
 
     firebase.initializeApp(firebaseConfig);
     const rtdb = firebase.database();
+    
 
     let liveOnlineStatus = {};
+    
 
-    rtdb.ref('/status').on('value', (snapshot) => {
+    rtdb.ref('/status').on('value', (snapshot) =>
+    // --- ĐỒNG BỘ LỚP HỌC & NGƯỜI DÙNG TỪ FIREBASE REALTIME ---
+rtdb.ref('/classes').on('value', (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    classDatabase = Array.isArray(data) ? data : Object.values(data);
+    localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase));
+  }
+  // Tự động render lại giao diện lớp học nếu đang mở trang
+  const activePage = document.querySelector('.page.active');
+  if (activePage && activePage.id === 'my_class' && typeof initMyClassView === 'function') {
+    initMyClassView();
+  }
+});
+
+rtdb.ref('/users').on('value', (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    userDatabase = Array.isArray(data) ? data : Object.values(data);
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+  }
+  // Cập nhật lại UI người dùng và thành viên lớp
+  if (typeof updateUserUI === 'function') updateUserUI();
+  const activePage = document.querySelector('.page.active');
+  if (activePage && activePage.id === 'my_class' && typeof renderClassMembersView === 'function') {
+    const sel = document.getElementById('adminSelectClassView');
+    const currentCls = sel ? sel.value : (currentUser ? currentUser.classId : 'all_users');
+    renderClassMembersView(currentCls);
+  }
+});
+      {
       liveOnlineStatus = snapshot.val() || {};
       const activePage = document.querySelector('.page.active');
       if (activePage && activePage.id === 'my_class' && typeof renderClassMembersView === 'function') {
