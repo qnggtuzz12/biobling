@@ -971,8 +971,6 @@
             Tài Liệu & Đề Thi
           </button>
 
-          
-
           <button id="navBtnNotes" data-page="notes" onclick="navigateTo('notes')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             Sổ Tay Sinh Học
@@ -1098,156 +1096,7 @@
           <div id="classMembersGrid" class="grid-3"></div>
         </section>
 
-        <!-- 3. PHÒNG NGỮ ÂM & DANH PHÁP QUỐC TẾ -->
-        <section id="phonetics" class="page">
-          <div class="page-header">
-            <div>
-              <h1>Phòng Luyện Phát Âm Thuật Ngữ Sinh Học & Danh Pháp</h1>
-              <p>Kho thuật ngữ chuyên ngành 220+ từ theo 14 quy tắc then chốt, tích hợp công cụ ghi âm luyện đọc (Shadowing Studio).</p>
-            </div>
-            <div style="display:flex;gap:8px;">
-              <button class="primary" onclick="openAlphabetHandbook()">
-                📖 Cẩm Nang Danh Pháp & Ký Hiệu
-              </button>
-              <button class="secondary" id="btnPhoneticModeToggle" onclick="togglePhoneticSubTab()">
-                <span id="phoneticTabToggleLabel">Chuyển sang: Bảng chữ cái A-Z</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Alphabet interactive view -->
-          <div id="phoneticsAlphabetView" style="display:none;" class="panel">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
-              <div>
-                <h3 style="margin:0;color:#183d2e;">Bảng Ký Tự Danh Pháp Khoa Học (26 Chữ Cái Chuẩn)</h3>
-                <p style="margin:4px 0 0;font-size:12px;color:#6b8275;">Nhấn vào từng chữ cái để nghe phát âm chuẩn quốc tế.</p>
-              </div>
-              <button class="primary" onclick="playAudioText('A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z.')">
-                🔊 Nghe toàn bộ bảng A-Z
-              </button>
-            </div>
-            <div class="alphabet-grid" id="alphabetInteractiveGrid"></div>
-          </div>
-
-          <!-- 14 Quy tắc ghép âm & Shadowing Studio -->
-          <div id="phoneticsRulesView" class="two-col" style="margin-top:0">
-            <div class="panel" style="padding:20px;">
-              <div class="field" style="margin-top:0;">
-                <label for="patternSelect">1. Lựa chọn Quy tắc cấu tạo & phát âm thuật ngữ (14 nhóm chuẩn)</label>
-                <select id="patternSelect" style="font-weight:700;color:#184230;background:#f8fcf9;">
-                  <optgroup label="Quy tắc đuôi từ (Terminaisons)">
-                    <option value="tail_ure">1. Đuôi -ure / -ur [yʁ] (u chu môi + r họng)</option>
-                    <option value="tail_eur">2. Đuôi -eur / -euvre [œʁ] (ơ mở)</option>
-                    <option value="tail_er_ir">3. Đuôi -er / -ir / -ire [e] / [iʁ]</option>
-                    <option value="tail_air_elle">4. Đuôi -air / -aire / -elle [ɛʁ] / [ɛl]</option>
-                    <option value="tail_ique_aque">5. Đuôi -ique / -aque [ik] / [ak]</option>
-                  </optgroup>
-                  <optgroup label="Cụm âm giữa & đầu từ (Combinaisons internes)">
-                    <option value="mid_er_ir_ur">6. Cụm er / ir / ur [ɛʁ] / [iʁ] / [yʁ]</option>
-                    <option value="mid_ar_or_oi">7. Cụm ar / or / oi [aʁ] / [ɔʁ] / [wa]</option>
-                    <option value="mid_tion">8. Cụm đuôi -tion / -sion [sjɔ̃] / [zjɔ̃]</option>
-                  </optgroup>
-                  <optgroup label="Nguyên âm mũi (Voyelles nasales)">
-                    <option value="nasal_in_ain">9. Âm mũi in, im, ain, ein [ɛ̃] (bẹt môi)</option>
-                    <option value="nasal_an_en">10. Âm mũi an, am, en, em [ɑ̃] (mở sâu)</option>
-                    <option value="nasal_on">11. Âm mũi on, om [ɔ̃] (chu tròn môi)</option>
-                  </optgroup>
-                  <optgroup label="Phụ âm & Bán nguyên âm (Consonnes & Semi-voyelles)">
-                    <option value="consonant_s_z">12. Phụ âm [s] (ss, ç) vs [z] (s kẹp)</option>
-                    <option value="consonant_ch_j_gn">13. Phụ âm ch [ʃ], j/ge [ʒ], gn [ɲ]</option>
-                    <option value="semi_vowels">14. Bán nguyên âm il/ill [j], ui [ɥi], oi [wa]</option>
-                  </optgroup>
-                </select>
-              </div>
-
-              <div id="ruleInfoText" class="notice" style="margin-top:10px;text-align:left;line-height:1.55;"></div>
-
-              <div style="display:flex;align-items:center;gap:8px;margin-top:14px;">
-                <input type="text" id="phoneticSearchInput" placeholder="🔍 Tìm nhanh thuật ngữ trong nhóm này..." oninput="handleSearchWords(this.value)" style="border:1px solid #dce8df;padding:8px 12px;border-radius:10px;font-size:12px;flex:1;">
-                <button class="secondary" onclick="document.getElementById('phoneticSearchInput').value=''; handleSearchWords('');" style="padding:8px 10px;font-size:11px;" title="Xóa tìm kiếm">Xóa</button>
-              </div>
-
-              <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px;">
-                <span id="patternWordsCountBadge" style="font-size:11px;font-weight:800;color:#557464;text-transform:uppercase;">Danh sách thuật ngữ (16 từ)</span>
-                <span id="patternProgressBadge" class="tag status-pending">Đã thuộc: 0/16</span>
-              </div>
-
-              <div id="patternWordsList" style="max-height:420px;overflow-y:auto;display:grid;gap:6px;" class="stack"></div>
-            </div>
-
-            <div class="studio-card">
-              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-                <span id="stCategoryBadge" class="tag" style="background:#edf7ef;color:#246f4b;">Đuôi -ure</span>
-                <span id="stTypeBadge" class="tag" style="background:#e0f2fe;color:#0369a1;">nf</span>
-                <span id="stStatusBadge" class="tag status-pending">Chưa học</span>
-              </div>
-
-              <div style="margin:24px 0 18px;width:100%;">
-                <div id="stWordDisplay" class="font-serif-fr" style="font-size:clamp(42px,5.5vw,62px);font-weight:700;color:#143b2a;line-height:1.1;letter-spacing:-.02em;">
-                  nature
-                </div>
-
-                <div style="display:flex;gap:8px;justify-content:center;align-items:center;margin-top:14px;flex-wrap:wrap;">
-                  <span id="stIpaDisplay" style="font-family:monospace;font-size:17px;background:#edf5ee;color:#1e5d3c;padding:6px 14px;border-radius:10px;font-weight:700;border:1px solid #d0e7d5;">
-                    [na.tyʁ]
-                  </span>
-                  <span id="stHintDisplay" style="font-size:12px;background:#fff8ea;color:#926117;padding:6px 13px;border-radius:10px;font-weight:600;border:1px solid #fae8c3;">
-                    💡 Đuôi -ure: uy-ếc
-                  </span>
-                </div>
-
-                <p id="stMeanDisplay" style="color:#567061;font-size:14.5px;margin-top:12px;font-weight:600;">
-                  Nghĩa: tự nhiên, bản chất
-                </p>
-              </div>
-
-              <div style="width:100%;background:#f8fbf8;border:1px solid #dce8df;border-radius:18px;padding:18px;display:grid;gap:12px;">
-                <div style="display:flex;gap:8px;">
-                  <button id="btnListenNative" class="primary" style="flex:1;justify-content:center;padding:12px;font-size:13px;" onclick="speakCurrentStudioWord()">
-                    🔊 1. Nghe phát âm mẫu (Space)
-                  </button>
-                  <button class="secondary" style="padding:12px 14px;" onclick="speakCurrentStudioWord(0.6)" title="Nghe chậm tốc độ 0.6x">
-                    🐢 Chậm
-                  </button>
-                </div>
-
-                <div style="display:flex;gap:8px;">
-                  <button id="btnRecordMic" class="primary" style="flex:1;justify-content:center;padding:12px;background:#c93b3b;border-color:#c93b3b;font-size:13px;" onclick="toggleRecordUserVoice()">
-                    <span id="recordMicIcon">🎙️</span> <span id="recordMicLabel">2. Bấm để nhại giọng (Shadowing)</span>
-                  </button>
-                  <button id="btnPlayUserVoice" class="secondary" style="display:none;padding:12px 14px;" onclick="playbackUserRecording()">
-                    ▶ Nghe lại bạn đọc
-                  </button>
-                </div>
-
-                <div id="stFeedbackTip" style="font-size:11.5px;color:#7e9486;line-height:1.4;">
-                  💡 <em>Mẹo sư phạm BioBling:</em> Nghe 2 lần để ngấm khẩu hình và ngữ điệu, bấm mic nhại lại ngay lập tức rồi đánh giá mức độ ghi nhớ.
-                </div>
-              </div>
-
-              <div style="width:100%;margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <button class="secondary" style="justify-content:center;padding:12px;border:1.5px solid #287c54;color:#1e5b3c;background:#edf8f0;" onclick="rateCurrentStudioWord('mastered')">
-                  <b>[ 1 ] Đã thuộc ✓</b>
-                </button>
-                <button class="secondary" style="justify-content:center;padding:12px;border:1.5px solid #c93b3b;color:#a82828;background:#fef2f2;" onclick="rateCurrentStudioWord('review')">
-                  <b>[ 2 ] Cần ôn lại ↺</b>
-                </button>
-              </div>
-
-              <div style="margin-top:14px;display:flex;gap:12px;align-items:center;">
-                <button class="text-btn" onclick="pickNextStudioWord(true)">
-                  🎲 Thuật ngữ ngẫu nhiên (Phím R)
-                </button>
-                <span style="color:#cbdad0;">•</span>
-                <button class="text-btn" onclick="pickSequentialWord(1)">
-                  Từ kế tiếp ❯
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 4. VIDEO BÀI GIẢNG (GOOGLE DRIVE VIDEO) -->
+        <!-- 3. VIDEO BÀI GIẢNG (GOOGLE DRIVE VIDEO) -->
         <section id="videos" class="page">
           <div class="page-header">
             <div>
@@ -1277,7 +1126,7 @@
           </div>
         </section>
 
-        <!-- 5. TÀI LIỆU THEO BUỔI -->
+        <!-- 4. TÀI LIỆU THEO BUỔI -->
         <section id="documents" class="page">
           <div class="page-header">
             <div>
@@ -1291,7 +1140,7 @@
           <div class="grid-3" id="docCardsContainer"></div>
         </section>
 
-        <!-- 6. QUẢN LÝ LỚP & HỌC LIỆU (ADMIN) -->
+        <!-- 5. QUẢN LÝ LỚP & HỌC LIỆU (ADMIN) -->
         <section id="class_admin" class="page">
           <div class="page-header">
             <div>
@@ -1357,7 +1206,7 @@
           </div>
         </section>
 
-        <!-- 7. SỔ TAY GHI CHÚ -->
+        <!-- 6. SỔ TAY GHI CHÚ -->
         <section id="notes" class="page">
           <div class="page-header">
             <div>
@@ -1373,7 +1222,7 @@
           <div id="notesContainer" class="stack" style="margin-top:20px;"></div>
         </section>
 
-        <!-- 8. CÀI ĐẶT TÀI KHOẢN -->
+        <!-- 7. CÀI ĐẶT TÀI KHOẢN -->
         <section id="account_settings" class="page">
           <div class="page-header">
             <div>
@@ -1474,34 +1323,6 @@
     </div>
   </div>
 
-  <!-- MODAL: CẨM NANG DANH PHÁP SINH HỌC -->
-  <div id="handbookModal" class="modal-wrap">
-    <div class="modal-box" style="width:min(100%, 650px);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <h2 style="margin:0;font-size:18px;color:#183d2e;">📖 Cẩm Nang Danh Pháp Quốc Tế & Quy Tắc Đọc Sinh Học</h2>
-        <button class="del-btn" onclick="document.getElementById('handbookModal').classList.remove('open')">✕</button>
-      </div>
-      <div style="font-size:13px;line-height:1.6;color:#335443;display:grid;gap:12px;">
-        <div style="background:#f4faf6;border:1px solid #d4ebdd;padding:12px;border-radius:12px;">
-          <b style="color:#1b5037;">1. Quy tắc danh pháp hai phần (Binomial Nomenclature):</b>
-          <ul style="margin:6px 0 0;padding-left:20px;">
-            <li><strong>Tên Chi (Genus):</strong> Luôn viết hoa chữ cái đầu tiên (ví dụ: <em>Homo</em>, <em>Escherichia</em>, <em>Pisum</em>).</li>
-            <li><strong>Tên Loài (Species epithet):</strong> Luôn viết thường hoàn toàn (ví dụ: <em>sapiens</em>, <em>coli</em>, <em>sativum</em>).</li>
-            <li><strong>Hình thức trình bày:</strong> Khi in ấn bắt buộc phải in nghiêng (<em>Homo sapiens</em>), khi viết tay phải gạch chân riêng từng từ.</li>
-            <li><strong>Thuật ngữ nguồn gốc Latin / Hy Lạp:</strong> Nắm chắc quy tắc ghép âm giúp đọc trôi chảy các thuật ngữ sinh hóa, di truyền học và tên cơ quan tế bào.</li>
-          </ul>
-        </div>
-        <div style="background:#fffcf2;border:1px solid #fde7b9;padding:12px;border-radius:12px;">
-          <b style="color:#8a590d;">2. Bí kíp luyện nhớ thuật ngữ và nhại giọng (Shadowing) tại BioBling - 2B:</b>
-          <p style="margin:4px 0 0;">Lắng nghe mẫu 2 lần để cảm thụ chuẩn xác phát âm tên danh pháp khoa học. Sau đó nhấn mic nhại lại ngay lập tức để rèn luyện phản xạ ngôn ngữ sinh học quốc tế và đọc hiểu tài liệu nghiên cứu chuyên sâu.</p>
-        </div>
-      </div>
-      <div style="text-align:right;margin-top:16px;">
-        <button class="primary" onclick="document.getElementById('handbookModal').classList.remove('open')">Đã hiểu</button>
-      </div>
-    </div>
-  </div>
-
   <!-- MODALS QUẢN LÝ ADMIN -->
   <div id="assignMemberModal" class="modal-wrap">
     <div class="modal-box" style="width: min(100%, 500px);">
@@ -1557,6 +1378,18 @@
 
   <!-- LOGIC HỆ THỐNG TOÀN DIỆN -->
   <script>
+    /* ================= STORAGE KEYS ================= */
+    const AUTH_STORAGE_KEY = "atelier_auth_users_v9";
+    const SESSION_STORAGE_KEY = "atelier_current_session_v9";
+    const MEDIA_STORAGE_KEY = "atelier_media_v9";
+    const CLASSES_STORAGE_KEY = "atelier_classes_v9";
+    const SESSIONS_STORAGE_KEY = "atelier_sessions_v9";
+    const WORD_PROGRESS_KEY = "atelier_phonetic_progress_v9";
+    const NOTES_STORAGE_KEY = "atelier_user_notes_v9";
+    const STUDY_LOG_KEY = "atelier_study_logs_v1";
+    const DEVICE_ID_KEY = "biobling_device_unique_id";
+
+    /* ================= FIREBASE INITIALIZATION ================= */
     const firebaseConfig = {
       apiKey: "AIzaSyB3WQ7dd_0JIqxTyVVFi8hpK8eLtPtwMdA",
       databaseURL: "https://biobling-default-rtdb.firebaseio.com",
@@ -1565,38 +1398,65 @@
 
     firebase.initializeApp(firebaseConfig);
     const rtdb = firebase.database();
-    
-
     let liveOnlineStatus = {};
-    // --- ĐỒNG BỘ LỚP HỌC & NGƯỜI DÙNG TỪ FIREBASE REALTIME ---
-rtdb.ref('/classes').on('value', (snapshot) => {
-  const data = snapshot.val();
-  if (data) {
-    classDatabase = Array.isArray(data) ? data : Object.values(data);
-    localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase));
-  }
-  // Tự động render lại giao diện lớp học nếu đang mở trang
-  const activePage = document.querySelector('.page.active');
-  if (activePage && activePage.id === 'my_class' && typeof initMyClassView === 'function') {
-    initMyClassView();
-  }
-});
 
-rtdb.ref('/users').on('value', (snapshot) => {
-  const data = snapshot.val();
-  if (data) {
-    userDatabase = Array.isArray(data) ? data : Object.values(data);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-  }
-  // Cập nhật lại UI người dùng và thành viên lớp
-  if (typeof updateUserUI === 'function') updateUserUI();
-  const activePage = document.querySelector('.page.active');
-  if (activePage && activePage.id === 'my_class' && typeof renderClassMembersView === 'function') {
-    const sel = document.getElementById('adminSelectClassView');
-    const currentCls = sel ? sel.value : (currentUser ? currentUser.classId : 'all_users');
-    renderClassMembersView(currentCls);
-  }
-});
+    /* ================= STATE ================= */
+    let userDatabase = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY)) || [
+      { id: 1, username: "admin1", fullName: "Casta Nguyễn", password: "Meocon@123", role: "admin", status: "approved", classId: "all", avatar: "", bio: "BioBling - 2B", createdAt: "2026-10-01" },
+      { id: 2, username: "tranducanh", fullName: "Trần Đức Anh", password: "12345678", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Giảng viên Sinh học BioBling - 2B", createdAt: "2026-10-01" },
+      { id: 3, username: "admin2", fullName: "Admin BioBling", password: "05012009", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Trợ giảng chuyên đề BioBling - 2B", createdAt: "2026-10-01" }
+    ];
+    let classDatabase = JSON.parse(localStorage.getItem(CLASSES_STORAGE_KEY)) || [{ id: "cls_a1", name: "Lớp Sinh Học Chuyên Sâu - BioBling 2B" }];
+    let sessionDatabase = JSON.parse(localStorage.getItem(SESSIONS_STORAGE_KEY)) || [
+      { id: "ses_1", title: "Chuyên đề 01: Cơ sở vật chất & Cơ chế di truyền ADN" },
+      { id: "ses_2", title: "Chuyên đề 02: Phiên mã, Dịch mã & Điều hòa hoạt động Gen" }
+    ];
+    let mediaDatabase = JSON.parse(localStorage.getItem(MEDIA_STORAGE_KEY)) || [];
+    let currentUser = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY)) || null;
+    let wordMasteryMap = JSON.parse(localStorage.getItem(WORD_PROGRESS_KEY)) || {};
+    let notesDatabase = JSON.parse(localStorage.getItem(NOTES_STORAGE_KEY)) || [
+      { id: "note_1", content: "Nguyên tắc bổ sung trong phân tử ADN: A liên kết với T bằng 2 liên kết hydro, G liên kết với X bằng 3 liên kết hydro.", time: "10:15 - 01/10/2026" }
+    ];
+
+    /* ================= REALTIME LISTENERS ================= */
+    rtdb.ref('/classes').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        classDatabase = Array.isArray(data) ? data : Object.values(data);
+        localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase));
+      }
+      const activePage = document.querySelector('.page.active');
+      if (activePage && activePage.id === 'my_class') {
+        initMyClassView();
+      }
+    });
+
+    rtdb.ref('/users').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        userDatabase = Array.isArray(data) ? data : Object.values(data);
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      }
+      updateUserUI();
+      const activePage = document.querySelector('.page.active');
+      if (activePage && activePage.id === 'my_class') {
+        const sel = document.getElementById('adminSelectClassView');
+        const currentCls = sel ? sel.value : (currentUser ? currentUser.classId : 'all_users');
+        renderClassMembersView(currentCls);
+      }
+    });
+
+    // Lắng nghe trạng thái online của toàn bộ người dùng
+    rtdb.ref('/status').on('value', (snapshot) => {
+      const data = snapshot.val() || {};
+      liveOnlineStatus = data;
+      const activePage = document.querySelector('.page.active');
+      if (activePage && activePage.id === 'my_class') {
+        const sel = document.getElementById('adminSelectClassView');
+        const currentCls = sel ? sel.value : (currentUser ? currentUser.classId : 'all_users');
+        renderClassMembersView(currentCls);
+      }
+    });
 
     function setupLivePresence(user) {
       if (!user) return;
@@ -1617,8 +1477,6 @@ rtdb.ref('/users').on('value', (snapshot) => {
       });
     }
 
-    const DEVICE_ID_KEY = "biobling_auth_users_v1";
-
     function getOrCreateDeviceId() {
       let devId = localStorage.getItem(DEVICE_ID_KEY);
       if (!devId) {
@@ -1635,33 +1493,6 @@ rtdb.ref('/users').on('value', (snapshot) => {
       if (/Mac/i.test(ua)) return "Máy tính Mac";
       return "Máy tính Windows / PC";
     }
-
-    /* ================= STORAGE & STATE ================= */
-    const AUTH_STORAGE_KEY = "atelier_auth_users_v9";
-    const SESSION_STORAGE_KEY = "atelier_current_session_v9";
-    const MEDIA_STORAGE_KEY = "atelier_media_v9";
-    const CLASSES_STORAGE_KEY = "atelier_classes_v9";
-    const SESSIONS_STORAGE_KEY = "atelier_sessions_v9";
-    const WORD_PROGRESS_KEY = "atelier_phonetic_progress_v9";
-    const NOTES_STORAGE_KEY = "atelier_user_notes_v9";
-    const STUDY_LOG_KEY = "atelier_study_logs_v1";
-
-    let userDatabase = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY)) || [
-      { id: 1, username: "admin1", fullName: "Casta Nguyễn", password: "Meocon@123", role: "admin", status: "approved", classId: "all", avatar: "", bio: "BioBling - 2B", createdAt: "2026-10-01" },
-      { id: 2, username: "tranducanh", fullName: "Trần Đức Anh", password: "12345678", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Giảng viên Sinh học BioBling - 2B", createdAt: "2026-10-01" },
-      { id: 3, username: "admin2", fullName: "Admin BioBling", password: "05012009", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Trợ giảng chuyên đề BioBling - 2B", createdAt: "2026-10-01" }
-    ];
-    let classDatabase = JSON.parse(localStorage.getItem(CLASSES_STORAGE_KEY)) || [{ id: "cls_a1", name: "Lớp Sinh Học Chuyên Sâu - BioBling 2B" }];
-    let sessionDatabase = JSON.parse(localStorage.getItem(SESSIONS_STORAGE_KEY)) || [
-      { id: "ses_1", title: "Chuyên đề 01: Cơ sở vật chất & Cơ chế di truyền ADN" },
-      { id: "ses_2", title: "Chuyên đề 02: Phiên mã, Dịch mã & Điều hòa hoạt động Gen" }
-    ];
-    let mediaDatabase = JSON.parse(localStorage.getItem(MEDIA_STORAGE_KEY)) || [];
-    let currentUser = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY)) || null;
-    let wordMasteryMap = JSON.parse(localStorage.getItem(WORD_PROGRESS_KEY)) || {};
-    let notesDatabase = JSON.parse(localStorage.getItem(NOTES_STORAGE_KEY)) || [
-      { id: "note_1", content: "Nguyên tắc bổ sung trong phân tử ADN: A liên kết với T bằng 2 liên kết hydro, G liên kết với X bằng 3 liên kết hydro.", time: "10:15 - 01/10/2026" }
-    ];
 
     /* ================= UTILITIES ================= */
     function setElText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
@@ -1693,7 +1524,6 @@ rtdb.ref('/users').on('value', (snapshot) => {
         dashboard: "Tổng quan cá nhân",
         videos: "Kho Video Bài Giảng BioBling",
         documents: "Thư Viện Tài Liệu & Đề Thi",
-        phonetics: "Thuật Ngữ & Danh Pháp Sinh Học",
         notes: "Sổ Tay Sinh Học Cá Nhân",
         class_admin: "Quản Lý Lớp & Học Liệu",
         account_settings: "Cài Đặt Hồ Sơ Cá Nhân",
@@ -1701,7 +1531,6 @@ rtdb.ref('/users').on('value', (snapshot) => {
       };
       setElText('crumbLabel', crumbMap[pageId] || "Học tập");
 
-      if(pageId==='phonetics') initPhoneticsView();
       if(pageId==='dashboard') initDashboardView();
       if(pageId==='videos') initVideosView();
       if(pageId==='documents') initDocumentsView();
@@ -1711,104 +1540,7 @@ rtdb.ref('/users').on('value', (snapshot) => {
       if(pageId==='my_class') initMyClassView();
     }
 
-    /* ================= KHO TỪ VỰNG NGỮ ÂM & DANH PHÁP (14 QUY TẮC) ================= */
-    const phoneticsData = {
-      tail_ure: [
-        { word: "nature", ipa: "[na.tyʁ]", type: "nf", mean: "tự nhiên, bản chất", hint: "u chu môi + r sâu trong họng" },
-        { word: "structure", ipa: "[stʁyk.tyʁ]", type: "nf", mean: "cấu trúc, thể cấu tạo", hint: "cấu trúc ADN/NST" },
-        { word: "culture", ipa: "[kyl.tyʁ]", type: "nf", mean: "nuôi cấy (mô/tế bào)", hint: "nuôi cấy mô sinh học" },
-        { word: "mesure", ipa: "[mə.zyʁ]", type: "nf", mean: "phép đo, kích thước", hint: "s kẹp giữa đọc [z]" },
-        { word: "ouverture", ipa: "[u.vɛʁ.tyʁ]", type: "nf", mean: "sự mở (tháo xoắn)", hint: "mở chẽ ba tái bản" },
-        { word: "blessure", ipa: "[blɛ.syʁ]", type: "nf", mean: "tổn thương, vết rách", hint: "tổn thương tế bào" },
-        { word: "futur", ipa: "[fy.tyʁ]", type: "nm/adj", mean: "tương lai", hint: "chu môi [y]" },
-        { word: "pur", ipa: "[pyʁ]", type: "adj", mean: "thuần chủng, nguyên chất", hint: "dòng thuần chủng Menđen" }
-      ],
-      tail_eur: [
-        { word: "facteur", ipa: "[fak.tœʁ]", type: "nm", mean: "nhân tố, hệ số", hint: "nhân tố di truyền Menđen" },
-        { word: "acteur", ipa: "[ak.tœʁ]", type: "nm", mean: "tác tử, nhân tố tham gia", hint: "chất xúc tác enzym" },
-        { word: "docteur", ipa: "[dɔk.tœʁ]", type: "nm", mean: "bác sĩ, tiến sĩ y sinh", hint: "doc- phát âm [dɔk]" },
-        { word: "chaleur", ipa: "[ʃa.lœʁ]", type: "nf", mean: "nhiệt độ, năng lượng nhiệt", hint: "nhiệt biến tính ADN" },
-        { word: "douleur", ipa: "[du.lœʁ]", type: "nf", mean: "cảm giác đau", hint: "thần kinh cảm giác" },
-        { word: "cœur", ipa: "[kœʁ]", type: "nm", mean: "quả tim, hệ tuần hoàn", hint: "chu kỳ hoạt động tim" }
-      ],
-      tail_er_ir: [
-        { word: "cellule", ipa: "[sɛ.lyl]", type: "nf", mean: "tế bào sống", hint: "đơn vị cơ bản của sự sống" },
-        { word: "respirer", ipa: "[ʁɛs.pi.ʁe]", type: "v", mean: "hô hấp tế bào", hint: "quá trình trao đổi khí" },
-        { word: "diviser", ipa: "[di.vi.ze]", type: "v", mean: "phân chia, phân bào", hint: "nguyên phân & giảm phân" },
-        { word: "muter", ipa: "[my.te]", type: "v", mean: "đột biến gen", hint: "biến đổi cấu trúc ADN" }
-      ],
-      tail_air_elle: [
-        { word: "nucléaire", ipa: "[ny.kle.ɛʁ]", type: "adj", mean: "thuộc nhân tế bào", hint: "màng nhân, gen trong nhân" },
-        { word: "cellulaire", ipa: "[sɛ.ly.lɛʁ]", type: "adj", mean: "thuộc cấp độ tế bào", hint: "cấu trúc tế bào" },
-        { word: "paire", ipa: "[pɛʁ]", type: "nf", mean: "cặp (nhiễm sắc thể tương đồng)", hint: "cặp alen tương ứng" }
-      ],
-      tail_ique_aque: [
-        { word: "génétique", ipa: "[ʒe.ne.tik]", type: "nf/adj", mean: "di truyền học", hint: "môn học cốt lõi BioBling" },
-        { word: "biologique", ipa: "[bjɔ.lɔ.ʒik]", type: "adj", mean: "thuộc sinh học", hint: "khoa học sự sống" },
-        { word: "chromosomique", ipa: "[kʁo.mo.zo.mik]", type: "adj", mean: "thuộc nhiễm sắc thể", hint: "đột biến cấu trúc NST" }
-      ],
-      mid_er_ir_ur: [
-        { word: "enzyme", ipa: "[ɑ̃.zim]", type: "nf", mean: "chất xúc tác sinh học", hint: "protein xúc tác phản ứng" },
-        { word: "service", ipa: "[sɛʁ.vis]", type: "nm", mean: "hoạt động chức năng", hint: "chức năng nội quan" }
-      ],
-      mid_ar_or_oi: [
-        { word: "organe", ipa: "[ɔʁ.ɡan]", type: "nm", mean: "cơ quan sinh học", hint: "hệ cơ quan tuần hoàn/tiêu hóa" },
-        { word: "corps", ipa: "[kɔʁ]", type: "nm", mean: "thể (thể truyền plasmit)", hint: "vector plasmit" }
-      ],
-      mid_tion: [
-        { word: "traduction", ipa: "[tʁa.dyk.sjɔ̃]", type: "nf", mean: "dịch mã tổng hợp chuỗi polipeptit", hint: "tại bào quan ribôxôm" },
-        { word: "transcription", ipa: "[tʁɑ̃s.kʁip.sjɔ̃]", type: "nf", mean: "phiên mã tổng hợp ARN", hint: "enzym ARN polimeraza" },
-        { word: "réplication", ipa: "[ʁe.pli.ka.sjɔ̃]", type: "nf", mean: "nhân đôi / tái bản ADN", hint: "nguyên tắc bán bảo tồn" },
-        { word: "mutation", ipa: "[my.ta.sjɔ̃]", type: "nf", mean: "đột biến gen / đột biến NST", hint: "phát sinh biến dị" }
-      ],
-      nasal_in_ain: [
-        { word: "bassin", ipa: "[ba.sɛ̃]", type: "nm", mean: "xương chậu, bể chứa", hint: "giải phẫu học" },
-        { word: "timbre", ipa: "[tɛ̃bʁ]", type: "nm", mean: "dấu vết, đặc tính", hint: "âm mũi [ɛ̃]" }
-      ],
-      nasal_an_en: [
-        { word: "sang", ipa: "[sɑ̃]", type: "nm", mean: "máu & hệ tuần hoàn", hint: "nhóm máu A, B, AB, O" },
-        { word: "parent", ipa: "[pa.ʁɑ̃]", type: "nm", mean: "thế hệ bố mẹ P", hint: "phép lai phân tích" }
-      ],
-      nasal_on: [
-        { word: "codon", ipa: "[kɔ.dɔ̃]", type: "nm", mean: "bộ ba mã sao trên mARN", hint: "mã mở đầu AUG, mã kết thúc" },
-        { word: "anticodon", ipa: "[ɑ̃.ti.kɔ.dɔ̃]", type: "nm", mean: "bộ ba đối mã trên tARN", hint: "khớp bổ sung tại ribôxôm" }
-      ],
-      consonant_s_z: [
-        { word: "mitose", ipa: "[mi.toz]", type: "nf", mean: "nguyên phân", hint: "phân chia tế bào sinh dưỡng" },
-        { word: "méiose", ipa: "[me.joz]", type: "nf", mean: "giảm phân sinh giao tử", hint: "giảm một nửa bộ NST" }
-      ],
-      consonant_ch_j_gn: [
-        { word: "lignée", ipa: "[li.ɲe]", type: "nf", mean: "dòng, dòng thuần", hint: "dòng tế bào vô tính" },
-        { word: "gène", ipa: "[ʒɛn]", type: "nm", mean: "gen (đoạn ADN mang thông tin)", hint: "trung tâm di truyền học" }
-      ],
-      semi_vowels: [
-        { word: "noyau", ipa: "[nwa.jo]", type: "nm", mean: "nhân tế bào", hint: "chứa vật chất di truyền ADN" },
-        { word: "feuille", ipa: "[fœj]", type: "nf", mean: "lá cây (quang hợp)", hint: "bào quan lục lạp" }
-      ]
-    };
-
-    const phoneticsRulesDesc = {
-      tail_ure: "👉 <strong>Đuôi -ure / -ur:</strong> Đọc là <code>[yʁ]</code>. Môi chu tròn nhọn về phía trước để tạo âm [y], sau đó tạo luồng ma sát nhẹ ở cuống họng tạo âm [ʁ].",
-      tail_eur: "👉 <strong>Đuôi -eur / -euvre:</strong> Đọc là <code>[œʁ]</code>. Mở miệng tự nhiên, phát âm hạ quai hàm.",
-      tail_er_ir: "👉 <strong>Đuôi động từ -er / -ir:</strong> Đuôi <code>-er</code> phát âm là <code>[e]</code>. Đuôi <code>-ir</code> phát âm rõ cả âm i và r <code>[iʁ]</code>.",
-      tail_air_elle: "👉 <strong>Đuôi -air / -aire / -elle:</strong> Đọc là <code>[ɛʁ]</code> hoặc <code>[ɛl]</code> với đầu lưỡi nâng nhẹ chạm lợi trên.",
-      tail_ique_aque: "👉 <strong>Đuôi -ique / -aque:</strong> Cụm <code>-ique</code> luôn đọc dứt khoát là <code>[ik]</code>.",
-      mid_er_ir_ur: "👉 <strong>er / ir / ur giữa từ:</strong> Khi đứng trước một phụ âm khác trong lòng từ, <code>er</code> đọc là <code>[ɛʁ]</code>; <code>ir</code> đọc là <code>[iʁ]</code>.",
-      mid_ar_or_oi: "👉 <strong>ar / or / oi giữa từ:</strong> <code>ar</code> đọc là <code>[aʁ]</code>; <code>or</code> đọc là <code>[ɔʁ]</code>; <code>oi</code> là bán nguyên âm <code>[wa]</code>.",
-      mid_tion: "👉 <strong>Cụm đuôi -tion / -sion:</strong> Đọc là <code>[sjɔ̃]</code> với nguyên âm mũi chu tròn môi.",
-      nasal_in_ain: "👉 <strong>Âm mũi [ɛ̃] (in, im, ain):</strong> Khẩu hình môi bẹt ngang sang 2 bên như đang mỉm cười.",
-      nasal_an_en: "👉 <strong>Âm mũi [ɑ̃] (an, am, en):</strong> Mở rộng vòm họng theo chiều dọc hình oval, âm thanh trầm ấm từ khoang mũi.",
-      nasal_on: "👉 <strong>Âm mũi [ɔ̃] (on, om):</strong> Môi chu tròn xoe về phía trước, đẩy hơi mạnh lên hốc mũi.",
-      consonant_s_z: "👉 <strong>Phụ âm [s] vs [z]:</strong> Chữ <code>s</code> đứng giữa 2 nguyên âm bắt buộc phải phát âm rung dây thanh quản thành <code>[z]</code>.",
-      consonant_ch_j_gn: "👉 <strong>ch [ʃ], j [ʒ], gn [ɲ]:</strong> Cụm <code>gn</code> đọc như âm 'nh' mềm mại.",
-      semi_vowels: "👉 <strong>Bán nguyên âm:</strong> Cụm <code>-il / -ille</code> tạo âm trượt <code>[j]</code>; <code>ui</code> lướt nhanh sang [ɥi]."
-    };
-
-    let isAlphabetMode = false;
     let currentVoiceSpeed = 0.85;
-    let currentStudioWord = null;
-    let currentWordFilterText = "";
-
     function cycleVoiceSpeed() {
       if(currentVoiceSpeed === 0.85) currentVoiceSpeed = 1.0;
       else if(currentVoiceSpeed === 1.0) currentVoiceSpeed = 0.65;
@@ -1816,272 +1548,6 @@ rtdb.ref('/users').on('value', (snapshot) => {
       setElText('speedLabelText', currentVoiceSpeed + "x");
       showToast(`Tốc độ phát âm: ${currentVoiceSpeed}x`);
     }
-
-    function playAudioText(text, customRate = null) {
-      if(!text) return;
-      window.speechSynthesis.cancel();
-      const msg = new SpeechSynthesisUtterance(text);
-      msg.lang = 'fr-FR';
-      msg.rate = customRate || currentVoiceSpeed;
-      window.speechSynthesis.speak(msg);
-    }
-
-    function speakCurrentStudioWord(speedOverride = null) {
-      if(currentStudioWord) playAudioText(currentStudioWord.word, speedOverride);
-    }
-
-    function openAlphabetHandbook() {
-      document.getElementById('handbookModal').classList.add('open');
-    }
-
-    function togglePhoneticSubTab() {
-      isAlphabetMode = !isAlphabetMode;
-      document.getElementById('phoneticsAlphabetView').style.display = isAlphabetMode ? 'block' : 'none';
-      document.getElementById('phoneticsRulesView').style.display = isAlphabetMode ? 'none' : 'grid';
-      setElText('phoneticTabToggleLabel', isAlphabetMode ? 'Chuyển sang: Ghép vần & Shadowing' : 'Chuyển sang: Bảng chữ cái A-Z');
-    }
-
-    function handleSearchWords(query) {
-      currentWordFilterText = (query || "").trim().toLowerCase();
-      renderPatternWords();
-    }
-
-    function renderPatternWords() {
-      const ruleSelect = document.getElementById('patternSelect');
-      if(!ruleSelect) return;
-      const rule = ruleSelect.value;
-      const allWords = phoneticsData[rule] || [];
-      const filteredWords = allWords.filter(w => 
-        !currentWordFilterText || 
-        w.word.toLowerCase().includes(currentWordFilterText) || 
-        w.mean.toLowerCase().includes(currentWordFilterText) ||
-        w.ipa.toLowerCase().includes(currentWordFilterText)
-      );
-
-      const masteredCount = allWords.filter(w => wordMasteryMap[w.word] === 'mastered').length;
-      setElText('patternProgressBadge', `Đã thuộc: ${masteredCount}/${allWords.length}`);
-      setElText('patternWordsCountBadge', `Danh sách (${filteredWords.length}/${allWords.length} từ)`);
-
-      const listContainer = document.getElementById('patternWordsList');
-      if(!listContainer) return;
-
-      if(!filteredWords.length) {
-        listContainer.innerHTML = `<div class="notice" style="text-align:center;">Không tìm thấy thuật ngữ phù hợp với "${escapeHTML(currentWordFilterText)}"</div>`;
-        return;
-      }
-
-      listContainer.innerHTML = filteredWords.map((w) => {
-        const isMastered = wordMasteryMap[w.word] === 'mastered';
-        const isReview = wordMasteryMap[w.word] === 'review';
-        const isCurrent = currentStudioWord && currentStudioWord.word === w.word;
-        
-        let statusBadge = `<span class="tag status-pending" style="font-size:9.5px;">Chưa học</span>`;
-        if(isMastered) statusBadge = `<span class="tag status-done" style="font-size:9.5px;">✓ Đã thuộc</span>`;
-        if(isReview) statusBadge = `<span class="tag" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-size:9.5px;">↺ Ôn lại</span>`;
-
-        return `
-        <div class="word-list-card ${isCurrent ? 'active-selected' : ''}" onclick="selectStudioWordByWord('${w.word}')">
-          <div style="min-width:0;flex:1;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <b style="color:#174230;font-size:14px;">${escapeHTML(w.word)}</b>
-              <span style="font-size:10.5px;color:#0284c7;background:#e0f2fe;padding:2px 6px;border-radius:6px;font-weight:700;">${escapeHTML(w.type)}</span>
-              <span style="color:#6b8275;font-size:12px;font-family:monospace;">${escapeHTML(w.ipa)}</span>
-            </div>
-            <div style="font-size:11.5px;color:#6b8275;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-              ${escapeHTML(w.mean)}
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;flex:none;margin-left:8px;">
-            ${statusBadge}
-            <button onclick="event.stopPropagation(); playAudioText('${w.word}')" style="border:0;background:#e8f4ec;color:#246a48;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:12px;" title="Nghe thuật ngữ này">
-              🔊
-            </button>
-          </div>
-        </div>
-      `;
-      }).join('');
-
-      const infoEl = document.getElementById('ruleInfoText');
-      if (infoEl) infoEl.innerHTML = phoneticsRulesDesc[rule] || "";
-      const catBadge = document.getElementById('stCategoryBadge');
-      if (catBadge) catBadge.textContent = ruleSelect.options[ruleSelect.selectedIndex].text.split(' ')[1] || "Quy tắc";
-    }
-
-    function selectStudioWordByWord(wordText) {
-      const rule = document.getElementById('patternSelect').value;
-      const words = phoneticsData[rule] || [];
-      const found = words.find(w => w.word === wordText);
-      if(found) {
-        currentStudioWord = found;
-        updateStudioCardUI();
-        renderPatternWords();
-        playAudioText(found.word);
-      }
-    }
-
-    function updateStudioCardUI() {
-      if(!currentStudioWord) return;
-      setElText('stWordDisplay', currentStudioWord.word);
-      setElText('stIpaDisplay', currentStudioWord.ipa);
-      setElText('stHintDisplay', "💡 " + (currentStudioWord.hint || "Luyện phát âm chuẩn danh pháp"));
-      setElText('stMeanDisplay', "Nghĩa: " + currentStudioWord.mean);
-      setElText('stTypeBadge', currentStudioWord.type || "thuật ngữ");
-
-      const status = wordMasteryMap[currentStudioWord.word];
-      const statusBadge = document.getElementById('stStatusBadge');
-      if(statusBadge) {
-        if(status === 'mastered') {
-          statusBadge.className = 'tag status-done';
-          statusBadge.textContent = '✓ Đã thuộc';
-        } else if(status === 'review') {
-          statusBadge.className = 'tag';
-          statusBadge.style.background = '#fef2f2';
-          statusBadge.style.color = '#b91c1c';
-          statusBadge.style.borderColor = '#fecaca';
-          statusBadge.textContent = '↺ Cần ôn lại';
-        } else {
-          statusBadge.className = 'tag status-pending';
-          statusBadge.textContent = 'Chưa học';
-        }
-      }
-    }
-
-    function pickNextStudioWord(isRandom = false) {
-      const rule = document.getElementById('patternSelect').value;
-      const words = phoneticsData[rule];
-      if(!words || !words.length) return;
-
-      if (isRandom && words.length > 1) {
-        let nextWord;
-        do { nextWord = words[Math.floor(Math.random() * words.length)]; } while(currentStudioWord && nextWord.word === currentStudioWord.word);
-        currentStudioWord = nextWord;
-      } else {
-        currentStudioWord = words[0];
-      }
-
-      updateStudioCardUI();
-      renderPatternWords();
-      if(isRandom) playAudioText(currentStudioWord.word);
-    }
-
-    function pickSequentialWord(step = 1) {
-      const rule = document.getElementById('patternSelect').value;
-      const words = phoneticsData[rule] || [];
-      if(!words.length) return;
-      let currentIndex = words.findIndex(w => currentStudioWord && w.word === currentStudioWord.word);
-      if(currentIndex === -1) currentIndex = 0;
-      let nextIndex = (currentIndex + step + words.length) % words.length;
-      currentStudioWord = words[nextIndex];
-      updateStudioCardUI();
-      renderPatternWords();
-      playAudioText(currentStudioWord.word);
-    }
-
-    function rateCurrentStudioWord(rating) {
-      if(!currentStudioWord) return;
-      wordMasteryMap[currentStudioWord.word] = rating;
-      localStorage.setItem(WORD_PROGRESS_KEY, JSON.stringify(wordMasteryMap));
-      showToast(rating === 'mastered' ? `✓ Đã ghi nhớ thuật ngữ "${currentStudioWord.word}"` : `↺ Đã chuyển thuật ngữ "${currentStudioWord.word}" vào danh sách cần ôn`);
-      updateStudioCardUI();
-      renderPatternWords();
-      setTimeout(() => pickSequentialWord(1), 350);
-    }
-
-    /* ================= SHADOWING RECORDING ================= */
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let recordedAudioBlob = null;
-    let recordedAudioUrl = null;
-    let isRecording = false;
-
-    async function toggleRecordUserVoice() {
-      if(isRecording) {
-        if(mediaRecorder && mediaRecorder.state !== 'inactive') {
-          mediaRecorder.stop();
-        }
-        return;
-      }
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        audioChunks = [];
-        mediaRecorder = new MediaRecorder(stream);
-
-        mediaRecorder.ondataavailable = (e) => {
-          if(e.data.size > 0) audioChunks.push(e.data);
-        };
-
-        mediaRecorder.onstop = () => {
-          isRecording = false;
-          stream.getTracks().forEach(track => track.stop());
-          setElText('recordMicIcon', "🎙️");
-          setElText('recordMicLabel', "2. Bấm để nhại giọng (Shadowing)");
-          document.getElementById('btnRecordMic').style.background = "#c93b3b";
-
-          recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-          if(recordedAudioUrl) URL.revokeObjectURL(recordedAudioUrl);
-          recordedAudioUrl = URL.createObjectURL(recordedAudioBlob);
-          document.getElementById('btnPlayUserVoice').style.display = 'inline-flex';
-          showToast("Đã lưu bản đọc của bạn! Nhấn 'Nghe lại bạn đọc' để đối chiếu.");
-        };
-
-        mediaRecorder.start();
-        isRecording = true;
-        setElText('recordMicIcon', "⏹️");
-        setElText('recordMicLabel', "Đang thu âm... Bấm để dừng");
-        document.getElementById('btnRecordMic').style.background = "#b91c1c";
-        document.getElementById('btnPlayUserVoice').style.display = 'none';
-      } catch(err) {
-        alert("Vui lòng cấp quyền truy cập Microphone cho trình duyệt để sử dụng tính năng nhại giọng Shadowing!");
-      }
-    }
-
-    function playbackUserRecording() {
-      if(!recordedAudioUrl) return;
-      const audio = new Audio(recordedAudioUrl);
-      audio.play();
-    }
-
-    function initPhoneticsView() {
-      const grid = document.getElementById('alphabetInteractiveGrid');
-      if(grid && !grid.innerHTML) {
-        const alphabet = "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z".split(",");
-        const ipaAlpha = ["a","be","se","de","ə","ɛf","ʒe","aʃ","i","ʒi","ka","ɛl","ɛm","ɛn","o","pe","ky","ɛʁ","ɛs","te","y","ve","dublə.ve","iks","i.ɡʁɛk","zɛd"];
-        grid.innerHTML = alphabet.map((letter, i) => `
-            <div class="alpha-box" onclick="playAudioText('${letter}')">
-              <b>${letter}</b>
-              <span>[${ipaAlpha[i]}]</span>
-            </div>
-        `).join('');
-
-        document.getElementById('patternSelect').addEventListener('change', () => {
-          currentWordFilterText = "";
-          document.getElementById('phoneticSearchInput').value = "";
-          renderPatternWords();
-          pickNextStudioWord(false);
-        });
-      }
-
-      renderPatternWords();
-      if(!currentStudioWord) {
-        pickNextStudioWord(false);
-      } else {
-        updateStudioCardUI();
-      }
-    }
-
-    window.addEventListener('keydown', (e) => {
-      const activePage = document.querySelector('.page.active');
-      if(activePage && activePage.id === 'phonetics' && !isAlphabetMode) {
-        const tagName = e.target.tagName;
-        if(tagName !== 'INPUT' && tagName !== 'TEXTAREA') {
-          if(e.code === 'Space') { e.preventDefault(); speakCurrentStudioWord(); }
-          if(e.code === 'KeyR') { e.preventDefault(); pickNextStudioWord(true); }
-          if(e.key === '1') { e.preventDefault(); rateCurrentStudioWord('mastered'); }
-          if(e.key === '2') { e.preventDefault(); rateCurrentStudioWord('review'); }
-        }
-      }
-    });
 
     /* ================= DOC VIEWER ================= */
     function convertToDrivePreviewUrl(rawUrl) {
@@ -2256,6 +1722,7 @@ rtdb.ref('/users').on('value', (snapshot) => {
 
       userDatabase[userIdx] = user;
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      rtdb.ref('/users').set(userDatabase);
 
       currentUser = user;
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
@@ -2267,7 +1734,8 @@ rtdb.ref('/users').on('value', (snapshot) => {
       const un = document.getElementById('regUsername').value.trim().toLowerCase();
       if(userDatabase.some(u=>u.username.toLowerCase()===un)) return alert("Tên đăng nhập đã tồn tại!");
       if(document.getElementById('regPassword').value !== document.getElementById('regConfirmPassword').value) return alert("Mật khẩu xác nhận không khớp!");
-      userDatabase.push({ 
+      
+      const newUser = { 
         id: Date.now(), 
         username: un, 
         fullName: document.getElementById('regFullName').value.trim(), 
@@ -2278,8 +1746,12 @@ rtdb.ref('/users').on('value', (snapshot) => {
         avatar: "", 
         bio: "", 
         createdAt: new Date().toLocaleDateString('vi-VN') 
-      });
+      };
+      
+      userDatabase.push(newUser);
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      rtdb.ref('/users').set(userDatabase);
+
       alert("Đăng ký thành công! Vui lòng chờ Giảng viên BioBling duyệt."); 
       switchAuthTab('login');
     }
@@ -2296,6 +1768,7 @@ rtdb.ref('/users').on('value', (snapshot) => {
           if (user && user.activeSessions) {
             user.activeSessions = user.activeSessions.filter(s => s.deviceId !== currentDevId);
             localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+            rtdb.ref('/users').set(userDatabase);
           }
         }
         currentUser = null;
@@ -2326,7 +1799,8 @@ rtdb.ref('/users').on('value', (snapshot) => {
         }
       }
 
-      document.getElementById('navBtnAdmin').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+      const adminBtn = document.getElementById('navBtnAdmin');
+      if (adminBtn) adminBtn.style.display = currentUser.role === 'admin' ? 'flex' : 'none';
       
       const initChar = name.charAt(0).toUpperCase();
       const drawAvatar = (elId) => {
@@ -2458,7 +1932,7 @@ rtdb.ref('/users').on('value', (snapshot) => {
     }
 
     function initMyClassView() {
-      const isAdmin = currentUser.role === 'admin';
+      const isAdmin = currentUser && currentUser.role === 'admin';
       const selectorWrap = document.getElementById('adminClassSelectorWrap');
       const selector = document.getElementById('adminSelectClassView');
 
@@ -2472,7 +1946,7 @@ rtdb.ref('/users').on('value', (snapshot) => {
         renderClassMembersView(currentClassViewId);
       } else {
         selectorWrap.style.display = 'none';
-        currentClassViewId = currentUser.classId;
+        currentClassViewId = currentUser ? currentUser.classId : "";
         renderClassMembersView(currentClassViewId);
       }
     }
@@ -2480,7 +1954,9 @@ rtdb.ref('/users').on('value', (snapshot) => {
     function renderClassMembersView(classId) {
       currentClassViewId = classId;
       const container = document.getElementById('classMembersGrid');
-      const isAdmin = currentUser.role === 'admin';
+      if (!container) return;
+
+      const isAdmin = currentUser && currentUser.role === 'admin';
       let members = [];
 
       const classMap = {};
@@ -2523,7 +1999,7 @@ rtdb.ref('/users').on('value', (snapshot) => {
 
       container.innerHTML = members.map(m => {
         const online = isUserOnline(m);
-        const isMe = m.id === currentUser.id;
+        const isMe = currentUser && m.id === currentUser.id;
         const initial = (m.fullName || m.username).charAt(0).toUpperCase();
         const userClassName = m.classId === 'all' 
           ? 'Toàn hệ thống' 
@@ -2577,85 +2053,82 @@ rtdb.ref('/users').on('value', (snapshot) => {
 
     let targetClassForAdd = null;
 
-   function openAssignMemberModal(classId) {
-  targetClassForAdd = classId;
-  const targetClass = classDatabase.find(c => c.id === classId);
-  if (!targetClass) return;
+    function openAssignMemberModal(classId) {
+      targetClassForAdd = classId;
+      const targetClass = classDatabase.find(c => c.id === classId);
+      if (!targetClass) return;
 
-  setElText('assignModalTitle', `➕ Thêm học viên/giáo viên vào "${targetClass.name}"`);
+      setElText('assignModalTitle', `➕ Thêm học viên/giáo viên vào "${targetClass.name}"`);
 
-  // Cho phép lấy tất cả tài khoản đã duyệt mà chưa thuộc lớp này (kể cả admin/giáo viên)
-  const candidates = userDatabase.filter(u => u.status === 'approved' && u.classId !== classId);
-  const listEl = document.getElementById('assignCandidateList');
+      const candidates = userDatabase.filter(u => u.status === 'approved' && u.classId !== classId);
+      const listEl = document.getElementById('assignCandidateList');
 
-  const classMap = {};
-  classDatabase.forEach(c => classMap[c.id] = c.name);
+      const classMap = {};
+      classDatabase.forEach(c => classMap[c.id] = c.name);
 
-  if (!candidates.length) {
-    listEl.innerHTML = `<div class="notice" style="text-align:center;">Không có thành viên nào khả dụng để thêm vào lớp.</div>`;
-  } else {
-    listEl.innerHTML = candidates.map(u => {
-      const currentClassStr = u.classId ? `(Đang ở: ${classMap[u.classId] || 'Lớp khác'})` : `(Chưa có lớp)`;
-      const roleBadge = u.role === 'admin' ? '<span style="color:#b45309;font-weight:700;">[Giảng viên]</span> ' : '';
-      return `
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fbf8; border:1px solid #dce8df; border-radius:12px; padding:10px 14px;">
-          <div>
-            <b style="font-size:13px; color:#173d2e;">${roleBadge}${escapeHTML(u.fullName || u.username)}</b>
-            <span style="font-size:11px; color:#6b8275; margin-left:6px;">@${escapeHTML(u.username)}</span>
-            <div style="font-size:10.5px; color:#23694b; margin-top:2px;">${escapeHTML(currentClassStr)}</div>
-          </div>
-          <button class="primary" style="padding:6px 12px; font-size:11.5px;" onclick="addCandidateToClass(${u.id})">
-            Thêm vào lớp
-          </button>
-        </div>
-      `;
-    }).join('');
-  }
+      if (!candidates.length) {
+        listEl.innerHTML = `<div class="notice" style="text-align:center;">Không có thành viên nào khả dụng để thêm vào lớp.</div>`;
+      } else {
+        listEl.innerHTML = candidates.map(u => {
+          const currentClassStr = u.classId ? `(Đang ở: ${classMap[u.classId] || 'Lớp khác'})` : `(Chưa có lớp)`;
+          const roleBadge = u.role === 'admin' ? '<span style="color:#b45309;font-weight:700;">[Giảng viên]</span> ' : '';
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fbf8; border:1px solid #dce8df; border-radius:12px; padding:10px 14px;">
+              <div>
+                <b style="font-size:13px; color:#173d2e;">${roleBadge}${escapeHTML(u.fullName || u.username)}</b>
+                <span style="font-size:11px; color:#6b8275; margin-left:6px;">@${escapeHTML(u.username)}</span>
+                <div style="font-size:10.5px; color:#23694b; margin-top:2px;">${escapeHTML(currentClassStr)}</div>
+              </div>
+              <button class="primary" style="padding:6px 12px; font-size:11.5px;" onclick="addCandidateToClass(${u.id})">
+                Thêm vào lớp
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
 
-  document.getElementById('assignMemberModal').classList.add('open');
-}
+      document.getElementById('assignMemberModal').classList.add('open');
+    }
 
     function closeAssignMemberModal() {
       document.getElementById('assignMemberModal').classList.remove('open');
     }
 
     function addCandidateToClass(userId) {
-  const user = userDatabase.find(u => u.id === userId);
-  if (!user || !targetClassForAdd) return;
+      const user = userDatabase.find(u => u.id === userId);
+      if (!user || !targetClassForAdd) return;
 
-  user.classId = targetClassForAdd;
-  
-  // Lưu vào máy và đồng bộ ngay lên Firebase
-  localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-  rtdb.ref('/users').set(userDatabase);
+      user.classId = targetClassForAdd;
+      
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      rtdb.ref('/users').set(userDatabase);
 
-  const targetClass = classDatabase.find(c => c.id === targetClassForAdd);
-  showToast(`Đã thêm @${user.username} vào lớp ${targetClass ? targetClass.name : ''}`);
+      const targetClass = classDatabase.find(c => c.id === targetClassForAdd);
+      showToast(`Đã thêm @${user.username} vào lớp ${targetClass ? targetClass.name : ''}`);
 
-  openAssignMemberModal(targetClassForAdd);
-  renderClassMembersView(targetClassForAdd);
-}
+      openAssignMemberModal(targetClassForAdd);
+      renderClassMembersView(targetClassForAdd);
+    }
 
-function removeUserFromClass(userId) {
-  const user = userDatabase.find(u => u.id === userId);
-  if (!user) return;
+    function removeUserFromClass(userId) {
+      const user = userDatabase.find(u => u.id === userId);
+      if (!user) return;
 
-  if (confirm(`Bạn có chắc muốn gỡ @${user.username} khỏi lớp hiện tại không?`)) {
-    user.classId = "";
-    
-    // Lưu vào máy và đồng bộ ngay lên Firebase
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-    rtdb.ref('/users').set(userDatabase);
+      if (confirm(`Bạn có chắc muốn gỡ @${user.username} khỏi lớp hiện tại không?`)) {
+        user.classId = "";
+        
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+        rtdb.ref('/users').set(userDatabase);
 
-    showToast(`Đã gỡ @${user.username} khỏi lớp.`);
-    renderClassMembersView(currentClassViewId);
-  }
-}
+        showToast(`Đã gỡ @${user.username} khỏi lớp.`);
+        renderClassMembersView(currentClassViewId);
+      }
+    }
 
     /* ================= VIDEOS ================= */
     let currentVidFilter = 'all';
     function initVideosView() {
-      document.getElementById('videoSessionToolbar').innerHTML = `<button class="pill active" onclick="currentVidFilter='all'; initVideosView();">Tất cả chuyên đề</button>` + sessionDatabase.map(s => `<button class="pill ${currentVidFilter===s.id?'active':''}" onclick="currentVidFilter='${s.id}'; initVideosView();">${escapeHTML(s.title)}</button>`).join('');
+      document.getElementById('videoSessionToolbar').innerHTML = `<button class="pill ${currentVidFilter==='all'?'active':''}" onclick="currentVidFilter='all'; initVideosView();">Tất cả chuyên đề</button>` + sessionDatabase.map(s => `<button class="pill ${currentVidFilter===s.id?'active':''}" onclick="currentVidFilter='${s.id}'; initVideosView();">${escapeHTML(s.title)}</button>`).join('');
       const vids = mediaDatabase.filter(m => m.type==='drive_video' && (currentUser.role==='admin' || m.classId===currentUser.classId || m.classId==='all'));
       const filtered = vids.filter(v => currentVidFilter==='all' || v.sessionId===currentVidFilter);
       const playlist = document.getElementById('videoPlaylistContainer');
@@ -2778,20 +2251,19 @@ function removeUserFromClass(userId) {
       showToast("Đã thêm buổi học mới!");
     }
 
-function handleCreateClass(e) { 
-  e.preventDefault(); 
-  const newClass = { id: "cls_" + Date.now(), name: document.getElementById('newClassName').value.trim() };
-  classDatabase.push(newClass);
-  
-  // Lưu vào máy và đồng bộ lên Firebase cho tất cả admin khác
-  localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase)); 
-  rtdb.ref('/classes').set(classDatabase);
+    function handleCreateClass(e) { 
+      e.preventDefault(); 
+      const newClass = { id: "cls_" + Date.now(), name: document.getElementById('newClassName').value.trim() };
+      classDatabase.push(newClass);
+      
+      localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase)); 
+      rtdb.ref('/classes').set(classDatabase);
 
-  e.target.reset(); 
-  openClassManagerModal(); 
-  renderAdminClassDashboard(); 
-  showToast("Đã tạo lớp học mới!");
-}
+      e.target.reset(); 
+      openClassManagerModal(); 
+      renderAdminClassDashboard(); 
+      showToast("Đã tạo lớp học mới!");
+    }
     
     function openSessionManagerModal() { 
       document.getElementById('sessionListDisplay').innerHTML = sessionDatabase.map(s=>`
@@ -2832,6 +2304,7 @@ function handleCreateClass(e) {
       if(u) {
         u.status = 'approved';
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+        rtdb.ref('/users').set(userDatabase);
         showToast(`Đã phê duyệt tài khoản @${u.username}`);
         renderAdminClassDashboard();
         openApprovalModal();
@@ -2902,6 +2375,7 @@ function handleCreateClass(e) {
         userDatabase[idx].bio = currentUser.bio;
         userDatabase[idx].avatar = currentUser.avatar;
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+        rtdb.ref('/users').set(userDatabase);
       }
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
       updateUserUI(); 
@@ -2915,6 +2389,7 @@ function handleCreateClass(e) {
       currentUser.password = document.getElementById('pwdNew').value;
       userDatabase.find(u=>u.id===currentUser.id).password = currentUser.password;
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      rtdb.ref('/users').set(userDatabase);
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
       e.target.reset(); 
       showToast("Đổi mật khẩu thành công!");
