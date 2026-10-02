@@ -2134,87 +2134,124 @@
     }
 
     /* ================= VIDEOS ================= */
-    let currentVidFilter = 'all';
-    function initVideosView() {
-      document.getElementById('videoSessionToolbar').innerHTML = `<button class="pill ${currentVidFilter==='all'?'active':''}" onclick="currentVidFilter='all'; initVideosView();">Tất cả chuyên đề</button>` + sessionDatabase.map(s => `<button class="pill ${currentVidFilter===s.id?'active':''}" onclick="currentVidFilter='${s.id}'; initVideosView();">${escapeHTML(s.title)}</button>`).join('');
-      
-      const vids = mediaDatabase.filter(m => m.type === 'drive_video' && canUserAccessMedia(m));
-      const filtered = vids.filter(v => currentVidFilter==='all' || v.sessionId===currentVidFilter);
-      const playlist = document.getElementById('videoPlaylistContainer');
-      const player = document.getElementById('driveVideoContainer');
-      
-      if (!currentUser.classId && currentUser.role !== 'admin') {
-        player.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#fff;">Bạn chưa được xếp vào lớp học để xem video.</div>`;
-        playlist.innerHTML = '';
-        document.getElementById('btnOpenExternalVideo').style.display = 'none';
-        return;
-      }
+   let currentVidFilter = 'all';
+function initVideosView() {
+  const vids = mediaDatabase.filter(m => m.type === 'drive_video' && canUserAccessMedia(m));
 
-      if(!filtered.length) { 
-        player.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#fff;">Chưa có video nào được gán cho lớp của bạn trong chuyên đề này.</div>`; 
-        playlist.innerHTML=''; 
-        document.getElementById('btnOpenExternalVideo').style.display='none'; 
-        return; 
-      }
-      
-      const loadVid = (v) => {
-        setElText('currentVideoTitle', v.title); 
-        setElText('currentVideoNote', v.note || "Video bài giảng chính thức từ BioBling - 2B."); 
-        setElText('currentVideoSessionBadge', v.sessionName);
-        document.getElementById('btnOpenExternalVideo').href = v.url; 
-        document.getElementById('btnOpenExternalVideo').style.display='inline-flex';
-        player.innerHTML = `<iframe src="${convertToDrivePreviewUrl(v.url)}" allowfullscreen></iframe>`;
-      };
-      loadVid(filtered[0]);
-      
-      playlist.innerHTML = filtered.map(v => `
-        <div class="playlist-item" style="padding:12px;border:1px solid #e7eee9;background:#fbfdfb;border-radius:12px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f1f8f3'" onmouseout="this.style.background='#fbfdfb'" onclick="loadDriveVideoPlayer('${v.id}')">
-          <div style="display:flex;justify-content:space-between;"><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(v.sessionName)}</span></div>
-          <b style="font-size:13px;display:block;margin-top:4px;color:#183d2e;">${escapeHTML(v.title)}</b>
-        </div>`).join('');
-      
-      window.loadDriveVideoPlayer = (id) => loadVid(filtered.find(v=>v.id===id));
-    }
+  // Lấy danh sách ID các buổi học có video mà người dùng này được phép xem
+  const activeSessionIds = new Set(vids.map(v => v.sessionId));
+
+  // Lọc chỉ giữ lại các buổi có video hợp lệ (Admin vẫn xem được toàn bộ nếu muốn)
+  const availableSessions = currentUser && currentUser.role === 'admin' 
+    ? sessionDatabase 
+    : sessionDatabase.filter(s => activeSessionIds.has(s.id));
+
+  // Kiểm tra nếu bộ lọc hiện tại không còn tồn tại trong danh sách thì trả về 'all'
+  if (currentVidFilter !== 'all' && !availableSessions.some(s => s.id === currentVidFilter)) {
+    currentVidFilter = 'all';
+  }
+
+  // Vẽ thanh toolbar: Chỉ hiện các buổi học hợp lệ
+  const toolbar = document.getElementById('videoSessionToolbar');
+  if (availableSessions.length === 0) {
+    toolbar.innerHTML = '';
+  } else {
+    toolbar.innerHTML = `<button class="pill ${currentVidFilter === 'all' ? 'active' : ''}" onclick="currentVidFilter='all'; initVideosView();">Tất cả chuyên đề</button>` + 
+      availableSessions.map(s => `<button class="pill ${currentVidFilter === s.id ? 'active' : ''}" onclick="currentVidFilter='${s.id}'; initVideosView();">${escapeHTML(s.title)}</button>`).join('');
+  }
+  
+  const filtered = vids.filter(v => currentVidFilter === 'all' || v.sessionId === currentVidFilter);
+  const playlist = document.getElementById('videoPlaylistContainer');
+  const player = document.getElementById('driveVideoContainer');
+  
+  if (!currentUser.classId && currentUser.role !== 'admin') {
+    player.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#fff;">Bạn chưa được xếp vào lớp học để xem video.</div>`;
+    playlist.innerHTML = '';
+    document.getElementById('btnOpenExternalVideo').style.display = 'none';
+    return;
+  }
+
+  if (!filtered.length) { 
+    player.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#fff;">Chưa có video bài giảng nào được gán cho lớp của bạn.</div>`; 
+    playlist.innerHTML = ''; 
+    document.getElementById('btnOpenExternalVideo').style.display = 'none'; 
+    return; 
+  }
+  
+  const loadVid = (v) => {
+    setElText('currentVideoTitle', v.title); 
+    setElText('currentVideoNote', v.note || "Video bài giảng chính thức từ BioBling - 2B."); 
+    setElText('currentVideoSessionBadge', v.sessionName);
+    document.getElementById('btnOpenExternalVideo').href = v.url; 
+    document.getElementById('btnOpenExternalVideo').style.display = 'inline-flex';
+    player.innerHTML = `<iframe src="${convertToDrivePreviewUrl(v.url)}" allowfullscreen></iframe>`;
+  };
+  loadVid(filtered[0]);
+  
+  playlist.innerHTML = filtered.map(v => `
+    <div class="playlist-item" style="padding:12px;border:1px solid #e7eee9;background:#fbfdfb;border-radius:12px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f1f8f3'" onmouseout="this.style.background='#fbfdfb'" onclick="loadDriveVideoPlayer('${v.id}')">
+      <div style="display:flex;justify-content:space-between;"><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(v.sessionName)}</span></div>
+      <b style="font-size:13px;display:block;margin-top:4px;color:#183d2e;">${escapeHTML(v.title)}</b>
+    </div>`).join('');
+  
+  window.loadDriveVideoPlayer = (id) => loadVid(filtered.find(v => v.id === id));
+}
 
     /* ================= TÀI LIỆU & ĐỀ THI (DOCUMENTS) ================= */
-    let currentDocFilter = 'all';
-    function initDocumentsView() {
-      const toolbar = document.getElementById('docSessionToolbar');
-      toolbar.innerHTML = `<button class="pill ${currentDocFilter==='all'?'active':''}" onclick="currentDocFilter='all'; initDocumentsView();">Tất cả chuyên đề</button>` + 
-        sessionDatabase.map(s => `<button class="pill ${currentDocFilter===s.id?'active':''}" onclick="currentDocFilter='${s.id}'; initDocumentsView();">${escapeHTML(s.title)}</button>`).join('');
+   let currentDocFilter = 'all';
+function initDocumentsView() {
+  const docs = mediaDatabase.filter(m => m.type === 'drive_doc' && canUserAccessMedia(m));
 
-      const docs = mediaDatabase.filter(m => m.type === 'drive_doc' && canUserAccessMedia(m));
-      const filtered = docs.filter(d => currentDocFilter==='all' || d.sessionId===currentDocFilter);
-      const container = document.getElementById('docCardsContainer');
+  // Lấy danh sách ID các buổi học có tài liệu mà người dùng này được phép xem
+  const activeDocSessionIds = new Set(docs.map(d => d.sessionId));
 
-      if (!currentUser.classId && currentUser.role !== 'admin') {
-        container.innerHTML = `<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Bạn chưa được xếp vào lớp học để xem tài liệu.</div>`;
-        return;
-      }
+  // Chỉ lấy các buổi có tài liệu cho lớp của học sinh
+  const availableSessions = currentUser && currentUser.role === 'admin' 
+    ? sessionDatabase 
+    : sessionDatabase.filter(s => activeDocSessionIds.has(s.id));
 
-      if (!filtered.length) {
-        container.innerHTML = `<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Chưa có tài liệu hay đề thi nào được gán cho lớp của bạn trong chuyên đề này.</div>`;
-        return;
-      }
+  if (currentDocFilter !== 'all' && !availableSessions.some(s => s.id === currentDocFilter)) {
+    currentDocFilter = 'all';
+  }
 
-      container.innerHTML = filtered.map(doc => `
-        <div class="card">
-          <div class="card-top">
-            <div class="file-icon">📄</div>
-            <span class="tag session-badge">${escapeHTML(doc.sessionName)}</span>
-          </div>
-          <h3>${escapeHTML(doc.title)}</h3>
-          <p>${escapeHTML(doc.note || "Tài liệu học tập và đề ôn luyện chuẩn cấu trúc.")}</p>
-          <div class="card-foot">
-            <span class="tag status-class">Word / PPTX / PDF</span>
-            <button class="primary" style="padding:6px 12px;font-size:11.5px;" onclick="openDocViewer('${escapeHTML(doc.url)}', '${escapeHTML(doc.title)}')">
-              👁️ Xem tài liệu
-            </button>
-          </div>
-        </div>
-      `).join('');
-    }
+  const toolbar = document.getElementById('docSessionToolbar');
+  if (availableSessions.length === 0) {
+    toolbar.innerHTML = '';
+  } else {
+    toolbar.innerHTML = `<button class="pill ${currentDocFilter === 'all' ? 'active' : ''}" onclick="currentDocFilter='all'; initDocumentsView();">Tất cả chuyên đề</button>` + 
+      availableSessions.map(s => `<button class="pill ${currentDocFilter === s.id ? 'active' : ''}" onclick="currentDocFilter='${s.id}'; initDocumentsView();">${escapeHTML(s.title)}</button>`).join('');
+  }
 
+  const filtered = docs.filter(d => currentDocFilter === 'all' || d.sessionId === currentDocFilter);
+  const container = document.getElementById('docCardsContainer');
+
+  if (!currentUser.classId && currentUser.role !== 'admin') {
+    container.innerHTML = `<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Bạn chưa được xếp vào lớp học để xem tài liệu.</div>`;
+    return;
+  }
+
+  if (!filtered.length) {
+    container.innerHTML = `<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Chưa có tài liệu hay đề thi nào được gán cho lớp của bạn.</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(doc => `
+    <div class="card">
+      <div class="card-top">
+        <div class="file-icon">📄</div>
+        <span class="tag session-badge">${escapeHTML(doc.sessionName)}</span>
+      </div>
+      <h3>${escapeHTML(doc.title)}</h3>
+      <p>${escapeHTML(doc.note || "Tài liệu học tập và đề ôn luyện chuẩn cấu trúc.")}</p>
+      <div class="card-foot">
+        <span class="tag status-class">Word / PPTX / PDF</span>
+        <button class="primary" style="padding:6px 12px;font-size:11.5px;" onclick="openDocViewer('${escapeHTML(doc.url)}', '${escapeHTML(doc.title)}')">
+          👁️ Xem tài liệu
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
     /* ================= ADMIN & SESSION MANAGEMENT ================= */
     function renderAdminClassDashboard() {
       const sesHTML = sessionDatabase.length ? sessionDatabase.map(s=>`<option value="${s.id}">${escapeHTML(s.title)}</option>`).join('') : '<option value="">⚠️ Chưa có buổi (Tạo trước)</option>';
