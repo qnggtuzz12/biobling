@@ -580,63 +580,6 @@
       border: 0;
     }
     
-    .alphabet-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-      gap: 10px;
-    }
-    .alpha-box {
-      background: #fff;
-      border: 1.5px solid #dce8df;
-      border-radius: 16px;
-      padding: 12px 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: all .2s;
-      box-shadow: 0 2px 6px rgba(0,0,0,.03);
-    }
-    .alpha-box:hover {
-      background: #f1f8f3;
-      border-color: #92d0aa;
-      transform: translateY(-2px);
-    }
-    .alpha-box b {
-      display: block;
-      font-size: 24px;
-      color: #174230;
-      line-height: 1;
-    }
-    .alpha-box span {
-      display: block;
-      font-size: 10.5px;
-      color: #657e70;
-      margin-top: 4px;
-      font-family: monospace;
-    }
-
-    /* Phonetics Word Items */
-    .word-list-card {
-      background: #fff;
-      border: 1px solid #dce8df;
-      padding: 10px 14px;
-      border-radius: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .word-list-card:hover {
-      background: #f1f8f3;
-      border-color: #9cd1b1;
-      transform: translateX(3px);
-    }
-    .word-list-card.active-selected {
-      background: #e7f5ec;
-      border-color: #277952;
-      box-shadow: 0 2px 8px rgba(39,121,82,.12);
-    }
-    
     .field {
       display: grid;
       gap: 6px;
@@ -748,19 +691,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 60%;
-    }
-    
-    /* Studio Card */
-    .studio-card {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 26px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      box-shadow: var(--shadow);
     }
 
     .cropper-container {
@@ -1420,78 +1350,96 @@
 
     /* ================= REALTIME LISTENERS ================= */
     rtdb.ref('/classes').on('value', (snapshot) => {
-  const data = snapshot.val();
-  if (data) {
-    classDatabase = Array.isArray(data) ? data : Object.values(data);
-    localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase));
-  } else {
-    // Nếu trên Firebase chưa có dữ liệu lớp, đẩy dữ liệu hiện tại lên
-    if (classDatabase && classDatabase.length > 0) {
-      rtdb.ref('/classes').set(classDatabase);
-    }
-  }
+      const data = snapshot.val();
+      if (data) {
+        classDatabase = Array.isArray(data) ? data : Object.values(data);
+        localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase));
+      } else if (classDatabase && classDatabase.length > 0) {
+        rtdb.ref('/classes').set(classDatabase);
+      }
 
-  // Tự động làm mới UI nếu đang mở modal quản lý lớp hoặc trang admin
-  const classModal = document.getElementById('classManagerModal');
-  if (classModal && classModal.classList.contains('open')) {
-    openClassManagerModal();
-  }
-  const activePage = document.querySelector('.page.active');
-  if (activePage) {
-    if (activePage.id === 'my_class') {
-      initMyClassView();
-    } else if (activePage.id === 'class_admin') {
-      renderAdminClassDashboard();
-    }
-  }
-});
+      const classModal = document.getElementById('classManagerModal');
+      if (classModal && classModal.classList.contains('open')) {
+        openClassManagerModal();
+      }
+      const activePage = document.querySelector('.page.active');
+      if (activePage) {
+        if (activePage.id === 'my_class') {
+          initMyClassView();
+        } else if (activePage.id === 'class_admin') {
+          renderAdminClassDashboard();
+        }
+      }
+    });
 
-db.ref('/sessions').on('value', (snapshot) => {
-  const data = snapshot.val();
-  if (data) {
-    sessionDatabase = Array.isArray(data) ? data : Object.values(data);
-    localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessionDatabase));
-  } else {
-    // Nếu trên Firebase chưa có, đẩy dữ liệu mẫu ban đầu lên
-    if (sessionDatabase && sessionDatabase.length > 0) {
-      rtdb.ref('/sessions').set(sessionDatabase);
-    }
-  }
+    // Đồng bộ danh sách chuyên đề / buổi học (Đã fix lỗi biến db -> rtdb)
+    rtdb.ref('/sessions').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        sessionDatabase = Array.isArray(data) ? data : Object.values(data);
+        localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessionDatabase));
+      } else if (sessionDatabase && sessionDatabase.length > 0) {
+        rtdb.ref('/sessions').set(sessionDatabase);
+      }
 
-  // Tự động làm mới UI nếu đang mở modal quản lý buổi học hoặc các trang xem bài giảng
-  const sesModal = document.getElementById('sessionManagerModal');
-  if (sesModal && sesModal.classList.contains('open')) {
-    openSessionManagerModal();
-  }
-  const activePage = document.querySelector('.page.active');
-  if (activePage) {
-    if (activePage.id === 'videos') initVideosView();
-    if (activePage.id === 'documents') initDocumentsView();
-    if (activePage.id === 'class_admin') renderAdminClassDashboard();
-  }
-});
+      const sesModal = document.getElementById('sessionManagerModal');
+      if (sesModal && sesModal.classList.contains('open')) {
+        openSessionManagerModal();
+      }
+      const activePage = document.querySelector('.page.active');
+      if (activePage) {
+        if (activePage.id === 'videos') initVideosView();
+        if (activePage.id === 'documents') initDocumentsView();
+        if (activePage.id === 'class_admin') renderAdminClassDashboard();
+      }
+    });
 
-// --- ĐỒNG BỘ HỌC LIỆU / VIDEO / ĐỀ THI TỪ FIREBASE REALTIME ---
-rtdb.ref('/media').on('value', (snapshot) => {
-  const data = snapshot.val();
-  if (data) {
-    mediaDatabase = Array.isArray(data) ? data : Object.values(data);
-    localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
-  } else {
-    if (mediaDatabase && mediaDatabase.length > 0) {
-      rtdb.ref('/media').set(mediaDatabase);
-    }
-  }
+    // Đồng bộ danh sách học liệu / video Drive
+    rtdb.ref('/media').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        mediaDatabase = Array.isArray(data) ? data : Object.values(data);
+        localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
+      } else if (mediaDatabase && mediaDatabase.length > 0) {
+        rtdb.ref('/media').set(mediaDatabase);
+      }
 
-  // Cập nhật lại giao diện ngay lập tức cho cả học viên và admin đang xem
-  const activePage = document.querySelector('.page.active');
-  if (activePage) {
-    if (activePage.id === 'dashboard') initDashboardView();
-    if (activePage.id === 'videos') initVideosView();
-    if (activePage.id === 'documents') initDocumentsView();
-    if (activePage.id === 'class_admin') renderAdminClassDashboard();
-  }
-});
+      const activePage = document.querySelector('.page.active');
+      if (activePage) {
+        if (activePage.id === 'dashboard') initDashboardView();
+        if (activePage.id === 'videos') initVideosView();
+        if (activePage.id === 'documents') initDocumentsView();
+        if (activePage.id === 'class_admin') renderAdminClassDashboard();
+      }
+    });
+
+    // Bổ sung: Đồng bộ danh sách người dùng và tự động gán lớp realtime cho học viên
+    rtdb.ref('/users').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        userDatabase = Array.isArray(data) ? data : Object.values(data);
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+        
+        if (currentUser) {
+          const fresh = userDatabase.find(u => u.id === currentUser.id);
+          if (fresh) {
+            currentUser = fresh;
+            localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+            updateUserUI();
+          }
+        }
+
+        const activePage = document.querySelector('.page.active');
+        if (activePage) {
+          if (activePage.id === 'dashboard') initDashboardView();
+          if (activePage.id === 'videos') initVideosView();
+          if (activePage.id === 'documents') initDocumentsView();
+          if (activePage.id === 'my_class') initMyClassView();
+        }
+      } else if (userDatabase && userDatabase.length > 0) {
+        rtdb.ref('/users').set(userDatabase);
+      }
+    });
 
     // Lắng nghe trạng thái online của toàn bộ người dùng
     rtdb.ref('/status').on('value', (snapshot) => {
@@ -1842,7 +1790,7 @@ rtdb.ref('/media').on('value', (snapshot) => {
           roleTextEl.textContent = "Quản trị viên / Giảng viên";
         } else {
           const userClass = classDatabase.find(c => c.id === currentUser.classId);
-          roleTextEl.textContent = userClass ? `Học viên · ${userClass.name}` : "Học viên";
+          roleTextEl.textContent = userClass ? `Học viên · ${userClass.name}` : "Học viên (Chưa xếp lớp)";
         }
       }
 
@@ -2250,7 +2198,7 @@ rtdb.ref('/media').on('value', (snapshot) => {
       document.getElementById('adminUploadedMediaList').innerHTML = mediaDatabase.map(m=>`
         <div style="background:#f8fbf8;border:1px solid #dce8df;padding:11px 14px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
           <div><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(m.sessionName)}</span> <b style="font-size:13px;margin-left:6px;">${escapeHTML(m.title)}</b></div>
-          <button onclick="mediaDatabase=mediaDatabase.filter(x=>x.id!=='${m.id}'); localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase)); renderAdminClassDashboard(); showToast('Đã xóa học liệu');" class="del-btn">🗑️</button>
+          <button onclick="handleDeleteMedia('${m.id}')" class="del-btn">🗑️</button>
         </div>`).join('') || '<div class="notice">Chưa có học liệu nào.</div>';
 
       const pendingUsers = userDatabase.filter(u => u.status === 'pending');
@@ -2264,52 +2212,49 @@ rtdb.ref('/media').on('value', (snapshot) => {
         : '<div style="font-size:12px;color:#71877d;">Không có học viên chờ duyệt.</div>';
     }
 
-     function handleUploadMedia(e) {
-  e.preventDefault();
-  const sesId = document.getElementById('mediaSessionSelect').value;
-  if (!sesId) return alert("Vui lòng tạo buổi học trước!");
-  const sesObj = sessionDatabase.find(s => s.id === sesId);
-  const sesName = sesObj ? sesObj.title : "";
-  const noteEl = document.getElementById('mediaNote');
-  const noteVal = noteEl ? noteEl.value.trim() : "";
-  
-  const newMedia = { 
-    id: "med_" + Date.now(), 
-    classId: document.getElementById('mediaClassSelect').value, 
-    sessionId: sesId, 
-    sessionName: sesName, 
-    type: document.getElementById('mediaTypeSelect').value, 
-    title: document.getElementById('mediaTitle').value.trim(), 
-    url: document.getElementById('mediaUrl').value.trim(), 
-    note: noteVal 
-  };
+    function handleUploadMedia(e) {
+      e.preventDefault();
+      const sesId = document.getElementById('mediaSessionSelect').value;
+      if (!sesId) return alert("Vui lòng tạo buổi học trước!");
+      const sesObj = sessionDatabase.find(s => s.id === sesId);
+      const sesName = sesObj ? sesObj.title : "";
+      const noteEl = document.getElementById('mediaNote');
+      const noteVal = noteEl ? noteEl.value.trim() : "";
+      
+      const newMedia = { 
+        id: "med_" + Date.now(), 
+        classId: document.getElementById('mediaClassSelect').value, 
+        sessionId: sesId, 
+        sessionName: sesName, 
+        type: document.getElementById('mediaTypeSelect').value, 
+        title: document.getElementById('mediaTitle').value.trim(), 
+        url: document.getElementById('mediaUrl').value.trim(), 
+        note: noteVal 
+      };
 
-  mediaDatabase.unshift(newMedia);
-  
-  // Đồng bộ lên Firebase cho toàn bộ học sinh và admin
-  localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
-  rtdb.ref('/media').set(mediaDatabase).then(() => {
-    showToast("Đã đăng tải và đồng bộ học liệu đến học viên!");
-  });
+      mediaDatabase.unshift(newMedia);
+      
+      localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
+      rtdb.ref('/media').set(mediaDatabase).then(() => {
+        showToast("Đã đăng tải và đồng bộ học liệu đến học viên!");
+      });
 
-  e.target.reset(); 
-  renderAdminClassDashboard(); 
-}
+      e.target.reset(); 
+      renderAdminClassDashboard(); 
+    }
 
-function handleDeleteMedia(mediaId) {
-  if (confirm("Bạn có chắc muốn xóa tài liệu/video này khỏi hệ thống?")) {
-    mediaDatabase = mediaDatabase.filter(x => x.id !== mediaId);
-    localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
-    
-    // Đồng bộ lệnh xóa lên Firebase
-    rtdb.ref('/media').set(mediaDatabase).then(() => {
-      showToast("Đã xóa học liệu trên toàn bộ thiết bị!");
-    });
-    
-    renderAdminClassDashboard();
-  }
-}
-
+    function handleDeleteMedia(mediaId) {
+      if (confirm("Bạn có chắc muốn xóa tài liệu/video này khỏi hệ thống?")) {
+        mediaDatabase = mediaDatabase.filter(x => x.id !== mediaId);
+        localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
+        
+        rtdb.ref('/media').set(mediaDatabase).then(() => {
+          showToast("Đã xóa học liệu trên toàn bộ thiết bị!");
+        });
+        
+        renderAdminClassDashboard();
+      }
+    }
     
     function handleCreateClass(e) { 
       e.preventDefault(); 
@@ -2324,40 +2269,53 @@ function handleDeleteMedia(mediaId) {
       renderAdminClassDashboard(); 
       showToast("Đã tạo lớp học mới!");
     }
+
+    function handleCreateSession(e) {
+      e.preventDefault();
+      const title = document.getElementById('newSessionTitle').value.trim();
+      const newSession = { id: "ses_" + Date.now(), title: title };
+      sessionDatabase.push(newSession);
+
+      localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessionDatabase));
+      rtdb.ref('/sessions').set(sessionDatabase);
+
+      e.target.reset();
+      openSessionManagerModal();
+      renderAdminClassDashboard();
+      showToast("Đã lưu buổi học mới!");
+    }
     
     function openSessionManagerModal() { 
       document.getElementById('sessionListDisplay').innerHTML = sessionDatabase.map(s=>`
         <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #edf2ed;">
           <span>${escapeHTML(s.title)}</span>
-          <button onclick="sessionDatabase=sessionDatabase.filter(x=>x.id!=='${s.id}'); localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessionDatabase)); openSessionManagerModal(); renderAdminClassDashboard();" class="del-btn">🗑️</button>
+          <button onclick="sessionDatabase=sessionDatabase.filter(x=>x.id!=='${s.id}'); localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessionDatabase)); rtdb.ref('/sessions').set(sessionDatabase); openSessionManagerModal(); renderAdminClassDashboard();" class="del-btn">🗑️</button>
         </div>`).join('');
       document.getElementById('sessionManagerModal').classList.add('open'); 
     }
 
     function openClassManagerModal() { 
-  document.getElementById('classListContainer').innerHTML = classDatabase.map(c => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #edf2ed;">
-      <span>${escapeHTML(c.name)}</span>
-      <button onclick="handleDeleteClass('${c.id}')" class="del-btn">🗑️</button>
-    </div>`).join('');
-  document.getElementById('classManagerModal').classList.add('open'); 
-}
+      document.getElementById('classListContainer').innerHTML = classDatabase.map(c => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #edf2ed;">
+          <span>${escapeHTML(c.name)}</span>
+          <button onclick="handleDeleteClass('${c.id}')" class="del-btn">🗑️</button>
+        </div>`).join('');
+      document.getElementById('classManagerModal').classList.add('open'); 
+    }
 
-// Hàm xóa lớp và đồng bộ ngay lên Firebase
-function handleDeleteClass(classId) {
-  if (confirm("Bạn có chắc chắn muốn xóa lớp học này không?")) {
-    classDatabase = classDatabase.filter(x => x.id !== classId);
-    localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase));
-    
-    // Đẩy danh sách đã cập nhật lên Firebase
-    rtdb.ref('/classes').set(classDatabase).then(() => {
-      showToast("Đã xóa và đồng bộ danh sách lớp!");
-    });
+    function handleDeleteClass(classId) {
+      if (confirm("Bạn có chắc chắn muốn xóa lớp học này không?")) {
+        classDatabase = classDatabase.filter(x => x.id !== classId);
+        localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase));
+        
+        rtdb.ref('/classes').set(classDatabase).then(() => {
+          showToast("Đã xóa và đồng bộ danh sách lớp!");
+        });
 
-    openClassManagerModal();
-    renderAdminClassDashboard();
-  }
-}
+        openClassManagerModal();
+        renderAdminClassDashboard();
+      }
+    }
 
     function openApprovalModal() {
       const pending = userDatabase.filter(u => u.status === 'pending');
