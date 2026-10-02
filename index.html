@@ -2589,72 +2589,80 @@ rtdb.ref('/users').on('value', (snapshot) => {
 
     let targetClassForAdd = null;
 
-    function openAssignMemberModal(classId) {
-      targetClassForAdd = classId;
-      const targetClass = classDatabase.find(c => c.id === classId);
-      if (!targetClass) return;
+   function openAssignMemberModal(classId) {
+  targetClassForAdd = classId;
+  const targetClass = classDatabase.find(c => c.id === classId);
+  if (!targetClass) return;
 
-      setElText('assignModalTitle', `➕ Thêm học viên vào "${targetClass.name}"`);
+  setElText('assignModalTitle', `➕ Thêm học viên/giáo viên vào "${targetClass.name}"`);
 
-      const candidates = userDatabase.filter(u => u.role !== 'admin' && u.status === 'approved' && u.classId !== classId);
-      const listEl = document.getElementById('assignCandidateList');
+  // Cho phép lấy tất cả tài khoản đã duyệt mà chưa thuộc lớp này (kể cả admin/giáo viên)
+  const candidates = userDatabase.filter(u => u.status === 'approved' && u.classId !== classId);
+  const listEl = document.getElementById('assignCandidateList');
 
-      const classMap = {};
-      classDatabase.forEach(c => classMap[c.id] = c.name);
+  const classMap = {};
+  classDatabase.forEach(c => classMap[c.id] = c.name);
 
-      if (!candidates.length) {
-        listEl.innerHTML = `<div class="notice" style="text-align:center;">Không có học viên nào khả dụng để thêm vào lớp.</div>`;
-      } else {
-        listEl.innerHTML = candidates.map(u => {
-          const currentClassStr = u.classId ? `(Đang ở: ${classMap[u.classId] || 'Lớp khác'})` : `(Chưa có lớp)`;
-          return `
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fbf8; border:1px solid #dce8df; border-radius:12px; padding:10px 14px;">
-              <div>
-                <b style="font-size:13px; color:#173d2e;">${escapeHTML(u.fullName || u.username)}</b>
-                <span style="font-size:11px; color:#6b8275; margin-left:6px;">@${escapeHTML(u.username)}</span>
-                <div style="font-size:10.5px; color:#23694b; margin-top:2px;">${escapeHTML(currentClassStr)}</div>
-              </div>
-              <button class="primary" style="padding:6px 12px; font-size:11.5px;" onclick="addCandidateToClass(${u.id})">
-                Thêm vào lớp
-              </button>
-            </div>
-          `;
-        }).join('');
-      }
+  if (!candidates.length) {
+    listEl.innerHTML = `<div class="notice" style="text-align:center;">Không có thành viên nào khả dụng để thêm vào lớp.</div>`;
+  } else {
+    listEl.innerHTML = candidates.map(u => {
+      const currentClassStr = u.classId ? `(Đang ở: ${classMap[u.classId] || 'Lớp khác'})` : `(Chưa có lớp)`;
+      const roleBadge = u.role === 'admin' ? '<span style="color:#b45309;font-weight:700;">[Giảng viên]</span> ' : '';
+      return `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fbf8; border:1px solid #dce8df; border-radius:12px; padding:10px 14px;">
+          <div>
+            <b style="font-size:13px; color:#173d2e;">${roleBadge}${escapeHTML(u.fullName || u.username)}</b>
+            <span style="font-size:11px; color:#6b8275; margin-left:6px;">@${escapeHTML(u.username)}</span>
+            <div style="font-size:10.5px; color:#23694b; margin-top:2px;">${escapeHTML(currentClassStr)}</div>
+          </div>
+          <button class="primary" style="padding:6px 12px; font-size:11.5px;" onclick="addCandidateToClass(${u.id})">
+            Thêm vào lớp
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
 
-      document.getElementById('assignMemberModal').classList.add('open');
-    }
+  document.getElementById('assignMemberModal').classList.add('open');
+}
 
     function closeAssignMemberModal() {
       document.getElementById('assignMemberModal').classList.remove('open');
     }
 
     function addCandidateToClass(userId) {
-      const user = userDatabase.find(u => u.id === userId);
-      if (!user || !targetClassForAdd) return;
+  const user = userDatabase.find(u => u.id === userId);
+  if (!user || !targetClassForAdd) return;
 
-      user.classId = targetClassForAdd;
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+  user.classId = targetClassForAdd;
+  
+  // Lưu vào máy và đồng bộ ngay lên Firebase
+  localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+  rtdb.ref('/users').set(userDatabase);
 
-      const targetClass = classDatabase.find(c => c.id === targetClassForAdd);
-      showToast(`Đã thêm @${user.username} vào lớp ${targetClass ? targetClass.name : ''}`);
+  const targetClass = classDatabase.find(c => c.id === targetClassForAdd);
+  showToast(`Đã thêm @${user.username} vào lớp ${targetClass ? targetClass.name : ''}`);
 
-      openAssignMemberModal(targetClassForAdd);
-      renderClassMembersView(targetClassForAdd);
-    }
+  openAssignMemberModal(targetClassForAdd);
+  renderClassMembersView(targetClassForAdd);
+}
 
-    function removeUserFromClass(userId) {
-      const user = userDatabase.find(u => u.id === userId);
-      if (!user) return;
+function removeUserFromClass(userId) {
+  const user = userDatabase.find(u => u.id === userId);
+  if (!user) return;
 
-      if (confirm(`Bạn có chắc muốn gỡ học viên @${user.username} khỏi lớp hiện tại không?`)) {
-        user.classId = "";
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+  if (confirm(`Bạn có chắc muốn gỡ @${user.username} khỏi lớp hiện tại không?`)) {
+    user.classId = "";
+    
+    // Lưu vào máy và đồng bộ ngay lên Firebase
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+    rtdb.ref('/users').set(userDatabase);
 
-        showToast(`Đã gỡ @${user.username} khỏi lớp.`);
-        renderClassMembersView(currentClassViewId);
-      }
-    }
+    showToast(`Đã gỡ @${user.username} khỏi lớp.`);
+    renderClassMembersView(currentClassViewId);
+  }
+}
 
     /* ================= VIDEOS ================= */
     let currentVidFilter = 'all';
@@ -2782,15 +2790,20 @@ rtdb.ref('/users').on('value', (snapshot) => {
       showToast("Đã thêm buổi học mới!");
     }
 
-    function handleCreateClass(e) { 
-      e.preventDefault(); 
-      classDatabase.push({id:"cls_"+Date.now(), name:document.getElementById('newClassName').value.trim()}); 
-      localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase)); 
-      e.target.reset(); 
-      openClassManagerModal(); 
-      renderAdminClassDashboard(); 
-      showToast("Đã tạo lớp học mới!");
-    }
+function handleCreateClass(e) { 
+  e.preventDefault(); 
+  const newClass = { id: "cls_" + Date.now(), name: document.getElementById('newClassName').value.trim() };
+  classDatabase.push(newClass);
+  
+  // Lưu vào máy và đồng bộ lên Firebase cho tất cả admin khác
+  localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase)); 
+  rtdb.ref('/classes').set(classDatabase);
+
+  e.target.reset(); 
+  openClassManagerModal(); 
+  renderAdminClassDashboard(); 
+  showToast("Đã tạo lớp học mới!");
+}
     
     function openSessionManagerModal() { 
       document.getElementById('sessionListDisplay').innerHTML = sessionDatabase.map(s=>`
