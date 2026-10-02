@@ -1568,9 +1568,6 @@
     
 
     let liveOnlineStatus = {};
-    
-
-    rtdb.ref('/status').on('value', (snapshot) =>
     // --- ĐỒNG BỘ LỚP HỌC & NGƯỜI DÙNG TỪ FIREBASE REALTIME ---
 rtdb.ref('/classes').on('value', (snapshot) => {
   const data = snapshot.val();
@@ -1600,15 +1597,6 @@ rtdb.ref('/users').on('value', (snapshot) => {
     renderClassMembersView(currentCls);
   }
 });
-      {
-      liveOnlineStatus = snapshot.val() || {};
-      const activePage = document.querySelector('.page.active');
-      if (activePage && activePage.id === 'my_class' && typeof renderClassMembersView === 'function') {
-        const sel = document.getElementById('adminSelectClassView');
-        const currentCls = sel ? sel.value : (currentUser ? currentUser.classId : 'all_users');
-        renderClassMembersView(currentCls);
-      }
-    });
 
     function setupLivePresence(user) {
       if (!user) return;
