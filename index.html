@@ -1372,7 +1372,6 @@
       }
     });
 
-    // Đồng bộ danh sách chuyên đề / buổi học (Đã fix lỗi biến db -> rtdb)
     rtdb.ref('/sessions').on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -1394,7 +1393,6 @@
       }
     });
 
-    // Đồng bộ danh sách học liệu / video Drive
     rtdb.ref('/media').on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -1413,7 +1411,6 @@
       }
     });
 
-    // Bổ sung: Đồng bộ danh sách người dùng và tự động gán lớp realtime cho học viên
     rtdb.ref('/users').on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -1441,7 +1438,6 @@
       }
     });
 
-    // Lắng nghe trạng thái online của toàn bộ người dùng
     rtdb.ref('/status').on('value', (snapshot) => {
       const data = snapshot.val() || {};
       liveOnlineStatus = data;
@@ -1489,10 +1485,21 @@
       return "Máy tính Windows / PC";
     }
 
-    /* ================= UTILITIES ================= */
+    /* ================= UTILITIES & PERMISSION CONTROL ================= */
     function setElText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
     function escapeHTML(str) { return String(str||'').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]); }
     
+    // Kiểm tra học viên có quyền xem file/video hay không
+    function canUserAccessMedia(m) {
+      if (!currentUser) return false;
+      // Admin/Giảng viên có quyền xem toàn bộ học liệu
+      if (currentUser.role === 'admin') return true;
+      // Học sinh chưa có lớp hoặc file chưa được gán vào lớp -> không cho xem
+      if (!currentUser.classId || !m.classId) return false;
+      // Học sinh chỉ thấy file được phân đúng lớp của mình
+      return m.classId === currentUser.classId;
+    }
+
     let toastTimer;
     function showToast(msg) {
       const t = document.getElementById('toast'); 
@@ -1897,7 +1904,13 @@
       setElText('dashCurrentClassName', currentClassName);
 
       const container = document.getElementById('dashboardAssignmentsContainer');
-      const visible = mediaDatabase.filter(m => currentUser.role==='admin' || m.classId===currentUser.classId || m.classId==='all').slice(0,6);
+      const visible = mediaDatabase.filter(canUserAccessMedia).slice(0, 6);
+      
+      if (!currentUser.classId && currentUser.role !== 'admin') {
+        container.innerHTML = `<div class="notice" style="grid-column:1/-1;">Tài khoản của bạn chưa được xếp vào lớp học. Vui lòng liên hệ giảng viên để được cấp quyền vào lớp.</div>`;
+        return;
+      }
+
       if(!visible.length) { 
         container.innerHTML = `<div class="notice" style="grid-column:1/-1;">Chưa có tài liệu hay video nào được đăng tải cho lớp sinh học của bạn.</div>`; 
         return; 
@@ -2124,13 +2137,21 @@
     let currentVidFilter = 'all';
     function initVideosView() {
       document.getElementById('videoSessionToolbar').innerHTML = `<button class="pill ${currentVidFilter==='all'?'active':''}" onclick="currentVidFilter='all'; initVideosView();">Tất cả chuyên đề</button>` + sessionDatabase.map(s => `<button class="pill ${currentVidFilter===s.id?'active':''}" onclick="currentVidFilter='${s.id}'; initVideosView();">${escapeHTML(s.title)}</button>`).join('');
-      const vids = mediaDatabase.filter(m => m.type==='drive_video' && (currentUser.role==='admin' || m.classId===currentUser.classId || m.classId==='all'));
+      
+      const vids = mediaDatabase.filter(m => m.type === 'drive_video' && canUserAccessMedia(m));
       const filtered = vids.filter(v => currentVidFilter==='all' || v.sessionId===currentVidFilter);
       const playlist = document.getElementById('videoPlaylistContainer');
       const player = document.getElementById('driveVideoContainer');
       
+      if (!currentUser.classId && currentUser.role !== 'admin') {
+        player.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#fff;">Bạn chưa được xếp vào lớp học để xem video.</div>`;
+        playlist.innerHTML = '';
+        document.getElementById('btnOpenExternalVideo').style.display = 'none';
+        return;
+      }
+
       if(!filtered.length) { 
-        player.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#fff;">Chưa có video nào được đăng tải trong chuyên đề này.</div>`; 
+        player.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#fff;">Chưa có video nào được gán cho lớp của bạn trong chuyên đề này.</div>`; 
         playlist.innerHTML=''; 
         document.getElementById('btnOpenExternalVideo').style.display='none'; 
         return; 
@@ -2162,12 +2183,17 @@
       toolbar.innerHTML = `<button class="pill ${currentDocFilter==='all'?'active':''}" onclick="currentDocFilter='all'; initDocumentsView();">Tất cả chuyên đề</button>` + 
         sessionDatabase.map(s => `<button class="pill ${currentDocFilter===s.id?'active':''}" onclick="currentDocFilter='${s.id}'; initDocumentsView();">${escapeHTML(s.title)}</button>`).join('');
 
-      const docs = mediaDatabase.filter(m => m.type==='drive_doc' && (currentUser.role==='admin' || m.classId===currentUser.classId || m.classId==='all'));
+      const docs = mediaDatabase.filter(m => m.type === 'drive_doc' && canUserAccessMedia(m));
       const filtered = docs.filter(d => currentDocFilter==='all' || d.sessionId===currentDocFilter);
       const container = document.getElementById('docCardsContainer');
 
+      if (!currentUser.classId && currentUser.role !== 'admin') {
+        container.innerHTML = `<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Bạn chưa được xếp vào lớp học để xem tài liệu.</div>`;
+        return;
+      }
+
       if (!filtered.length) {
-        container.innerHTML = `<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Chưa có tài liệu hay đề thi nào trong chuyên đề này.</div>`;
+        container.innerHTML = `<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Chưa có tài liệu hay đề thi nào được gán cho lớp của bạn trong chuyên đề này.</div>`;
         return;
       }
 
@@ -2193,11 +2219,22 @@
     function renderAdminClassDashboard() {
       const sesHTML = sessionDatabase.length ? sessionDatabase.map(s=>`<option value="${s.id}">${escapeHTML(s.title)}</option>`).join('') : '<option value="">⚠️ Chưa có buổi (Tạo trước)</option>';
       document.getElementById('mediaSessionSelect').innerHTML = sesHTML;
-      document.getElementById('mediaClassSelect').innerHTML = `<option value="all">Tất cả lớp</option>` + classDatabase.map(c=>`<option value="${c.id}">${escapeHTML(c.name)}</option>`).join('');
       
+      // Bắt buộc chọn đúng một lớp cụ thể khi đăng tải tài liệu
+      document.getElementById('mediaClassSelect').innerHTML = classDatabase.length 
+        ? classDatabase.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join('')
+        : '<option value="">⚠️ Chưa có lớp (Hãy tạo lớp trước)</option>';
+      
+      const classMap = {};
+      classDatabase.forEach(c => classMap[c.id] = c.name);
+
       document.getElementById('adminUploadedMediaList').innerHTML = mediaDatabase.map(m=>`
         <div style="background:#f8fbf8;border:1px solid #dce8df;padding:11px 14px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
-          <div><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(m.sessionName)}</span> <b style="font-size:13px;margin-left:6px;">${escapeHTML(m.title)}</b></div>
+          <div>
+            <span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(m.sessionName)}</span> 
+            <span class="tag status-class" style="font-size:9.5px;margin-left:4px;">Lớp: ${escapeHTML(classMap[m.classId] || 'Không xác định')}</span>
+            <b style="font-size:13px;margin-left:6px;">${escapeHTML(m.title)}</b>
+          </div>
           <button onclick="handleDeleteMedia('${m.id}')" class="del-btn">🗑️</button>
         </div>`).join('') || '<div class="notice">Chưa có học liệu nào.</div>';
 
@@ -2215,7 +2252,10 @@
     function handleUploadMedia(e) {
       e.preventDefault();
       const sesId = document.getElementById('mediaSessionSelect').value;
+      const targetClassId = document.getElementById('mediaClassSelect').value;
+      if (!targetClassId) return alert("Vui lòng tạo lớp học trước khi đăng bài!");
       if (!sesId) return alert("Vui lòng tạo buổi học trước!");
+      
       const sesObj = sessionDatabase.find(s => s.id === sesId);
       const sesName = sesObj ? sesObj.title : "";
       const noteEl = document.getElementById('mediaNote');
@@ -2223,7 +2263,7 @@
       
       const newMedia = { 
         id: "med_" + Date.now(), 
-        classId: document.getElementById('mediaClassSelect').value, 
+        classId: targetClassId, 
         sessionId: sesId, 
         sessionName: sesName, 
         type: document.getElementById('mediaTypeSelect').value, 
@@ -2236,7 +2276,7 @@
       
       localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
       rtdb.ref('/media').set(mediaDatabase).then(() => {
-        showToast("Đã đăng tải và đồng bộ học liệu đến học viên!");
+        showToast("Đã đăng tải và gán học liệu vào đúng lớp!");
       });
 
       e.target.reset(); 
