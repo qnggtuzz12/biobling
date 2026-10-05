@@ -1566,6 +1566,12 @@
           <small style="font-size:11px; color:#64748b;">Chỉ học viên thuộc lớp này mới nhìn thấy và làm được đề thi.</small>
         </div>
 
+        <div class="field" style="margin:0;">
+          <label>📅 Hạn làm bài (không bắt buộc):</label>
+          <input type="datetime-local" id="inpAdminExamDeadline">
+          <small style="font-size:11px; color:#64748b;">Sau thời điểm này học viên chưa làm bài sẽ không thể bắt đầu bài thi. Để trống nếu không giới hạn hạn nộp.</small>
+        </div>
+
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px; display:flex; gap:16px; flex-wrap:wrap;">
           <label style="font-size:12px; display:flex; align-items:center; gap:6px; cursor:pointer;">
             <input type="checkbox" id="chkAdminIsUnlimited"> ⏱️ Thời gian vô hạn (Đề cương)
@@ -2127,6 +2133,10 @@
         const isPractice = !!e.practiceOnly;
         const timeBadge = isUnlimited ? 'Vô hạn thời gian' : `${e.timeLimit || 50} phút`;
         const targetClassName = classMap[e.targetClassId || 'all'] || 'Lớp cụ thể';
+        const hasDeadline = !!e.deadline;
+        const deadlineDate = hasDeadline ? new Date(e.deadline) : null;
+        const isDeadlineValid = deadlineDate && !isNaN(deadlineDate.getTime());
+        const isOverdue = !!(isDeadlineValid && Date.now() > deadlineDate.getTime());
 
         const userSubmission = currentUser 
           ? studentSubmissions.find(s => s.examCode === e.code && s.userId === currentUser.id)
@@ -2143,6 +2153,14 @@
               </div>
               <button class="secondary" style="width:100%; justify-content:center; padding:8px; font-size:12px; border-color:#86efac; color:#166534;" onclick="openReviewExamDirectly('${escapeHTML(e.code)}')">
                 <i class="fa-solid fa-eye"></i> Xem Lại Bài Làm
+              </button>
+            </div>
+          `;
+        } else if (!isAdmin && isOverdue) {
+          examActionHtml = `
+            <div class="card-foot" style="padding-top:10px;">
+              <button class="secondary" disabled style="width:100%; justify-content:center; padding:10px; font-size:12.5px; color:#b91c1c; border-color:#fecaca; background:#fef2f2; cursor:not-allowed; opacity:1;">
+                <i class="fa-solid fa-lock"></i> Đã hết hạn làm bài
               </button>
             </div>
           `;
@@ -2193,6 +2211,7 @@
             <div style="background:#f8fafc; border:1px solid #edf2f7; border-radius:10px; padding:8px 10px; margin:10px 0; font-size:11.5px; color:#475569;">
               <div>⏱️ Thời lượng: <strong>${timeBadge}</strong></div>
               <div style="margin-top:2px;">📑 Cấu trúc: <strong>${structureDesc}</strong></div>
+              ${isDeadlineValid ? `<div style="margin-top:4px; color:${isOverdue ? '#b91c1c' : '#c2410c'}; font-weight:700;">📅 ${isOverdue ? 'Đã hết hạn' : 'Hạn làm bài'}: <strong>${escapeHTML(formatDeadline(e.deadline))}</strong></div>` : '<div style="margin-top:4px;color:#64748b;">📅 Hạn làm bài: <strong>Không giới hạn</strong></div>'}
             </div>
 
             ${examActionHtml}
@@ -2209,12 +2228,21 @@
         return;
       }
 
+      if (currentUser && currentUser.role !== 'admin' && exam.deadline) {
+        const deadlineDate = new Date(exam.deadline);
+        if (!isNaN(deadlineDate.getTime()) && Date.now() > deadlineDate.getTime()) {
+          alert(`Bài thi này đã hết hạn lúc ${formatDeadline(exam.deadline)}. Bạn không thể bắt đầu bài mới.`);
+          return;
+        }
+      }
+
       const isUnlimited = !!exam.isUnlimited;
 
       document.getElementById('examWarningText').innerHTML = `
         <div style="margin-bottom:8px;">Bài thi: <strong style="color:#1e3a8a; font-size:14px;">${escapeHTML(exam.title)}</strong></div>
         <div style="margin-bottom:8px;">Mã đề: <span style="font-family:monospace; font-weight:bold; color:#2563eb;">${escapeHTML(exam.code)}</span></div>
         <div style="margin-bottom:8px;">${isUnlimited ? '📌 <strong>Chế độ:</strong> Đề cương thời gian vô hạn.' : `⏱️ <strong>Thời gian làm bài:</strong> ${exam.timeLimit || 50} phút.`}</div>
+        ${exam.deadline ? `<div style="margin-bottom:8px;color:#c2410c;">📅 <strong>Hạn làm bài:</strong> ${escapeHTML(formatDeadline(exam.deadline))}</div>` : ''}
         <div style="color:#b91c1c; font-size:12px; font-weight:600; background:#fef2f2; border:1px solid #fee2e2; border-radius:8px; padding:8px 10px;">
           ⚠ Vui lòng chuẩn bị sẵn giấy nháp và bút. Sau khi bấm bắt đầu, phòng thi sẽ mở và đồng hồ tính giờ ngay lập tức!
         </div>
@@ -2724,6 +2752,7 @@
       document.getElementById('inpAdminSaKeys').value = "";
       document.getElementById('chkAdminIsUnlimited').checked = false;
       document.getElementById('chkAdminPracticeOnly').checked = false;
+      document.getElementById('inpAdminExamDeadline').value = "";
       document.getElementById('inpAdminExamClassSelect').value = "all";
       document.getElementById('adminExamFormModal').classList.add('open');
     }
@@ -2747,6 +2776,7 @@
       const targetClassId = document.getElementById('inpAdminExamClassSelect').value;
       const isUnlimited = document.getElementById('chkAdminIsUnlimited').checked;
       const practiceOnly = document.getElementById('chkAdminPracticeOnly').checked;
+      const deadline = document.getElementById('inpAdminExamDeadline').value || '';
       const rawDocsUrl = document.getElementById('inpAdminDocsUrl').value.trim();
 
       const rawMcq = document.getElementById('inpAdminMcqKeys').value.trim();
@@ -2798,6 +2828,7 @@
           targetClassId,
           isUnlimited,
           practiceOnly,
+          deadline,
           rawDocsUrl,
           embedUrl,
           rawMcq,
@@ -2820,6 +2851,16 @@
       }
     }
 
+    function toDateTimeLocalValue(value) {
+      if (!value) return '';
+      const raw = String(value);
+      if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(raw)) return raw;
+      const d = new Date(raw);
+      if (isNaN(d.getTime())) return '';
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
     function editAdminExam(code) {
       const exam = examsList.find(x => x.code === code);
       if (!exam) return;
@@ -2833,6 +2874,7 @@
       document.getElementById('inpAdminExamClassSelect').value = exam.targetClassId || "all";
       document.getElementById('chkAdminIsUnlimited').checked = !!exam.isUnlimited;
       document.getElementById('chkAdminPracticeOnly').checked = !!exam.practiceOnly;
+      document.getElementById('inpAdminExamDeadline').value = toDateTimeLocalValue(exam.deadline);
       document.getElementById('inpAdminDocsUrl').value = exam.rawDocsUrl || exam.embedUrl || "";
       document.getElementById('inpAdminMcqKeys').value = exam.rawMcq || exam.rawKeys || "";
       document.getElementById('inpAdminTfKeys').value = exam.rawTf || "";
