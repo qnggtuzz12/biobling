@@ -867,7 +867,9 @@
   <div id="authOverlay" style="display:none;">
     <div class="auth-card">
       <div style="text-align:center;margin-bottom:20px;">
-        <div class="brand-mark" style="margin:0 auto 10px;width:48px;height:48px;font-size:24px;">2B</div>
+        <div class="brand-mark" style="margin:0 auto 12px;width:96px;height:96px;border-radius:22px;background:#244916;box-shadow:0 10px 28px rgba(27,73,52,.18);">
+          <img src="favicon.png" alt="BioBling logo" style="width:100%;height:100%;object-fit:cover;display:block;">
+        </div>
         <h2 style="margin:0;font-size:20px;color:#173d2e;">BioBling - 2B</h2>
         <p style="margin:4px 0 0;font-size:12px;color:#6b8275;">Đăng nhập để vào không gian học tập Sinh học</p>
       </div>
@@ -1220,6 +1222,11 @@
               <div class="field">
                 <label>Ghi chú / Yêu cầu làm bài (Không bắt buộc):</label>
                 <input type="text" id="mediaNote" placeholder="Ví dụ: Đọc kỹ sơ đồ giảm phân từ trang 5 đến 15 và làm bài tập vận dụng...">
+              </div>
+              <div class="field">
+                <label>Hạn hoàn thành (Không bắt buộc):</label>
+                <input type="datetime-local" id="mediaDeadline">
+                <small style="font-size:10.5px;color:#7b9184;">Nếu để trống, học liệu sẽ không có hạn nộp.</small>
               </div>
               
               <div style="text-align:right;margin-top:12px;">
@@ -3255,6 +3262,28 @@
       if (dashTimeEl) dashTimeEl.textContent = `${userData.dates[today]} phút`;
     }, 60 * 1000);
 
+    function formatDeadline(deadline) {
+      if (!deadline) return '';
+      const d = new Date(deadline);
+      if (Number.isNaN(d.getTime())) return '';
+      return d.toLocaleString('vi-VN', {
+        hour: '2-digit', minute: '2-digit',
+        day: '2-digit', month: '2-digit', year: 'numeric'
+      });
+    }
+
+    function getDeadlineBadgeHTML(deadline) {
+      if (!deadline) return '';
+      const d = new Date(deadline);
+      if (Number.isNaN(d.getTime())) return '';
+      const isOverdue = Date.now() > d.getTime();
+      const bg = isOverdue ? '#fee2e2' : '#fff7ed';
+      const color = isOverdue ? '#b91c1c' : '#c2410c';
+      const border = isOverdue ? '#fecaca' : '#fed7aa';
+      const label = isOverdue ? 'Đã quá hạn' : 'Hạn';
+      return `<div style="margin-top:10px;font-size:11px;font-weight:700;color:${color};background:${bg};border:1px solid ${border};padding:7px 9px;border-radius:9px;display:inline-flex;align-items:center;gap:5px;">⏰ ${label}: ${escapeHTML(formatDeadline(deadline))}</div>`;
+    }
+
     function initDashboardView() {
       if (!currentUser) return;
       updateUserUI();
@@ -3295,6 +3324,7 @@
         <div class="card">
           <div class="card-top"><div class="file-icon">${isVid?'🎬':'📄'}</div><span class="tag session-badge">${escapeHTML(m.sessionName)}</span></div>
           <h3>${escapeHTML(m.title)}</h3><p>${escapeHTML(m.note || "Học liệu theo chuyên đề.")}</p>
+          ${getDeadlineBadgeHTML(m.deadline)}
           <div class="card-foot">
             <span class="tag ${isVid?'status-done':'status-class'}">${isVid?'Video Bài Giảng':'Tài Liệu / Đề Thi'}</span>
             <button class="text-btn" onclick="navigateTo('${isVid?'videos':'documents'}')">Xem chi tiết</button>
@@ -3545,7 +3575,7 @@
       
       const loadVid = (v) => {
         setElText('currentVideoTitle', v.title); 
-        setElText('currentVideoNote', v.note || "Video bài giảng chính thức."); 
+        setElText('currentVideoNote', `${v.note || "Video bài giảng chính thức."}${v.deadline ? ` • Hạn: ${formatDeadline(v.deadline)}${Date.now() > new Date(v.deadline).getTime() ? ' (đã quá hạn)' : ''}` : ''}`); 
         setElText('currentVideoSessionBadge', v.sessionName);
         document.getElementById('btnOpenExternalVideo').href = v.url; 
         document.getElementById('btnOpenExternalVideo').style.display = 'inline-flex';
@@ -3557,6 +3587,7 @@
         <div class="playlist-item" style="padding:12px;border:1px solid #e7eee9;background:#fbfdfb;border-radius:12px;cursor:pointer;" onclick="loadDriveVideoPlayer('${v.id}')">
           <div style="display:flex;justify-content:space-between;"><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(v.sessionName)}</span></div>
           <b style="font-size:13px;display:block;margin-top:4px;color:#183d2e;">${escapeHTML(v.title)}</b>
+          ${v.deadline ? `<div style="font-size:10.5px;margin-top:5px;color:${Date.now() > new Date(v.deadline).getTime() ? '#b91c1c' : '#c2410c'};font-weight:700;">⏰ ${Date.now() > new Date(v.deadline).getTime() ? 'Đã quá hạn' : 'Hạn'}: ${escapeHTML(formatDeadline(v.deadline))}</div>` : ''}
         </div>`).join('');
       
       window.loadDriveVideoPlayer = (id) => loadVid(filtered.find(v => v.id === id));
@@ -3600,6 +3631,7 @@
           </div>
           <h3>${escapeHTML(doc.title)}</h3>
           <p>${escapeHTML(doc.note || "Tài liệu học tập chuẩn.")}</p>
+          ${getDeadlineBadgeHTML(doc.deadline)}
           <div class="card-foot">
             <span class="tag status-class">Word / PPTX / PDF</span>
             <button class="primary" style="padding:6px 12px;font-size:11.5px;" onclick="openDocViewer('${escapeHTML(doc.url)}', '${escapeHTML(doc.title)}')">
@@ -3627,6 +3659,7 @@
             <span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(m.sessionName)}</span> 
             <span class="tag status-class" style="font-size:9.5px;margin-left:4px;">Lớp: ${escapeHTML(classMap[m.classId] || 'Không xác định')}</span>
             <b style="font-size:13px;margin-left:6px;">${escapeHTML(m.title)}</b>
+            ${m.deadline ? `<div style="font-size:10.5px;color:${Date.now() > new Date(m.deadline).getTime() ? '#b91c1c' : '#c2410c'};font-weight:700;margin-top:5px;">⏰ ${Date.now() > new Date(m.deadline).getTime() ? 'Đã quá hạn' : 'Hạn'}: ${escapeHTML(formatDeadline(m.deadline))}</div>` : ''}
           </div>
           <button onclick="handleDeleteMedia('${m.id}')" class="del-btn">🗑️</button>
         </div>`).join('') || '<div class="notice">Chưa có học liệu nào.</div>';
@@ -3662,7 +3695,8 @@
         type: document.getElementById('mediaTypeSelect').value, 
         title: document.getElementById('mediaTitle').value.trim(), 
         url: document.getElementById('mediaUrl').value.trim(), 
-        note: document.getElementById('mediaNote').value.trim() 
+        note: document.getElementById('mediaNote').value.trim(),
+        deadline: document.getElementById('mediaDeadline').value || ''
       };
 
       mediaDatabase.unshift(newMedia);
