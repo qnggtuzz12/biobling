@@ -859,6 +859,63 @@
       .stat-row { grid-template-columns: 1fr; }
       .grid-3 { grid-template-columns: 1fr; }
     }
+
+    /* BioBling LMS V5 — Class multi-select: chỉ mở danh sách khi bấm vào. */
+    .multi-class-picker { display:block; min-height:0; padding:0; border:0; background:transparent; min-width:0; }
+    .class-picker-trigger {
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      width:100%; min-height:47px; padding:10px 13px; border:1px solid #dbe8de;
+      border-radius:12px; background:#fff; color:#213f2f; font-size:13px;
+      line-height:1.4; text-align:left; box-shadow:none; transition: border-color .16s, box-shadow .16s;
+    }
+    .class-picker-trigger:hover { border-color:#8dbda2; background:#fbfefc; }
+    .class-picker-trigger[aria-expanded="true"] { border-color:#2d8059; box-shadow:0 0 0 3px rgba(45,128,89,.1); }
+    .class-picker-trigger-text { min-width:0; flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-weight:650; }
+    .class-picker-trigger .class-picker-chevron { color:#6b8a77; flex-shrink:0; transition:transform .16s; }
+    .class-picker-trigger[aria-expanded="true"] .class-picker-chevron { transform:rotate(180deg); }
+    .class-picker-count { flex-shrink:0; font-size:10px; font-weight:750; padding:3px 7px; border-radius:99px; color:#26734f; background:#e8f5ed; }
+    .class-picker-trigger.is-empty .class-picker-trigger-text { color:#83988b; font-weight:500; }
+    .class-picker-popup {
+      position:fixed; z-index:15000; display:flex; flex-direction:column;
+      border:1px solid #d6e6dc; border-radius:15px; background:#fff;
+      box-shadow:0 16px 42px rgba(14,55,34,.20); overflow:hidden;
+      font-size:12.5px; color:#234533;
+    }
+    .class-picker-search-wrap { padding:12px 12px 9px; border-bottom:1px solid #eff3f0; }
+    .class-picker-search-wrap input {
+      display:block; width:100%; padding:10px 12px; background:#f8fbf9;
+      border:1px solid #dce9e0; border-radius:10px; color:#234533; font-size:12px;
+    }
+    .class-picker-actions { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 12px; border-bottom:1px solid #edf2ed; }
+    .class-picker-actions button { border:0; background:transparent; color:#267652; font-size:11.5px; font-weight:750; padding:4px 3px; }
+    .class-picker-actions button:hover { text-decoration:underline; }
+    .class-picker-list { overflow-y:auto; overscroll-behavior:contain; flex:1; min-height:0; padding:6px; }
+    .class-picker-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; cursor:pointer; line-height:1.45; overflow-wrap:anywhere; }
+    .class-picker-item:hover { background:#f2f8f4; }
+    .class-picker-item.selected { color:#17623e; background:#edf8f0; font-weight:700; }
+    .class-picker-item input { width:16px; height:16px; flex:0 0 16px; accent-color:#277a51; cursor:pointer; margin:0; }
+    .class-picker-item span { min-width:0; }
+    .class-picker-divider { border-top:1px solid #e6efe8; margin:4px 10px; }
+    .class-picker-empty { color:#82978a; text-align:center; padding:16px 8px; font-size:12px; }
+    .class-picker-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 12px; background:#f8fcf9; border-top:1px solid #e7efe8; }
+    .class-picker-footer button { padding:7px 14px; border-radius:9px; border:1px solid #277a51; background:#277a51; color:white; font-size:11.5px; font-weight:750; }
+    .class-picker-footer button:hover { background:#205e3f; }
+    .class-picker-footer span { font-size:11px; color:#557465; }
+    @media(max-width:580px) { .class-picker-popup { border-radius:12px; } }
+    .modal-heading,.form-actions,.admin-list-title { display:flex; gap:12px; align-items:center; justify-content:space-between; }
+    .modal-heading { margin-bottom:18px; }
+    .modal-heading h2 { margin:0; font-size:18px; }
+    .form-actions { justify-content:flex-end; border-top:1px solid #e5ece6; padding-top:15px; margin-top:16px; }
+    .class-editor-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; }
+    .admin-list-title { align-items:start; flex-wrap:wrap; margin-bottom:14px; }
+    .admin-list-title h3 { margin:0; }
+    .subtle { color:#7b8f83; font-size:11px; }
+    .draft-status { margin:0 14px; padding:9px 10px; font-size:11px; line-height:1.4; border:1px solid #d5ebda; color:#236547; background:#f0faf2; border-radius:9px; }
+    .draft-status.error { color:#9a3412; background:#fff7ed; border-color:#fed7aa; }
+    .media-admin-row { background:#f8fbf8; border:1px solid #dce8df; padding:12px 14px; border-radius:12px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:9px; }
+    .media-admin-actions { display:flex; gap:6px; flex-shrink:0; }
+    @media(max-width:620px){ .media-admin-row {align-items:flex-start;} .media-admin-actions {width:100%;justify-content:flex-end;} }
+
   </style>
 </head>
 <body>
@@ -870,7 +927,7 @@
         <div class="brand-mark" style="margin:0 auto 12px;width:96px;height:96px;border-radius:22px;background:#244916;box-shadow:0 10px 28px rgba(27,73,52,.18);">
           <img src="favicon.png" alt="BioBling logo" style="width:100%;height:100%;object-fit:cover;display:block;">
         </div>
-        <h2 style="margin:0;font-size:20px;color:#173d2e;">BioBling - 2B</h2>
+        <h2 style="margin:0;font-size:20px;color:#173d2e;">BioBling - 2B | LMS</h2>
         <p style="margin:4px 0 0;font-size:12px;color:#6b8275;">Đăng nhập để vào không gian học tập Sinh học</p>
       </div>
 
@@ -938,8 +995,8 @@
           <img src="favicon.png" alt="Logo">
         </div>
         <div>
-          <strong>BioBling</strong>
-          <small>2B BIOLOGY CENTER</small>
+          <strong>BioBling - 2B</strong>
+          <small>LEARNING MANAGEMENT SYSTEM</small>
         </div>
       </div>
       <div>
@@ -1192,8 +1249,9 @@
             <form onsubmit="handleUploadMedia(event)">
               <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;">
                 <div class="field">
-                  <label>Gán cho lớp:</label>
-                  <select id="mediaClassSelect" required></select>
+                  <label>Phân phối cho các lớp:</label>
+                  <div id="mediaClassPicker" class="multi-class-picker"></div>
+                  <small>Nhấn để tìm và tích chọn một hoặc nhiều lớp.</small>
                 </div>
                 <div class="field">
                   <label>Buổi học / Chuyên đề:</label>
@@ -1233,7 +1291,7 @@
 
           <div class="two-col" style="margin-top:0;">
             <div class="panel">
-              <h3>Học Liệu Sinh Học Đã Đăng Tải</h3>
+              <div class="admin-list-title"><h3>Học Liệu Sinh Học Đã Đăng Tải</h3><span class="subtle">Sửa tên, thay link, chuyển buổi, phân phối lớp bất cứ lúc nào</span></div>
               <div id="adminUploadedMediaList" style="display:grid;gap:8px;max-height:400px;overflow-y:auto;"></div>
             </div>
             <div class="panel">
@@ -1485,6 +1543,7 @@
           </div>
         </div>
 
+        <div id="examDraftSaveStatus" class="draft-status" role="status" aria-live="polite">🔒 Bài làm được tự động lưu trên thiết bị</div>
         <div id="liveAnswerSheetList" style="flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:14px;" class="custom-scrollbar"></div>
 
         <div style="padding:14px; border-top:1px solid #e2e8f0; background:#f8fafc;">
@@ -1557,9 +1616,9 @@
 
         <!-- Chọn Lớp Phân Quyền -->
         <div class="field" style="margin:0;">
-          <label>Phân quyền hiển thị cho Lớp:</label>
-          <select id="inpAdminExamClassSelect"></select>
-          <small style="font-size:11px; color:#64748b;">Chỉ học viên thuộc lớp này mới nhìn thấy và làm được đề thi.</small>
+          <label>Phân quyền hiển thị cho các lớp:</label>
+          <div id="examClassPicker" class="multi-class-picker"></div>
+          <small style="font-size:11px; color:#64748b;">Nhấn để chọn lớp nhận đề, có thể tìm nhanh theo tên lớp.</small>
         </div>
 
         <div class="field" style="margin:0;">
@@ -1692,6 +1751,38 @@
     </div>
   </div>
 
+  <!-- Chỉnh sửa học liệu đã đăng (không cần đăng lại) -->
+  <div id="editMediaModal" class="modal-wrap">
+    <div class="modal-box" style="width:min(100%,690px);max-height:90vh;overflow-y:auto;">
+      <div class="modal-heading"><h2>✏️ Chỉnh sửa học liệu</h2><button type="button" class="secondary" onclick="closeEditMediaModal()">✕</button></div>
+      <form id="editMediaForm" onsubmit="saveEditedMedia(event)">
+        <input type="hidden" id="editMediaId">
+        <div class="field"><label>Tiêu đề</label><input id="editMediaTitle" type="text" required maxlength="180"></div>
+        <div class="class-editor-grid">
+          <div class="field"><label>Loại học liệu</label><select id="editMediaType" required><option value="drive_video">🎬 Video</option><option value="drive_doc">📄 Tài liệu / Đề thi</option></select></div>
+          <div class="field"><label>Buổi / Chuyên đề</label><select id="editMediaSession" required></select></div>
+        </div>
+        <div class="field"><label>Hiển thị ở các lớp</label><div id="editMediaClassPicker" class="multi-class-picker"></div></div>
+        <div class="field"><label>Đường dẫn học liệu (Google Drive / Docs)</label><input id="editMediaUrl" type="url" required></div>
+        <div class="field"><label>Ghi chú / Yêu cầu</label><textarea id="editMediaNote" rows="2" placeholder="Có thể bổ sung hướng dẫn làm bài"></textarea></div>
+        <div class="field"><label>Hạn hoàn thành (không bắt buộc)</label><input type="datetime-local" id="editMediaDeadline"></div>
+        <div class="form-actions"><button type="button" class="secondary" onclick="closeEditMediaModal()">Hủy</button><button id="btnSaveEditedMedia" type="submit" class="primary">Lưu thay đổi</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Đổi tên lớp / buổi học sau khi tạo -->
+  <div id="editCatalogModal" class="modal-wrap">
+    <div class="modal-box" style="width:min(100%,500px);">
+      <div class="modal-heading"><h2 id="editCatalogHeading">Đổi tên</h2><button type="button" class="secondary" onclick="closeEditCatalogModal()">✕</button></div>
+      <form onsubmit="saveCatalogEdit(event)">
+        <input type="hidden" id="editCatalogKind"><input type="hidden" id="editCatalogId">
+        <div class="field"><label id="editCatalogLabel">Tên mới</label><input type="text" id="editCatalogName" maxlength="150" required></div>
+        <div class="form-actions"><button type="button" class="secondary" onclick="closeEditCatalogModal()">Hủy</button><button type="submit" class="primary" id="btnSaveCatalog">Cập nhật</button></div>
+      </form>
+    </div>
+  </div>
+
   <div id="approvalModal" class="modal-wrap">
     <div class="modal-box">
       <h2 style="font-size:18px;">Duyệt Học Viên</h2>
@@ -1729,6 +1820,8 @@
     const rtdb = firebase.database();
     const db = firebase.firestore();
     let liveOnlineStatus = {};
+    let currentClassPickerId = null;
+    let currentClassPickerQuery = '';
 
     /* ================= STATE GỐC ================= */
     let userDatabase = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY)) || [
@@ -1758,6 +1851,12 @@
     let examTimeRemaining = 0;
     let examZoomVal = 1.0;
     let examCurrentTool = null;
+    let activeDraftExpiresAt = null;
+    let activeDraftStartedAt = null;
+    let examSubmitting = false;
+    let examDraftCompleted = false;
+    const EXAM_DRAFT_PREFIX = 'biobling_exam_draft_v1_';
+    let examDraftHeartbeat = null;
 
     function isSuperAdmin() {
       return currentUser && 
@@ -1771,10 +1870,13 @@
       if (data) {
         classDatabase = Array.isArray(data) ? data : Object.values(data);
         localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase));
-      } else if (classDatabase && classDatabase.length > 0) {
-        rtdb.ref('/classes').set(classDatabase);
+      } else {
+        classDatabase = [];
+        localStorage.setItem(CLASSES_STORAGE_KEY, '[]');
       }
       populateExamClassSelectOptions();
+      if (document.getElementById('classManagerModal').classList.contains('open')) openClassManagerModal();
+      if (document.querySelector('.page.active')?.id === 'class_admin') renderAdminClassDashboard();
     });
 
     rtdb.ref('/sessions').on('value', (snapshot) => {
@@ -1782,9 +1884,12 @@
       if (data) {
         sessionDatabase = Array.isArray(data) ? data : Object.values(data);
         localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessionDatabase));
-      } else if (sessionDatabase && sessionDatabase.length > 0) {
-        rtdb.ref('/sessions').set(sessionDatabase);
+      } else {
+        sessionDatabase = [];
+        localStorage.setItem(SESSIONS_STORAGE_KEY, '[]');
       }
+      if (document.getElementById('sessionManagerModal').classList.contains('open')) openSessionManagerModal();
+      if (document.querySelector('.page.active')?.id === 'class_admin') renderAdminClassDashboard();
     });
 
     rtdb.ref('/media').on('value', (snapshot) => {
@@ -1792,9 +1897,15 @@
       if (data) {
         mediaDatabase = Array.isArray(data) ? data : Object.values(data);
         localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
-      } else if (mediaDatabase && mediaDatabase.length > 0) {
-        rtdb.ref('/media').set(mediaDatabase);
+      } else {
+        // Không tạo lại học liệu đã bị xóa hết bởi người quản trị khác.
+        mediaDatabase = [];
+        localStorage.setItem(MEDIA_STORAGE_KEY, '[]');
       }
+      if (document.querySelector('.page.active')?.id === 'class_admin') renderAdminClassDashboard();
+      if (document.querySelector('.page.active')?.id === 'documents') initDocumentsView();
+      if (document.querySelector('.page.active')?.id === 'videos') initVideosView();
+      if (document.querySelector('.page.active')?.id === 'dashboard') initDashboardView();
     });
 
     rtdb.ref('/users').on('value', (snapshot) => {
@@ -1892,11 +2003,226 @@
     function setElText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
     function escapeHTML(str) { return String(str||'').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]); }
     
+    // Tương thích dữ liệu cũ classId/targetClassId và dữ liệu mới classIds/targetClassIds.
+    function getAssignedClassIds(item, isExam = false) {
+      const saved = item && (isExam ? item.targetClassIds : item.classIds);
+      if (Array.isArray(saved) && saved.length) return saved.map(String);
+      const legacy = item && (isExam ? item.targetClassId : item.classId);
+      return [String(legacy || 'all')];
+    }
+    function isForClass(item, classId, isExam = false) {
+      const ids = getAssignedClassIds(item, isExam);
+      return ids.includes('all') || (classId && ids.includes(String(classId)));
+    }
+    function getAssignedClassNames(item, isExam = false) {
+      const ids = getAssignedClassIds(item, isExam);
+      if (ids.includes('all')) return 'Tất cả các lớp';
+      return ids.map(id => (classDatabase.find(c => c.id === id) || {}).name || '(Lớp đã xóa)').join(', ');
+    }
+    // Một menu dùng chung đặt trên <body> để không bị modal có overflow cắt mất.
+    // Trạng thái chọn nằm trong phần tử gốc, nên dữ liệu lưu Firebase V4 không thay đổi.
+    function normalizePickerIds(selected) {
+      const raw = Array.isArray(selected) ? selected : [selected];
+      const valid = new Set(classDatabase.map(c => String(c.id)));
+      const ids = [...new Set(raw.filter(v => v !== null && v !== undefined).map(String))];
+      if (ids.includes('all')) return ['all'];
+      return ids.filter(v => valid.has(v));
+    }
+
+    function classPickerSummary(ids) {
+      if (ids.includes('all')) return {label:'Tất cả các lớp',count:'Tất cả'};
+      if (!ids.length) return {label:'Bấm để chọn lớp',count:''};
+      if (ids.length === 1) {
+        const c = classDatabase.find(c => String(c.id) === ids[0]);
+        return {label:c ? c.name : '1 lớp đã chọn',count:'1 lớp'};
+      }
+      return {label:`Đã chọn ${ids.length} lớp`,count:`${ids.length} lớp`};
+    }
+
+    function renderClassPicker(id, selected = ['all']) {
+      if (currentClassPickerId === id) closeClassPicker();
+      const root = document.getElementById(id);
+      if (!root) return;
+      const ids = normalizePickerIds(selected);
+      root.dataset.selectedClasses = JSON.stringify(ids);
+      root.innerHTML = `<button type="button" class="class-picker-trigger" aria-label="Chọn các lớp được phân phối" aria-haspopup="dialog" aria-expanded="false" onclick="toggleClassPicker('${id}')">
+        <span class="class-picker-trigger-text"></span><span class="class-picker-count"></span>
+        <svg class="class-picker-chevron" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </button>`;
+      updateClassPickerTrigger(id);
+    }
+
+    function getSelectedClassIds(id) {
+      const root = document.getElementById(id);
+      if (!root) return [];
+      try { return normalizePickerIds(JSON.parse(root.dataset.selectedClasses || '[]')); }
+      catch (_) { return []; }
+    }
+
+    function updateClassPickerTrigger(id) {
+      const root = document.getElementById(id);
+      const trigger = root && root.querySelector('.class-picker-trigger');
+      if (!trigger) return;
+      const ids = getSelectedClassIds(id);
+      const info = classPickerSummary(ids);
+      trigger.querySelector('.class-picker-trigger-text').textContent = info.label;
+      const count = trigger.querySelector('.class-picker-count');
+      count.textContent = info.count;
+      count.style.display = info.count ? '' : 'none';
+      trigger.classList.toggle('is-empty', !ids.length);
+      trigger.title = ids.includes('all') ? 'Hiển thị ở tất cả các lớp, kể cả lớp mới tạo' :
+        ids.map(cid => (classDatabase.find(c => String(c.id) === cid) || {}).name || '').join(', ');
+    }
+
+    function setClassPickerSelection(id, selected) {
+      const root = document.getElementById(id);
+      if (!root) return;
+      root.dataset.selectedClasses = JSON.stringify(normalizePickerIds(selected));
+      updateClassPickerTrigger(id);
+      if (currentClassPickerId === id) renderClassPickerOptions();
+    }
+
+    function ensureClassPickerPopup() {
+      let popup = document.getElementById('bioblingClassPickerPopup');
+      if (!popup) {
+        popup = document.createElement('div');
+        popup.id = 'bioblingClassPickerPopup';
+        popup.className = 'class-picker-popup';
+        popup.setAttribute('role','dialog');
+        popup.setAttribute('aria-label','Danh sách lớp để phân phối');
+        popup.hidden = true;
+        popup.innerHTML = `<div class="class-picker-search-wrap"><input type="search" id="classPickerSearch" placeholder="🔎 Tìm lớp theo tên..." aria-label="Tìm lớp" autocomplete="off"></div>
+          <div class="class-picker-actions"><button type="button" onclick="setClassPickerSelection(currentClassPickerId, ['all'])">🌐 Chọn tất cả lớp</button><button type="button" onclick="setClassPickerSelection(currentClassPickerId, [])">Bỏ chọn</button></div>
+          <div class="class-picker-list" id="classPickerOptionList"></div>
+          <div class="class-picker-footer"><span id="classPickerSelectionStatus"></span><button type="button" onclick="closeClassPicker(true)">Xong</button></div>`;
+        document.body.appendChild(popup);
+        popup.querySelector('#classPickerSearch').addEventListener('input', e => {
+          currentClassPickerQuery = e.target.value;
+          renderClassPickerOptions();
+        });
+      }
+      return popup;
+    }
+
+    function positionClassPickerPopup() {
+      if (!currentClassPickerId) return;
+      const root = document.getElementById(currentClassPickerId);
+      const trigger = root && root.querySelector('button');
+      const popup = document.getElementById('bioblingClassPickerPopup');
+      if (!trigger || !popup || popup.hidden || !trigger.getClientRects().length) {
+        closeClassPicker();
+        return;
+      }
+      const r = trigger.getBoundingClientRect();
+      const viewportWidth = document.documentElement.clientWidth;
+      const viewportHeight = window.innerHeight;
+      const width = Math.min(Math.max(r.width, 320), 440, viewportWidth - 24);
+      const left = Math.max(12, Math.min(r.left, viewportWidth - width - 12));
+      const spaceBelow = viewportHeight - r.bottom - 12;
+      const spaceAbove = r.top - 12;
+      const above = spaceBelow < 275 && spaceAbove > spaceBelow;
+      const space = Math.max(130, above ? spaceAbove : spaceBelow);
+      const height = Math.min(380, space);
+      popup.style.width = `${width}px`;
+      popup.style.left = `${left}px`;
+      popup.style.maxHeight = `${height}px`;
+      popup.style.top = `${Math.max(8, above ? r.top - height - 6 : r.bottom + 6)}px`;
+    }
+
+    function renderClassPickerOptions() {
+      const id = currentClassPickerId;
+      const list = document.getElementById('classPickerOptionList');
+      if (!id || !list) return;
+      const chosen = getSelectedClassIds(id);
+      const normalize = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase();
+      const matches = classDatabase.filter(c => normalize(c.name).includes(normalize(currentClassPickerQuery.trim())));
+      const allChecked = chosen.includes('all');
+      const allHtml = !currentClassPickerQuery.trim() ? `<label class="class-picker-item ${allChecked ? 'selected' : ''}">
+        <input type="checkbox" value="all" ${allChecked ? 'checked' : ''} onchange="onClassPickerToggle(currentClassPickerId, this)"><span>🌐 Tất cả các lớp <small style="font-weight:400;color:#6c8877;display:block;">Bao gồm cả lớp tạo thêm sau này</small></span></label>
+        <div class="class-picker-divider"></div>` : '';
+      list.innerHTML = allHtml + (matches.length ? matches.map(c => {
+        const cid = String(c.id);
+        return `<label class="class-picker-item ${chosen.includes(cid) ? 'selected' : ''}">
+          <input type="checkbox" value="${escapeHTML(cid)}" ${chosen.includes(cid) ? 'checked' : ''} onchange="onClassPickerToggle(currentClassPickerId, this)">
+          <span>${escapeHTML(c.name)}</span></label>`;
+      }).join('') : '<div class="class-picker-empty">Không tìm thấy lớp phù hợp.</div>');
+      const status = document.getElementById('classPickerSelectionStatus');
+      if (status) status.textContent = classPickerSummary(chosen).label;
+    }
+
+    function onClassPickerToggle(id, checkbox) {
+      if (!id || !checkbox) return;
+      let ids = getSelectedClassIds(id);
+      const value = checkbox.value;
+      if (value === 'all') ids = checkbox.checked ? ['all'] : [];
+      else if (checkbox.checked) ids = [...ids.filter(x => x !== 'all'), value];
+      else ids = ids.filter(x => x !== value);
+      setClassPickerSelection(id, ids);
+    }
+
+    function toggleClassPicker(id) {
+      if (currentClassPickerId === id) { closeClassPicker(); return; }
+      closeClassPicker();
+      const root = document.getElementById(id);
+      if (!root) return;
+      currentClassPickerId = id;
+      currentClassPickerQuery = '';
+      const popup = ensureClassPickerPopup();
+      popup.hidden = false;
+      popup.style.display = 'flex';
+      const trigger = root.querySelector('.class-picker-trigger');
+      trigger.setAttribute('aria-expanded','true');
+      popup.querySelector('#classPickerSearch').value = '';
+      renderClassPickerOptions();
+      positionClassPickerPopup();
+      popup.querySelector('#classPickerSearch').focus();
+    }
+
+    function closeClassPicker(restoreFocus = false) {
+      const id = currentClassPickerId;
+      currentClassPickerId = null;
+      currentClassPickerQuery = '';
+      const popup = document.getElementById('bioblingClassPickerPopup');
+      if (popup) { popup.hidden = true; popup.style.display = 'none'; }
+      const trigger = id && document.getElementById(id)?.querySelector('.class-picker-trigger');
+      if (trigger) {
+        trigger.setAttribute('aria-expanded','false');
+        if (restoreFocus) trigger.focus();
+      }
+    }
+
+    // Thoát menu khi click ra ngoài; cuộn, resize vẫn giữ popup đúng vị trí.
+    document.addEventListener('pointerdown', event => {
+      if (!currentClassPickerId) return;
+      const root = document.getElementById(currentClassPickerId);
+      const popup = document.getElementById('bioblingClassPickerPopup');
+      if (!root?.contains(event.target) && !popup?.contains(event.target)) closeClassPicker();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && currentClassPickerId) {
+        event.stopPropagation();
+        closeClassPicker(true);
+      }
+    });
+    window.addEventListener('resize', positionClassPickerPopup);
+    window.addEventListener('scroll', positionClassPickerPopup, true);
     function canUserAccessMedia(m) {
       if (!currentUser) return false;
       if (currentUser.role === 'admin') return true;
-      if (!currentUser.classId || !m.classId) return false;
-      return m.classId === currentUser.classId;
+      return !!currentUser.classId && isForClass(m, currentUser.classId);
+    }
+    // Transaction tránh việc nhiều quản trị viên ghi đè dữ liệu của nhau.
+    async function commitRtdbList(path, modifier) {
+      const result = await rtdb.ref('/'+path).transaction(value => {
+        const list = Array.isArray(value) ? value.filter(Boolean) : (value && typeof value==='object' ? Object.values(value) : []);
+        return modifier(list);
+      }, undefined, false);
+      if (!result.committed) throw new Error('Không ghi được dữ liệu, hãy thử lại.');
+      return result.snapshot.val() || [];
+    }
+    function presentStorageError(err) {
+      console.error(err);
+      alert('Không thể đồng bộ lên Firebase: ' + (err && err.message || 'Lỗi kết nối. Vui lòng thử lại.'));
     }
 
     let toastTimer;
@@ -1910,6 +2236,7 @@
     }
 
     function navigateTo(pageId) {
+      closeClassPicker();
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       const targetPage = document.getElementById(pageId);
       if (targetPage) targetPage.classList.add('active');
@@ -2053,18 +2380,14 @@
     }
 
     function populateExamClassSelectOptions() {
-      const selectForm = document.getElementById('inpAdminExamClassSelect');
-      const selectFilter = document.getElementById('examClassFilterSelect');
-      
-      let htmlOptions = `<option value="all">🌐 Tất cả các lớp (Đề công khai)</option>`;
-      classDatabase.forEach(c => {
-        htmlOptions += `<option value="${c.id}">${escapeHTML(c.name)}</option>`;
-      });
-
-      if (selectForm) selectForm.innerHTML = htmlOptions;
-      if (selectFilter) {
-        selectFilter.innerHTML = `<option value="all_filter">Tất cả đề thi</option>` + htmlOptions;
-      }
+      const selected = getSelectedClassIds('examClassPicker');
+      renderClassPicker('examClassPicker', selected.length ? selected : ['all']);
+      const filter = document.getElementById('examClassFilterSelect');
+      if (!filter) return;
+      const current = filter.value || 'all_filter';
+      filter.innerHTML = '<option value="all_filter">Tất cả đề thi</option><option value="all">🌐 Đề công khai</option>' +
+        classDatabase.map(c => `<option value="${escapeHTML(c.id)}">${escapeHTML(c.name)}</option>`).join('');
+      filter.value = Array.from(filter.options).some(x=>x.value===current) ? current : 'all_filter';
     }
 
     function initExamsView() {
@@ -2100,11 +2423,9 @@
       let visible = examsList.filter(e => {
         if (isAdmin) {
           if (filterVal === 'all_filter') return true;
-          return (e.targetClassId || 'all') === filterVal;
+          return getAssignedClassIds(e, true).includes(filterVal);
         }
-        const targetClass = e.targetClassId || 'all';
-        if (targetClass === 'all') return true;
-        return currentUser && currentUser.classId === targetClass;
+        return !!currentUser && isForClass(e, currentUser.classId, true);
       });
 
       if (!visible.length) {
@@ -2128,7 +2449,7 @@
         const isUnlimited = !!e.isUnlimited;
         const isPractice = !!e.practiceOnly;
         const timeBadge = isUnlimited ? 'Vô hạn thời gian' : `${e.timeLimit || 50} phút`;
-        const targetClassName = classMap[e.targetClassId || 'all'] || 'Lớp cụ thể';
+        const targetClassName = getAssignedClassNames(e, true);
         const hasDeadline = !!e.deadline;
         const deadlineDate = hasDeadline ? new Date(e.deadline) : null;
         const isDeadlineValid = deadlineDate && !isNaN(deadlineDate.getTime());
@@ -2137,6 +2458,7 @@
         const userSubmission = currentUser 
           ? studentSubmissions.find(s => s.examCode === e.code && s.userId === currentUser.id)
           : null;
+        const savedDraft = !isAdmin && !userSubmission ? readExamDraft(e) : null;
 
         let examActionHtml = '';
         if (userSubmission && !isAdmin) {
@@ -2164,9 +2486,10 @@
           examActionHtml = `
             <div class="card-foot" style="padding-top:10px;">
               <button class="primary" style="width:100%; justify-content:center; padding:10px; font-size:12.5px; background:#2563eb; border-color:#2563eb;" onclick="promptStartExam('${escapeHTML(e.code)}')">
-                <i class="fa-solid fa-pencil"></i> Làm Bài Thi Ngay
+                <i class="fa-solid fa-pencil"></i> ${savedDraft ? '↩ Tiếp tục bài đang làm' : 'Làm Bài Thi Ngay'}
               </button>
             </div>
+            ${savedDraft ? '<small style="color:#15803d;font-weight:650;">💾 Đã có bài làm lưu trên thiết bị này</small>' : ''}
           `;
         }
 
@@ -2217,6 +2540,67 @@
       }).join('');
     }
 
+    // Bài làm được giữ lại sau khi đóng tab, F5, lỗi trình duyệt hoặc mất mạng.
+    // Đồng hồ dựa trên mốc kết thúc, không cộng lại thời gian khi tải trang.
+    function examDraftKey(exam = activeExam) {
+      if (!exam || !currentUser) return null;
+      return EXAM_DRAFT_PREFIX + encodeURIComponent(String(currentUser.id)) + '_' + encodeURIComponent(String(exam.code));
+    }
+    function readExamDraft(exam) {
+      const key = examDraftKey(exam);
+      if (!key) return null;
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        const d = JSON.parse(raw);
+        if (!d || String(d.userId)!==String(currentUser.id) || String(d.examCode)!==String(exam.code)) return null;
+        if (!d.answers || typeof d.answers!=='object') return null;
+        return d;
+      } catch(e) { console.warn('Không đọc được bản lưu bài làm:',e); return null; }
+    }
+    function formatDraftClock(time) {
+      return new Date(time).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    }
+    function showExamDraftStatus(message, failed = false) {
+      const el = document.getElementById('examDraftSaveStatus');
+      if (el) { el.textContent = message; el.classList.toggle('error', failed); }
+    }
+    function persistExamDraft() {
+      if (!activeExam || isLiveReviewMode || examDraftCompleted || !currentUser) return false;
+      const key = examDraftKey();
+      if (!key) return false;
+      const snapshot = {
+        version:1,
+        examCode: String(activeExam.code),
+        userId: String(currentUser.id),
+        startedAt: activeDraftStartedAt || Date.now(),
+        expiresAt: activeExam.isUnlimited ? null : activeDraftExpiresAt,
+        answers: JSON.parse(JSON.stringify(studentLiveAnswers)),
+        savedAt: Date.now()
+      };
+      try {
+        localStorage.setItem(key, JSON.stringify(snapshot));
+        showExamDraftStatus(`✅ Đã tự động lưu lúc ${formatDraftClock(snapshot.savedAt)} · Có thể trở lại làm tiếp trên trình duyệt này`);
+        return true;
+      } catch(err) {
+        showExamDraftStatus('⚠️ Không lưu được bài làm trên thiết bị. Hãy kiểm tra dung lượng/quyền lưu của trình duyệt.',true);
+        console.error('Exam autosave failed:',err);
+        return false;
+      }
+    }
+    function clearExamDraft(exam = activeExam) {
+      const key = examDraftKey(exam);
+      if (key) try { localStorage.removeItem(key); } catch(e) { console.warn(e); }
+    }
+    function stopExamDraftHeartbeat() {
+      clearInterval(examDraftHeartbeat);
+      examDraftHeartbeat = null;
+    }
+    window.addEventListener('pagehide', () => persistExamDraft());
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState==='hidden') persistExamDraft();
+    });
+
     function promptStartExam(examCode) {
       const exam = examsList.find(x => String(x.code).trim() === String(examCode).trim());
       if (!exam) {
@@ -2240,13 +2624,22 @@
         <div style="margin-bottom:8px;">${isUnlimited ? '📌 <strong>Chế độ:</strong> Đề cương thời gian vô hạn.' : `⏱️ <strong>Thời gian làm bài:</strong> ${exam.timeLimit || 50} phút.`}</div>
         ${exam.deadline ? `<div style="margin-bottom:8px;color:#c2410c;">📅 <strong>Hạn làm bài:</strong> ${escapeHTML(formatDeadline(exam.deadline))}</div>` : ''}
         <div style="color:#b91c1c; font-size:12px; font-weight:600; background:#fef2f2; border:1px solid #fee2e2; border-radius:8px; padding:8px 10px;">
-          ⚠ Vui lòng chuẩn bị sẵn giấy nháp và bút. Sau khi bấm bắt đầu, phòng thi sẽ mở và đồng hồ tính giờ ngay lập tức!
+          💾 Hệ thống tự động lưu mỗi câu trả lời vào trình duyệt. Nếu mất mạng, thoát tab hoặc F5, bạn có thể quay lại làm tiếp; đồng hồ vẫn tính theo thời gian đã bắt đầu.
         </div>
       `;
 
       document.getElementById('btnProceedExam').onclick = () => {
         document.getElementById('examWarningModal').classList.remove('open');
-        startExamRoom(exam, false);
+        const draft = readExamDraft(exam);
+        if (draft) {
+          const savedAt = draft.savedAt ? formatDraftClock(draft.savedAt) : 'trước đó';
+          if (confirm(`Đã tìm thấy bài làm lưu lúc ${savedAt}.\nBấm OK để TIẾP TỤC bài cũ (không đặt lại đồng hồ).\nBấm Hủy để bắt đầu lại từ đầu và xóa bản lưu cũ.`)) {
+            startExamRoom(exam, false, draft);
+          } else {
+            clearExamDraft(exam);
+            startExamRoom(exam, false);
+          }
+        } else startExamRoom(exam, false);
       };
 
       document.getElementById('examWarningModal').classList.add('open');
@@ -2256,7 +2649,7 @@
       document.getElementById('examWarningModal').classList.remove('open');
     }
 
-    function startExamRoom(exam, reviewOnly = false) {
+    function startExamRoom(exam, reviewOnly = false, restoredDraft = null) {
       if (!exam) {
         alert("Lỗi: Không tìm thấy dữ liệu bài thi!");
         return;
@@ -2264,6 +2657,7 @@
 
       activeExam = exam;
       isLiveReviewMode = reviewOnly;
+      examDraftCompleted = !!reviewOnly;
 
       if (!activeExam.mcqKeys) activeExam.mcqKeys = activeExam.keys || {};
       if (!activeExam.tfKeys) activeExam.tfKeys = {};
@@ -2284,7 +2678,23 @@
       }
 
       if (!reviewOnly) {
-        studentLiveAnswers = { mcq: {}, tf: {}, sa: {} };
+        const answers = restoredDraft && restoredDraft.answers;
+        studentLiveAnswers = {
+          mcq: {...(answers && answers.mcq || {})},
+          tf: {...(answers && answers.tf || {})},
+          sa: {...(answers && answers.sa || {})}
+        };
+        activeDraftStartedAt = restoredDraft && restoredDraft.startedAt || Date.now();
+        activeDraftExpiresAt = activeExam.isUnlimited ? null :
+          (restoredDraft && typeof restoredDraft.expiresAt === 'number'
+            ? restoredDraft.expiresAt
+            : activeDraftStartedAt + (activeExam.timeLimit || 50)*60000);
+        persistExamDraft();
+        stopExamDraftHeartbeat();
+        examDraftHeartbeat = setInterval(persistExamDraft, 15000);
+      } else {
+        stopExamDraftHeartbeat();
+        showExamDraftStatus('Chế độ xem lại bài đã nộp');
       }
 
       renderLiveExamAnswerSheet();
@@ -2311,7 +2721,7 @@
           clearInterval(examCountdownTimer);
         } else {
           timerBox.style.display = 'flex';
-          startExamTimer((activeExam.timeLimit || 50) * 60);
+          startExamTimer(activeDraftExpiresAt);
         }
       }
 
@@ -2457,6 +2867,7 @@
     function pickLiveOption(q, opt) {
       if (isLiveReviewMode) return;
       studentLiveAnswers.mcq[q] = (studentLiveAnswers.mcq[q] === opt) ? null : opt;
+      persistExamDraft();
       renderLiveExamAnswerSheet();
     }
 
@@ -2464,12 +2875,14 @@
       if (isLiveReviewMode) return;
       if (!studentLiveAnswers.tf[q]) studentLiveAnswers.tf[q] = {};
       studentLiveAnswers.tf[q][sub] = (studentLiveAnswers.tf[q][sub] === val) ? null : val;
+      persistExamDraft();
       renderLiveExamAnswerSheet();
     }
 
     function pickLiveSaAnswer(q, val) {
       if (isLiveReviewMode) return;
       studentLiveAnswers.sa[q] = val;
+      persistExamDraft();
       updateLiveProgress();
     }
 
@@ -2488,29 +2901,25 @@
       document.getElementById('liveProgressBar').style.width = `${totalItems ? (totalDone / totalItems) * 100 : 0}%`;
     }
 
-    function startExamTimer(seconds) {
+    function startExamTimer(expiresAt) {
       clearInterval(examCountdownTimer);
-      examTimeRemaining = seconds;
       const disp = document.getElementById('liveExamTimer');
-      
-      const updateDisplay = () => {
+      const update = () => {
+        examTimeRemaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
         const m = Math.floor(examTimeRemaining / 60);
-        const s = examTimeRemaining % 60;
-        disp.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-      };
-      
-      updateDisplay();
-
-      examCountdownTimer = setInterval(() => {
+        const sec = examTimeRemaining % 60;
+        disp.innerText = `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
         if (examTimeRemaining <= 0) {
           clearInterval(examCountdownTimer);
-          alert("Đã hết giờ làm bài! Hệ thống tự động nộp bài.");
-          submitLiveExam();
-          return;
+          examCountdownTimer = null;
+          if (!examSubmitting && activeExam && !isLiveReviewMode) {
+            showToast('Đã hết giờ! Hệ thống đang nộp bài thi.');
+            submitLiveExam();
+          }
         }
-        examTimeRemaining--;
-        updateDisplay();
-      }, 1000);
+      };
+      update();
+      if (examTimeRemaining > 0) examCountdownTimer = setInterval(update, 1000);
     }
 
     function confirmLiveSubmit() {
@@ -2524,14 +2933,22 @@
         exitExamToHome();
         return;
       }
-      if (confirm("Cảnh báo: Bạn đang trong thời gian làm bài thi!\nNếu thoát bây giờ, kết quả của bạn sẽ không được lưu. Bạn có chắc chắn muốn thoát?")) {
+      if (confirm('Bài làm đã được tự động lưu trên thiết bị. Bạn có muốn rời phòng thi và quay lại làm tiếp sau không?\nLưu ý: đồng hồ của đề có giới hạn thời gian vẫn tiếp tục chạy.')) {
+        persistExamDraft();
+        stopExamDraftHeartbeat();
         clearInterval(examCountdownTimer);
         document.getElementById('liveExamModal').classList.remove('open');
         document.body.style.overflow = '';
+        activeExam = null;
+        renderExamsList();
       }
     }
 
     async function submitLiveExam() {
+      if (examSubmitting || !activeExam || isLiveReviewMode) return;
+      examSubmitting = true;
+      persistExamDraft();
+      stopExamDraftHeartbeat();
       clearInterval(examCountdownTimer);
       
       const mcqKeys = activeExam.mcqKeys || {};
@@ -2629,11 +3046,20 @@
             answers: studentLiveAnswers,
             submittedAt: new Date().toISOString()
           });
+          clearExamDraft();
         } catch (err) {
-          console.error("Lỗi lưu điểm thi:", err);
+          console.error('Lỗi lưu điểm thi:', err);
+          showExamDraftStatus('⚠️ Chưa gửi được bài lên Firebase. Bản nháp vẫn an toàn trên thiết bị; hãy kết nối mạng và bấm Nộp bài lại.', true);
+          alert('Chưa thể gửi bài thi lên Firebase. Bài làm đã được lưu trên thiết bị. Hãy kiểm tra kết nối mạng và bấm Nộp bài lại.');
+          examSubmitting = false;
+          return;
         }
+      } else {
+        // Chế độ dùng thử không đăng nhập: không có kết quả trên đám mây.
+        clearExamDraft();
       }
-
+      examSubmitting = false;
+      examDraftCompleted = true;
       document.getElementById('examResultScoreModal').classList.add('open');
     }
 
@@ -2642,6 +3068,10 @@
       document.getElementById('liveExamModal').classList.remove('open');
       document.body.style.overflow = '';
       activeExam = null;
+      examDraftCompleted = false;
+      stopExamDraftHeartbeat();
+      activeDraftExpiresAt = null;
+      activeDraftStartedAt = null;
       isLiveReviewMode = false;
       renderExamsList();
     }
@@ -2749,11 +3179,12 @@
       document.getElementById('chkAdminIsUnlimited').checked = false;
       document.getElementById('chkAdminPracticeOnly').checked = false;
       document.getElementById('inpAdminExamDeadline').value = "";
-      document.getElementById('inpAdminExamClassSelect').value = "all";
+      renderClassPicker('examClassPicker', ['all']);
       document.getElementById('adminExamFormModal').classList.add('open');
     }
 
     function closeAdminExamModal() {
+      closeClassPicker();
       document.getElementById('adminExamFormModal').classList.remove('open');
     }
 
@@ -2769,7 +3200,9 @@
       const code = document.getElementById('inpAdminExamCode').value.trim();
       const title = document.getElementById('inpAdminExamTitle').value.trim();
       const timeLimit = parseInt(document.getElementById('inpAdminExamTime').value) || 50;
-      const targetClassId = document.getElementById('inpAdminExamClassSelect').value;
+      const targetClassIds = getSelectedClassIds('examClassPicker');
+      if (!targetClassIds.length) return alert('Vui lòng chọn ít nhất một lớp cho đề thi.');
+      const targetClassId = targetClassIds[0];
       const isUnlimited = document.getElementById('chkAdminIsUnlimited').checked;
       const practiceOnly = document.getElementById('chkAdminPracticeOnly').checked;
       const deadline = document.getElementById('inpAdminExamDeadline').value || '';
@@ -2822,6 +3255,7 @@
           title,
           timeLimit,
           targetClassId,
+          targetClassIds,
           isUnlimited,
           practiceOnly,
           deadline,
@@ -2867,7 +3301,7 @@
       document.getElementById('inpAdminExamCode').disabled = true;
       document.getElementById('inpAdminExamTitle').value = exam.title;
       document.getElementById('inpAdminExamTime').value = exam.timeLimit || 50;
-      document.getElementById('inpAdminExamClassSelect').value = exam.targetClassId || "all";
+      renderClassPicker('examClassPicker', getAssignedClassIds(exam, true));
       document.getElementById('chkAdminIsUnlimited').checked = !!exam.isUnlimited;
       document.getElementById('chkAdminPracticeOnly').checked = !!exam.practiceOnly;
       document.getElementById('inpAdminExamDeadline').value = toDateTimeLocalValue(exam.deadline);
@@ -3360,7 +3794,7 @@
         const isVid = m.type==='drive_video';
         return `
         <div class="card">
-          <div class="card-top"><div class="file-icon">${isVid?'🎬':'📄'}</div><span class="tag session-badge">${escapeHTML(m.sessionName)}</span></div>
+          <div class="card-top"><div class="file-icon">${isVid?'🎬':'📄'}</div><span class="tag session-badge">${escapeHTML((sessionDatabase.find(s=>s.id===m.sessionId)||{}).title || m.sessionName || 'Chuyên đề')}</span></div>
           <h3>${escapeHTML(m.title)}</h3><p>${escapeHTML(m.note || "Học liệu theo chuyên đề.")}</p>
           ${getDeadlineBadgeHTML(m.deadline)}
           <div class="card-foot">
@@ -3614,7 +4048,7 @@
       const loadVid = (v) => {
         setElText('currentVideoTitle', v.title); 
         setElText('currentVideoNote', `${v.note || "Video bài giảng chính thức."}${v.deadline ? ` • Hạn: ${formatDeadline(v.deadline)}${Date.now() > new Date(v.deadline).getTime() ? ' (đã quá hạn)' : ''}` : ''}`); 
-        setElText('currentVideoSessionBadge', v.sessionName);
+        setElText('currentVideoSessionBadge', (sessionDatabase.find(s=>s.id===v.sessionId)||{}).title || v.sessionName || 'Chuyên đề');
         document.getElementById('btnOpenExternalVideo').href = v.url; 
         document.getElementById('btnOpenExternalVideo').style.display = 'inline-flex';
         player.innerHTML = `<iframe src="${convertToDrivePreviewUrl(v.url)}" allowfullscreen></iframe>`;
@@ -3623,7 +4057,7 @@
       
       playlist.innerHTML = filtered.map(v => `
         <div class="playlist-item" style="padding:12px;border:1px solid #e7eee9;background:#fbfdfb;border-radius:12px;cursor:pointer;" onclick="loadDriveVideoPlayer('${v.id}')">
-          <div style="display:flex;justify-content:space-between;"><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(v.sessionName)}</span></div>
+          <div style="display:flex;justify-content:space-between;"><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML((sessionDatabase.find(s=>s.id===v.sessionId)||{}).title || v.sessionName || 'Chuyên đề')}</span></div>
           <b style="font-size:13px;display:block;margin-top:4px;color:#183d2e;">${escapeHTML(v.title)}</b>
           ${v.deadline ? `<div style="font-size:10.5px;margin-top:5px;color:${Date.now() > new Date(v.deadline).getTime() ? '#b91c1c' : '#c2410c'};font-weight:700;">⏰ ${Date.now() > new Date(v.deadline).getTime() ? 'Đã quá hạn' : 'Hạn'}: ${escapeHTML(formatDeadline(v.deadline))}</div>` : ''}
         </div>`).join('');
@@ -3665,7 +4099,7 @@
         <div class="card">
           <div class="card-top">
             <div class="file-icon">📄</div>
-            <span class="tag session-badge">${escapeHTML(doc.sessionName)}</span>
+            <span class="tag session-badge">${escapeHTML((sessionDatabase.find(s=>s.id===doc.sessionId)||{}).title || doc.sessionName || 'Chuyên đề')}</span>
           </div>
           <h3>${escapeHTML(doc.title)}</h3>
           <p>${escapeHTML(doc.note || "Tài liệu học tập chuẩn.")}</p>
@@ -3680,128 +4114,230 @@
       `).join('');
     }
 
-    function renderAdminClassDashboard() {
-      const sesHTML = sessionDatabase.length ? sessionDatabase.map(s=>`<option value="${s.id}">${escapeHTML(s.title)}</option>`).join('') : '<option value="">⚠️ Chưa có buổi (Tạo trước)</option>';
-      document.getElementById('mediaSessionSelect').innerHTML = sesHTML;
-      
-      document.getElementById('mediaClassSelect').innerHTML = classDatabase.length 
-        ? classDatabase.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join('')
-        : '<option value="">⚠️ Chưa có lớp (Hãy tạo lớp trước)</option>';
-      
-      const classMap = {};
-      classDatabase.forEach(c => classMap[c.id] = c.name);
+    function refreshAdminPickers() {
+      const mediaSelection = getSelectedClassIds('mediaClassPicker');
+      renderClassPicker('mediaClassPicker', mediaSelection.length ? mediaSelection : ['all']);
+      const sel = document.getElementById('mediaSessionSelect');
+      if (sel) {
+        const previous = sel.value;
+        sel.innerHTML = sessionDatabase.length ? sessionDatabase.map(s => `<option value="${escapeHTML(s.id)}">${escapeHTML(s.title)}</option>`).join('') : '<option value="">⚠️ Hãy tạo buổi học trước</option>';
+        if (sessionDatabase.some(s=>s.id===previous)) sel.value = previous;
+      }
+    }
 
-      document.getElementById('adminUploadedMediaList').innerHTML = mediaDatabase.map(m=>`
-        <div style="background:#f8fbf8;border:1px solid #dce8df;padding:11px 14px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(m.sessionName)}</span> 
-            <span class="tag status-class" style="font-size:9.5px;margin-left:4px;">Lớp: ${escapeHTML(classMap[m.classId] || 'Không xác định')}</span>
-            <b style="font-size:13px;margin-left:6px;">${escapeHTML(m.title)}</b>
-            ${m.deadline ? `<div style="font-size:10.5px;color:${Date.now() > new Date(m.deadline).getTime() ? '#b91c1c' : '#c2410c'};font-weight:700;margin-top:5px;">⏰ ${Date.now() > new Date(m.deadline).getTime() ? 'Đã quá hạn' : 'Hạn'}: ${escapeHTML(formatDeadline(m.deadline))}</div>` : ''}
+    function renderAdminClassDashboard() {
+      refreshAdminPickers();
+      const list = document.getElementById('adminUploadedMediaList');
+      list.innerHTML = mediaDatabase.map(m => `
+        <div class="media-admin-row">
+          <div style="min-width:0;flex:1;">
+            <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:4px;">
+              <span class="tag session-badge" style="font-size:9.5px;">${escapeHTML((sessionDatabase.find(s=>s.id===m.sessionId)||{}).title || m.sessionName || 'Chưa gán chuyên đề')}</span>
+              <span class="tag status-class" style="font-size:9.5px;">🏫 ${escapeHTML(getAssignedClassNames(m))}</span>
+            </div>
+            <b style="font-size:13px;overflow-wrap:anywhere;">${escapeHTML(m.title)}</b>
+            ${m.deadline ? `<div style="font-size:10.5px;color:${Date.now()>new Date(m.deadline).getTime()?'#b91c1c':'#c2410c'};font-weight:700;margin-top:5px;">⏰ Hạn: ${escapeHTML(formatDeadline(m.deadline))}</div>` : ''}
           </div>
-          <button onclick="handleDeleteMedia('${m.id}')" class="del-btn">🗑️</button>
+          <div class="media-admin-actions">
+            <button onclick="openEditMediaModal('${escapeHTML(m.id)}')" class="secondary" style="padding:6px 11px;font-size:11px;" title="Chỉnh sửa học liệu đã đăng">✏️ Sửa</button>
+            <button onclick="handleDeleteMedia('${escapeHTML(m.id)}')" class="del-btn" title="Xóa học liệu">🗑️</button>
+          </div>
         </div>`).join('') || '<div class="notice">Chưa có học liệu nào.</div>';
 
       const pendingUsers = userDatabase.filter(u => u.status === 'pending');
       const isMaster = isSuperAdmin();
-
-      document.getElementById('adminQuickUsersList').innerHTML = pendingUsers.length 
+      document.getElementById('adminQuickUsersList').innerHTML = pendingUsers.length
         ? pendingUsers.map(u => `
             <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#fff8ea;border:1px solid #fde7b9;border-radius:10px;font-size:12px;">
               <span><strong>${escapeHTML(u.fullName || u.username)}</strong> (@${escapeHTML(u.username)})</span>
-              <div style="display:flex; gap:6px;">
+              <div style="display:flex;gap:6px;">
                 <button class="primary" style="padding:4px 8px;font-size:11px;" onclick="approveUser(${u.id})">Duyệt</button>
                 ${isMaster ? `<button onclick="deleteUserPermanently(${u.id})" class="super-del-btn" style="padding:3px 6px;">Xóa</button>` : ''}
               </div>
-            </div>
-          `).join('')
+            </div>`).join('')
         : '<div style="font-size:12px;color:#71877d;">Không có học viên chờ duyệt.</div>';
     }
 
-    function handleUploadMedia(e) {
+    async function handleUploadMedia(e) {
       e.preventDefault();
-      const sesId = document.getElementById('mediaSessionSelect').value;
-      const targetClassId = document.getElementById('mediaClassSelect').value;
-      if (!targetClassId || !sesId) return alert("Vui lòng tạo lớp và buổi học trước!");
-      
-      const sesObj = sessionDatabase.find(s => s.id === sesId);
-      const newMedia = { 
-        id: "med_" + Date.now(), 
-        classId: targetClassId, 
-        sessionId: sesId, 
-        sessionName: sesObj ? sesObj.title : "", 
-        type: document.getElementById('mediaTypeSelect').value, 
-        title: document.getElementById('mediaTitle').value.trim(), 
-        url: document.getElementById('mediaUrl').value.trim(), 
+      const sessionId = document.getElementById('mediaSessionSelect').value;
+      const classIds = getSelectedClassIds('mediaClassPicker');
+      const title = document.getElementById('mediaTitle').value.trim();
+      const url = document.getElementById('mediaUrl').value.trim();
+      if (!sessionDatabase.some(s=>s.id===sessionId)) return alert('Hãy tạo buổi học trước.');
+      if (!classIds.length) return alert('Chọn ít nhất một lớp cho học liệu.');
+      if (!title || !url) return alert('Vui lòng nhập tiêu đề và đường dẫn học liệu.');
+      const sesObj = sessionDatabase.find(s => s.id === sessionId);
+      const newMedia = {
+        id: 'med_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+        classId: classIds[0], classIds,
+        sessionId, sessionName: sesObj.title,
+        type: document.getElementById('mediaTypeSelect').value,
+        title, url,
         note: document.getElementById('mediaNote').value.trim(),
-        deadline: document.getElementById('mediaDeadline').value || ''
+        deadline: document.getElementById('mediaDeadline').value || '',
+        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
       };
-
-      mediaDatabase.unshift(newMedia);
-      localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
-      rtdb.ref('/media').set(mediaDatabase).then(() => showToast("Đã đăng tải học liệu!"));
-
-      e.target.reset(); 
-      renderAdminClassDashboard(); 
-    }
-
-    function handleDeleteMedia(mediaId) {
-      if (confirm("Xóa tài liệu này khỏi hệ thống?")) {
-        mediaDatabase = mediaDatabase.filter(x => x.id !== mediaId);
-        localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
-        rtdb.ref('/media').set(mediaDatabase);
+      const button = e.target.querySelector('[type=submit]');
+      button.disabled = true;
+      try {
+        await commitRtdbList('media', rows => [newMedia, ...rows]);
+        e.target.reset();
+        renderClassPicker('mediaClassPicker',['all']);
+        showToast('Đã đăng học liệu cho ' + getAssignedClassNames(newMedia));
         renderAdminClassDashboard();
-      }
-    }
-    
-    function handleCreateClass(e) { 
-      e.preventDefault(); 
-      const newClass = { id: "cls_" + Date.now(), name: document.getElementById('newClassName').value.trim() };
-      classDatabase.push(newClass);
-      localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase)); 
-      rtdb.ref('/classes').set(classDatabase);
-      e.target.reset(); 
-      openClassManagerModal(); 
-      renderAdminClassDashboard(); 
+      } catch(err) { presentStorageError(err); }
+      finally { button.disabled = false; }
     }
 
-    function handleCreateSession(e) {
+    function openEditMediaModal(id) {
+      const item = mediaDatabase.find(m=>m.id===id);
+      if (!item) return alert('Học liệu không còn tồn tại.');
+      document.getElementById('editMediaId').value = item.id;
+      document.getElementById('editMediaTitle').value = item.title || '';
+      document.getElementById('editMediaType').value = item.type || 'drive_doc';
+      document.getElementById('editMediaSession').innerHTML = sessionDatabase.map(s=>`<option value="${escapeHTML(s.id)}">${escapeHTML(s.title)}</option>`).join('');
+      document.getElementById('editMediaSession').value = item.sessionId || '';
+      document.getElementById('editMediaUrl').value = item.url || '';
+      document.getElementById('editMediaNote').value = item.note || '';
+      document.getElementById('editMediaDeadline').value = toDateTimeLocalValue(item.deadline);
+      renderClassPicker('editMediaClassPicker', getAssignedClassIds(item));
+      document.getElementById('editMediaModal').classList.add('open');
+    }
+    function closeEditMediaModal() { closeClassPicker(); document.getElementById('editMediaModal').classList.remove('open'); }
+
+    async function saveEditedMedia(e) {
+      e.preventDefault();
+      const id = document.getElementById('editMediaId').value;
+      const classIds = getSelectedClassIds('editMediaClassPicker');
+      const sessionId = document.getElementById('editMediaSession').value;
+      if (!classIds.length) return alert('Hãy chọn ít nhất một lớp.');
+      const ses = sessionDatabase.find(s=>s.id===sessionId);
+      if (!ses) return alert('Buổi học đã bị xóa, vui lòng chọn lại.');
+      const patch = {
+        classId: classIds[0], classIds,
+        sessionId, sessionName: ses.title,
+        type: document.getElementById('editMediaType').value,
+        title: document.getElementById('editMediaTitle').value.trim(),
+        url: document.getElementById('editMediaUrl').value.trim(),
+        note: document.getElementById('editMediaNote').value.trim(),
+        deadline: document.getElementById('editMediaDeadline').value || '',
+        updatedAt: new Date().toISOString()
+      };
+      if (!patch.title || !patch.url) return alert('Tiêu đề và đường dẫn không thể để trống.');
+      const btn = document.getElementById('btnSaveEditedMedia');
+      btn.disabled = true;
+      try {
+        let found = false;
+        await commitRtdbList('media', rows => rows.map(item=>{
+          if (item.id !== id) return item;
+          found = true;
+          return {...item,...patch};
+        }));
+        if (!found) throw new Error('Không còn tìm thấy học liệu trên Firebase.');
+        closeEditMediaModal();
+        showToast('Đã cập nhật học liệu!');
+        renderAdminClassDashboard();
+      } catch(err) { presentStorageError(err); }
+      finally { btn.disabled = false; }
+    }
+
+    async function handleDeleteMedia(id) {
+      if (!confirm('Xóa học liệu này khỏi tất cả các lớp?')) return;
+      try {
+        await commitRtdbList('media', rows=>rows.filter(m=>m.id!==id));
+        showToast('Đã xóa học liệu.');
+        renderAdminClassDashboard();
+      } catch(err){presentStorageError(err);}
+    }
+
+    async function handleCreateClass(e) {
+      e.preventDefault();
+      const name = document.getElementById('newClassName').value.trim();
+      if (!name) return;
+      try {
+        await commitRtdbList('classes',rows=>[...rows,{id:'cls_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),name}]);
+        e.target.reset();
+        openClassManagerModal(); renderAdminClassDashboard();
+        showToast('Đã tạo lớp học.');
+      } catch(err) {presentStorageError(err);}
+    }
+    async function handleCreateSession(e) {
       e.preventDefault();
       const title = document.getElementById('newSessionTitle').value.trim();
-      sessionDatabase.push({ id: "ses_" + Date.now(), title });
-      localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessionDatabase));
-      rtdb.ref('/sessions').set(sessionDatabase);
-      e.target.reset();
-      openSessionManagerModal();
-      renderAdminClassDashboard();
+      if (!title) return;
+      try {
+        await commitRtdbList('sessions',rows=>[...rows,{id:'ses_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),title}]);
+        e.target.reset();
+        openSessionManagerModal(); renderAdminClassDashboard();
+        showToast('Đã thêm buổi học.');
+      } catch(err) {presentStorageError(err);}
     }
-    
-    function openSessionManagerModal() { 
+
+    function openSessionManagerModal() {
       document.getElementById('sessionListDisplay').innerHTML = sessionDatabase.map(s=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #edf2ed;">
-          <span>${escapeHTML(s.title)}</span>
-          <button onclick="sessionDatabase=sessionDatabase.filter(x=>x.id!=='${s.id}'); localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessionDatabase)); rtdb.ref('/sessions').set(sessionDatabase); openSessionManagerModal(); renderAdminClassDashboard();" class="del-btn">🗑️</button>
-        </div>`).join('');
-      document.getElementById('sessionManagerModal').classList.add('open'); 
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #edf2ed;">
+          <span style="font-size:13px;">${escapeHTML(s.title)}</span>
+          <div style="display:flex;gap:6px;"><button class="secondary" style="padding:5px 9px;font-size:11px;" onclick="openEditCatalogModal('session','${escapeHTML(s.id)}')">✏️ Sửa</button><button class="del-btn" onclick="handleDeleteSession('${escapeHTML(s.id)}')">🗑️</button></div>
+        </div>`).join('') || '<div class="notice">Chưa có buổi học.</div>';
+      document.getElementById('sessionManagerModal').classList.add('open');
     }
-
-    function openClassManagerModal() { 
-      document.getElementById('classListContainer').innerHTML = classDatabase.map(c => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #edf2ed;">
-          <span>${escapeHTML(c.name)}</span>
-          <button onclick="handleDeleteClass('${c.id}')" class="del-btn">🗑️</button>
-        </div>`).join('');
-      document.getElementById('classManagerModal').classList.add('open'); 
+    function openClassManagerModal() {
+      document.getElementById('classListContainer').innerHTML = classDatabase.map(c=>`
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #edf2ed;">
+          <span style="font-size:13px;">${escapeHTML(c.name)}</span>
+          <div style="display:flex;gap:6px;"><button class="secondary" style="padding:5px 9px;font-size:11px;" onclick="openEditCatalogModal('class','${escapeHTML(c.id)}')">✏️ Sửa</button><button class="del-btn" onclick="handleDeleteClass('${escapeHTML(c.id)}')">🗑️</button></div>
+        </div>`).join('') || '<div class="notice">Chưa có lớp học.</div>';
+      document.getElementById('classManagerModal').classList.add('open');
     }
-
-    function handleDeleteClass(classId) {
-      if (confirm("Bạn có chắc chắn muốn xóa lớp học này không?")) {
-        classDatabase = classDatabase.filter(x => x.id !== classId);
-        localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase));
-        rtdb.ref('/classes').set(classDatabase);
-        openClassManagerModal();
+    function openEditCatalogModal(kind,id) {
+      const data = kind==='class' ? classDatabase : sessionDatabase;
+      const obj = data.find(x=>x.id===id);
+      if (!obj) return alert('Không tìm thấy mục này.');
+      document.getElementById('editCatalogKind').value = kind;
+      document.getElementById('editCatalogId').value = id;
+      document.getElementById('editCatalogHeading').textContent = kind==='class'?'✏️ Đổi tên lớp học':'✏️ Đổi tên buổi học';
+      document.getElementById('editCatalogLabel').textContent = kind==='class'?'Tên lớp mới':'Tên buổi / chuyên đề mới';
+      document.getElementById('editCatalogName').value = kind==='class'?obj.name:obj.title;
+      document.getElementById('editCatalogModal').classList.add('open');
+      document.getElementById('editCatalogName').focus();
+    }
+    function closeEditCatalogModal() { document.getElementById('editCatalogModal').classList.remove('open'); }
+    async function saveCatalogEdit(e) {
+      e.preventDefault();
+      const kind = document.getElementById('editCatalogKind').value;
+      const id = document.getElementById('editCatalogId').value;
+      const name = document.getElementById('editCatalogName').value.trim();
+      if (!name) return;
+      const path = kind==='class' ? 'classes' : 'sessions';
+      const btn = document.getElementById('btnSaveCatalog');
+      btn.disabled = true;
+      try {
+        await commitRtdbList(path,rows=>rows.map(x=>x.id===id?{...x,[kind==='class'?'name':'title']:name}:x));
+        // Các thẻ học liệu được hiển thị qua sessionId => đổi tên sẽ hiện ngay, không đổi ID.
+        closeEditCatalogModal();
+        if (kind==='class') openClassManagerModal();
+        else openSessionManagerModal();
         renderAdminClassDashboard();
-      }
+        showToast('Đã đổi tên thành công.');
+      } catch(err) {presentStorageError(err);}
+      finally {btn.disabled=false;}
+    }
+    async function handleDeleteSession(id) {
+      const used = mediaDatabase.filter(m=>m.sessionId===id);
+      if (used.length) return alert(`Buổi học đang chứa ${used.length} học liệu. Hãy chuyển các học liệu sang buổi khác trước khi xóa.`);
+      if (!confirm('Xóa buổi học này?')) return;
+      try { await commitRtdbList('sessions',rows=>rows.filter(s=>s.id!==id)); openSessionManagerModal(); renderAdminClassDashboard(); }
+      catch(err){presentStorageError(err);}
+    }
+    async function handleDeleteClass(id) {
+      const members = userDatabase.filter(u=>u.classId===id);
+      const media = mediaDatabase.filter(m=>getAssignedClassIds(m).includes(id));
+      const exams = examsList.filter(e=>getAssignedClassIds(e,true).includes(id));
+      if (members.length || media.length || exams.length) return alert(`Lớp vẫn đang được sử dụng (${members.length} học viên, ${media.length} học liệu, ${exams.length} đề thi). Hãy chuyển các mục này sang lớp khác trước khi xóa.`);
+      if (!confirm('Xóa lớp này vĩnh viễn?')) return;
+      try { await commitRtdbList('classes',rows=>rows.filter(c=>c.id!==id)); openClassManagerModal(); renderAdminClassDashboard(); }
+      catch(err){presentStorageError(err);}
     }
 
     function openApprovalModal() {
