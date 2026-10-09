@@ -907,6 +907,23 @@
     .modal-heading h2 { margin:0; font-size:18px; }
     .form-actions { justify-content:flex-end; border-top:1px solid #e5ece6; padding-top:15px; margin-top:16px; }
     .class-editor-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; }
+    .session-allocation { border:1px solid #dfeae2; border-radius:14px; background:#fafdfa; padding:11px; display:grid; gap:9px; min-height:54px; }
+    #sessionManagerModal { z-index:11010; }
+    #editCatalogModal { z-index:12010; }
+    .session-allocation .allocation-list {display:grid;gap:9px;max-height:330px;overflow-y:auto;overscroll-behavior:contain;padding:1px 3px 3px 1px;}
+    .session-allocation .allocation-search {padding:8px 10px;width:100%;border:1px solid #dce8de;border-radius:9px;font-size:12px;background:white;}
+    .session-allocation .allocation-head { display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap; font-size:11px; color:#5f7e6b; font-weight:650; }
+    .session-allocation .session-class-row { display:grid; grid-template-columns:minmax(125px,.85fr) minmax(145px,1.5fr) auto;gap:10px; align-items:center; background:#fff;border:1px solid #e5eee7;border-radius:11px;padding:9px; }
+    .session-allocation .session-class-row strong {font-size:11.5px;overflow-wrap:anywhere;color:#275541;}
+    .session-allocation .session-class-row select {width:100%;min-width:0;padding:9px 10px;background:#fff;border:1px solid #d5e4da;border-radius:9px;font-size:12px;color:#1a4b33;}
+    .session-allocation .session-add-link {border:0;background:#e9f5ee;color:#1e7349;padding:9px 10px;border-radius:9px;font-size:11px;font-weight:700;white-space:nowrap;}
+    .session-allocation .session-empty { font-size:12px;color:#7b9484;padding:12px 4px;text-align:center; }
+    .session-mgr-label {display:block;font-size:12px;font-weight:750;color:#315b43;margin-bottom:5px;}
+    .session-mgr-hint {font-size:11px;color:#759080;margin:4px 0 9px;}
+    .session-mgr-card {display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 10px;border:1px solid #e3ece5;border-radius:12px;margin-bottom:8px;background:#fff;}
+    .session-mgr-card strong {font-size:12px;color:#284735;overflow-wrap:anywhere;}
+    @media(max-width:650px){.session-allocation .session-class-row{grid-template-columns:minmax(0,1fr) auto}.session-allocation .session-class-row strong{grid-column:1/-1}.session-allocation .session-class-row select{grid-column:1}.session-allocation .session-add-link{grid-column:2}}
+
     .admin-list-title { align-items:start; flex-wrap:wrap; margin-bottom:14px; }
     .admin-list-title h3 { margin:0; }
     .subtle { color:#7b8f83; font-size:11px; }
@@ -1254,16 +1271,16 @@
                   <small>Nhấn để tìm và tích chọn một hoặc nhiều lớp.</small>
                 </div>
                 <div class="field">
-                  <label>Buổi học / Chuyên đề:</label>
-                  <select id="mediaSessionSelect" required></select>
-                </div>
-                <div class="field">
                   <label>Loại học liệu:</label>
                   <select id="mediaTypeSelect" required>
                     <option value="drive_video">🎬 Video bài giảng Sinh học (Google Drive)</option>
                     <option value="drive_doc">📄 Tài liệu / Đề thi (Word, PPTX, PDF)</option>
                   </select>
                 </div>
+              </div>
+              <div class="field">
+                <label>Buổi học tương ứng với từng lớp:</label>
+                <div id="mediaSessionAllocation" class="session-allocation"></div>
               </div>
               <div class="field">
                 <label>Tiêu đề học liệu:</label>
@@ -1729,12 +1746,20 @@
 
   <div id="sessionManagerModal" class="modal-wrap">
     <div class="modal-box">
-      <h2 style="font-size:18px;">📅 Quản Lý Buổi Học / Chuyên Đề</h2>
-      <form onsubmit="handleCreateSession(event)">
-        <div class="field"><input type="text" id="newSessionTitle" required placeholder="Tên buổi (ví dụ: Chuyên đề 01 - Cấu trúc tế bào & Di truyền ADN)"></div>
-        <button type="submit" class="primary">Lưu buổi học</button>
+      <h2 style="font-size:18px;margin-bottom:4px;">📅 Buổi học theo từng lớp</h2>
+      <p class="session-mgr-hint">Mỗi lớp có danh sách buổi độc lập. Buổi 1 của lớp A không liên quan đến Buổi 1 của lớp B.</p>
+      <label class="session-mgr-label" for="sessionManagerClassSelect">1. Chọn lớp muốn quản lý</label>
+      <select id="sessionManagerClassSelect" onchange="onSessionManagerClassChange()" style="width:100%;border:1px solid #d5e4da;border-radius:11px;padding:11px 12px;background:white;color:#234a33;"></select>
+      <form onsubmit="handleCreateSession(event)" id="sessionCreateForm" style="margin-top:12px;">
+        <label class="session-mgr-label" for="newSessionTitle">2. Tạo buổi riêng cho lớp đã chọn</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input style="flex:1;min-width:180px;border:1px solid #d5e4da;border-radius:10px;padding:10px 12px;" type="text" id="newSessionTitle" required maxlength="150" placeholder="Ví dụ: Buổi 1 - Di truyền học">
+          <button type="submit" class="primary">+ Thêm buổi</button>
+        </div>
       </form>
-      <div id="sessionListDisplay" style="margin-top:16px;"></div>
+      <div style="font-size:12px;font-weight:750;color:#365e49;margin-top:20px;margin-bottom:9px;">Danh sách buổi thuộc lớp này <span id="sessionManagerCount" class="subtle"></span></div>
+      <div id="sessionListDisplay" style="max-height:38vh;overflow:auto;"></div>
+      <div id="legacySessionBanner" style="margin-top:12px;"></div>
       <div style="text-align:right;margin-top:10px;"><button class="secondary" onclick="document.getElementById('sessionManagerModal').classList.remove('open')">Đóng</button></div>
     </div>
   </div>
@@ -1760,9 +1785,10 @@
         <div class="field"><label>Tiêu đề</label><input id="editMediaTitle" type="text" required maxlength="180"></div>
         <div class="class-editor-grid">
           <div class="field"><label>Loại học liệu</label><select id="editMediaType" required><option value="drive_video">🎬 Video</option><option value="drive_doc">📄 Tài liệu / Đề thi</option></select></div>
-          <div class="field"><label>Buổi / Chuyên đề</label><select id="editMediaSession" required></select></div>
+
         </div>
         <div class="field"><label>Hiển thị ở các lớp</label><div id="editMediaClassPicker" class="multi-class-picker"></div></div>
+        <div class="field"><label>Buổi học của từng lớp</label><div id="editMediaSessionAllocation" class="session-allocation"></div></div>
         <div class="field"><label>Đường dẫn học liệu (Google Drive / Docs)</label><input id="editMediaUrl" type="url" required></div>
         <div class="field"><label>Ghi chú / Yêu cầu</label><textarea id="editMediaNote" rows="2" placeholder="Có thể bổ sung hướng dẫn làm bài"></textarea></div>
         <div class="field"><label>Hạn hoàn thành (không bắt buộc)</label><input type="datetime-local" id="editMediaDeadline"></div>
@@ -1820,8 +1846,6 @@
     const rtdb = firebase.database();
     const db = firebase.firestore();
     let liveOnlineStatus = {};
-    let currentClassPickerId = null;
-    let currentClassPickerQuery = '';
 
     /* ================= STATE GỐC ================= */
     let userDatabase = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY)) || [
@@ -1876,6 +1900,7 @@
       }
       populateExamClassSelectOptions();
       if (document.getElementById('classManagerModal').classList.contains('open')) openClassManagerModal();
+      if (document.getElementById('sessionManagerModal').classList.contains('open')) openSessionManagerModal(lastSessionManagerClassId);
       if (document.querySelector('.page.active')?.id === 'class_admin') renderAdminClassDashboard();
     });
 
@@ -1888,8 +1913,9 @@
         sessionDatabase = [];
         localStorage.setItem(SESSIONS_STORAGE_KEY, '[]');
       }
-      if (document.getElementById('sessionManagerModal').classList.contains('open')) openSessionManagerModal();
+      if (document.getElementById('sessionManagerModal').classList.contains('open')) openSessionManagerModal(lastSessionManagerClassId);
       if (document.querySelector('.page.active')?.id === 'class_admin') renderAdminClassDashboard();
+      reconcileVisibleSessionAllocations();
     });
 
     rtdb.ref('/media').on('value', (snapshot) => {
@@ -2021,6 +2047,9 @@
     }
     // Một menu dùng chung đặt trên <body> để không bị modal có overflow cắt mất.
     // Trạng thái chọn nằm trong phần tử gốc, nên dữ liệu lưu Firebase V4 không thay đổi.
+    let currentClassPickerId = null;
+    let currentClassPickerQuery = '';
+
     function normalizePickerIds(selected) {
       const raw = Array.isArray(selected) ? selected : [selected];
       const valid = new Set(classDatabase.map(c => String(c.id)));
@@ -2070,7 +2099,7 @@
       count.textContent = info.count;
       count.style.display = info.count ? '' : 'none';
       trigger.classList.toggle('is-empty', !ids.length);
-      trigger.title = ids.includes('all') ? 'Hiển thị ở tất cả các lớp, kể cả lớp mới tạo' :
+      trigger.title = ids.includes('all') ? (id === 'examClassPicker' ? 'Hiển thị ở mọi lớp, kể cả lớp mới' : 'Chọn tất cả lớp hiện tại; lớp mới cần gán buổi riêng') :
         ids.map(cid => (classDatabase.find(c => String(c.id) === cid) || {}).name || '').join(', ');
     }
 
@@ -2079,6 +2108,8 @@
       if (!root) return;
       root.dataset.selectedClasses = JSON.stringify(normalizePickerIds(selected));
       updateClassPickerTrigger(id);
+      if (id === 'mediaClassPicker') renderSessionAllocation('mediaClassPicker','mediaSessionAllocation');
+      if (id === 'editMediaClassPicker') renderSessionAllocation('editMediaClassPicker','editMediaSessionAllocation');
       if (currentClassPickerId === id) renderClassPickerOptions();
     }
 
@@ -2137,8 +2168,9 @@
       const normalize = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase();
       const matches = classDatabase.filter(c => normalize(c.name).includes(normalize(currentClassPickerQuery.trim())));
       const allChecked = chosen.includes('all');
+      const allNote = id==='examClassPicker' ? 'Bao gồm cả lớp tạo sau này' : 'Các lớp hiện tại; lớp mới cần gán buổi riêng';
       const allHtml = !currentClassPickerQuery.trim() ? `<label class="class-picker-item ${allChecked ? 'selected' : ''}">
-        <input type="checkbox" value="all" ${allChecked ? 'checked' : ''} onchange="onClassPickerToggle(currentClassPickerId, this)"><span>🌐 Tất cả các lớp <small style="font-weight:400;color:#6c8877;display:block;">Bao gồm cả lớp tạo thêm sau này</small></span></label>
+        <input type="checkbox" value="all" ${allChecked ? 'checked' : ''} onchange="onClassPickerToggle(currentClassPickerId, this)"><span>🌐 Tất cả các lớp <small style="font-weight:400;color:#6c8877;display:block;">${allNote}</small></span></label>
         <div class="class-picker-divider"></div>` : '';
       list.innerHTML = allHtml + (matches.length ? matches.map(c => {
         const cid = String(c.id);
@@ -3794,7 +3826,7 @@
         const isVid = m.type==='drive_video';
         return `
         <div class="card">
-          <div class="card-top"><div class="file-icon">${isVid?'🎬':'📄'}</div><span class="tag session-badge">${escapeHTML((sessionDatabase.find(s=>s.id===m.sessionId)||{}).title || m.sessionName || 'Chuyên đề')}</span></div>
+          <div class="card-top"><div class="file-icon">${isVid?'🎬':'📄'}</div><span class="tag session-badge">${escapeHTML(sessionTitleForMedia(m))}</span></div>
           <h3>${escapeHTML(m.title)}</h3><p>${escapeHTML(m.note || "Học liệu theo chuyên đề.")}</p>
           ${getDeadlineBadgeHTML(m.deadline)}
           <div class="card-foot">
@@ -4010,119 +4042,202 @@
       }
     }
 
+    // Theo lớp đang học: mỗi buổi chỉ chứa tài liệu được gán vào buổi đó trong lớp.
     let currentVidFilter = 'all';
+    let currentDocFilter = 'all';
+    function availableMediaSessions(items) {
+      const isAdmin = currentUser?.role === 'admin';
+      const ids = new Set();
+      items.forEach(m=>{
+        if(isAdmin) {
+          const assigned = getAssignedClassIds(m);
+          const concrete = assigned.includes('all') ? classDatabase.map(c=>String(c.id)) : assigned;
+          concrete.forEach(cid=>{const sid=mediaClassSessionId(m,cid);if(sid) ids.add(sid);});
+        } else {
+          const sid=mediaClassSessionId(m,currentUser?.classId);if(sid) ids.add(sid);
+        }
+      });
+      return sessionDatabase.filter(s=>ids.has(s.id));
+    }
+    function mediaInSelectedSession(media, filter) {
+      if(filter==='all') return true;
+      if(currentUser?.role==='admin') {
+        const classes=getAssignedClassIds(media);
+        return (classes.includes('all')?classDatabase.map(c=>String(c.id)):classes).some(cid=>mediaClassSessionId(media,cid)===filter);
+      }
+      return mediaClassSessionId(media,currentUser?.classId)===filter;
+    }
+    function renderMediaSessionToolbar(elementId,items,chosen,type) {
+      const el=document.getElementById(elementId);
+      const sessions=availableMediaSessions(items);
+      if(!sessions.some(s=>s.id===chosen))chosen='all';
+      if(type==='video') currentVidFilter=chosen;else currentDocFilter=chosen;
+      const update=type==='video'?'initVideosView':'initDocumentsView';
+      const curr=type==='video'?'currentVidFilter':'currentDocFilter';
+      el.innerHTML = !sessions.length ? '' : `<button class="pill ${chosen==='all'?'active':''}" onclick="${curr}='all';${update}();">Tất cả buổi</button>` + sessions.map(s=>{
+        const name = currentUser?.role==='admin' && s.classId ? `${classDatabase.find(c=>String(c.id)===s.classId)?.name||'Lớp'} • ${s.title}` : s.title;
+        return `<button class="pill ${chosen===s.id?'active':''}" onclick="${curr}='${escapeHTML(s.id)}';${update}();">${escapeHTML(name)}</button>`;
+      }).join('');
+    }
     function initVideosView() {
-      const vids = mediaDatabase.filter(m => m.type === 'drive_video' && canUserAccessMedia(m));
-      const activeSessionIds = new Set(vids.map(v => v.sessionId));
-
-      const availableSessions = currentUser && currentUser.role === 'admin' 
-        ? sessionDatabase 
-        : sessionDatabase.filter(s => activeSessionIds.has(s.id));
-
-      const toolbar = document.getElementById('videoSessionToolbar');
-      if (availableSessions.length === 0) {
-        toolbar.innerHTML = '';
-      } else {
-        toolbar.innerHTML = `<button class="pill ${currentVidFilter === 'all' ? 'active' : ''}" onclick="currentVidFilter='all'; initVideosView();">Tất cả chuyên đề</button>` + 
-          availableSessions.map(s => `<button class="pill ${currentVidFilter === s.id ? 'active' : ''}" onclick="currentVidFilter='${s.id}'; initVideosView();">${escapeHTML(s.title)}</button>`).join('');
+      const vids=mediaDatabase.filter(m=>m.type==='drive_video' && canUserAccessMedia(m));
+      renderMediaSessionToolbar('videoSessionToolbar',vids,currentVidFilter,'video');
+      const filtered=vids.filter(v=>mediaInSelectedSession(v,currentVidFilter));
+      const playlist=document.getElementById('videoPlaylistContainer');
+      const player=document.getElementById('driveVideoContainer');
+      if (!currentUser?.classId && currentUser?.role !== 'admin') {
+        player.innerHTML='<div style="padding:40px 20px;color:#fff;text-align:center;">Bạn chưa được xếp vào lớp học để xem video.</div>';
+        playlist.innerHTML='';document.getElementById('btnOpenExternalVideo').style.display='none';return;
       }
-      
-      const filtered = vids.filter(v => currentVidFilter === 'all' || v.sessionId === currentVidFilter);
-      const playlist = document.getElementById('videoPlaylistContainer');
-      const player = document.getElementById('driveVideoContainer');
-      
-      if (!currentUser.classId && currentUser.role !== 'admin') {
-        player.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#fff;">Bạn chưa được xếp vào lớp học để xem video.</div>`;
-        playlist.innerHTML = '';
-        document.getElementById('btnOpenExternalVideo').style.display = 'none';
-        return;
+      if(!filtered.length) {
+        player.innerHTML='<div style="padding:40px 20px;color:#fff;text-align:center;">Buổi này chưa có video bài giảng.</div>';
+        playlist.innerHTML='';document.getElementById('btnOpenExternalVideo').style.display='none';return;
       }
-
-      if (!filtered.length) { 
-        player.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#fff;">Chưa có video bài giảng nào.</div>`; 
-        playlist.innerHTML = ''; 
-        document.getElementById('btnOpenExternalVideo').style.display = 'none'; 
-        return; 
-      }
-      
-      const loadVid = (v) => {
-        setElText('currentVideoTitle', v.title); 
-        setElText('currentVideoNote', `${v.note || "Video bài giảng chính thức."}${v.deadline ? ` • Hạn: ${formatDeadline(v.deadline)}${Date.now() > new Date(v.deadline).getTime() ? ' (đã quá hạn)' : ''}` : ''}`); 
-        setElText('currentVideoSessionBadge', (sessionDatabase.find(s=>s.id===v.sessionId)||{}).title || v.sessionName || 'Chuyên đề');
-        document.getElementById('btnOpenExternalVideo').href = v.url; 
-        document.getElementById('btnOpenExternalVideo').style.display = 'inline-flex';
-        player.innerHTML = `<iframe src="${convertToDrivePreviewUrl(v.url)}" allowfullscreen></iframe>`;
+      const loadVid=(v)=>{
+        if(!v)return;
+        setElText('currentVideoTitle',v.title);
+        setElText('currentVideoNote',`${v.note||'Video bài giảng chính thức.'}${v.deadline?` • Hạn: ${formatDeadline(v.deadline)}`:''}`);
+        setElText('currentVideoSessionBadge',sessionTitleForMedia(v));
+        document.getElementById('btnOpenExternalVideo').href=v.url;
+        document.getElementById('btnOpenExternalVideo').style.display='inline-flex';
+        player.innerHTML=`<iframe src="${convertToDrivePreviewUrl(v.url)}" allowfullscreen></iframe>`;
       };
       loadVid(filtered[0]);
-      
-      playlist.innerHTML = filtered.map(v => `
-        <div class="playlist-item" style="padding:12px;border:1px solid #e7eee9;background:#fbfdfb;border-radius:12px;cursor:pointer;" onclick="loadDriveVideoPlayer('${v.id}')">
-          <div style="display:flex;justify-content:space-between;"><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML((sessionDatabase.find(s=>s.id===v.sessionId)||{}).title || v.sessionName || 'Chuyên đề')}</span></div>
-          <b style="font-size:13px;display:block;margin-top:4px;color:#183d2e;">${escapeHTML(v.title)}</b>
-          ${v.deadline ? `<div style="font-size:10.5px;margin-top:5px;color:${Date.now() > new Date(v.deadline).getTime() ? '#b91c1c' : '#c2410c'};font-weight:700;">⏰ ${Date.now() > new Date(v.deadline).getTime() ? 'Đã quá hạn' : 'Hạn'}: ${escapeHTML(formatDeadline(v.deadline))}</div>` : ''}
-        </div>`).join('');
-      
-      window.loadDriveVideoPlayer = (id) => loadVid(filtered.find(v => v.id === id));
+      playlist.innerHTML=filtered.map(v=>`<div class="playlist-item" style="padding:12px;border:1px solid #e7eee9;background:#fbfdfb;border-radius:12px;cursor:pointer;" onclick="loadDriveVideoPlayer('${escapeHTML(v.id)}')">
+        <div><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(sessionTitleForMedia(v))}</span></div>
+        <b style="font-size:13px;display:block;margin-top:4px;color:#183d2e;">${escapeHTML(v.title)}</b>
+        ${v.deadline?`<div style="font-size:10px;color:#b45309;margin-top:5px;">⏰ ${escapeHTML(formatDeadline(v.deadline))}</div>`:''}</div>`).join('');
+      window.loadDriveVideoPlayer=(id)=>loadVid(filtered.find(v=>v.id===id));
+    }
+    function initDocumentsView() {
+      const docs=mediaDatabase.filter(m=>m.type==='drive_doc' && canUserAccessMedia(m));
+      renderMediaSessionToolbar('docSessionToolbar',docs,currentDocFilter,'doc');
+      const filtered=docs.filter(m=>mediaInSelectedSession(m,currentDocFilter));
+      const container=document.getElementById('docCardsContainer');
+      if (!currentUser?.classId && currentUser?.role!=='admin') {
+        container.innerHTML='<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Bạn chưa được xếp vào lớp học để xem tài liệu.</div>';return;
+      }
+      if (!filtered.length) {container.innerHTML='<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Buổi này chưa có tài liệu.</div>';return;}
+      container.innerHTML=filtered.map(doc=>`<div class="card"><div class="card-top"><div class="file-icon">📄</div><span class="tag session-badge">${escapeHTML(sessionTitleForMedia(doc))}</span></div>
+        <h3>${escapeHTML(doc.title)}</h3><p>${escapeHTML(doc.note||'Tài liệu học tập chuẩn.')}</p>
+        ${getDeadlineBadgeHTML(doc.deadline)}<div class="card-foot"><span class="tag status-class">Word / PPTX / PDF</span>
+        <button class="primary" style="padding:6px 12px;font-size:11.5px;" onclick="openDocViewer('${escapeHTML(doc.url)}', '${escapeHTML(doc.title)}')">👁️ Xem tài liệu</button></div></div>`).join('');
     }
 
-    let currentDocFilter = 'all';
-    function initDocumentsView() {
-      const docs = mediaDatabase.filter(m => m.type === 'drive_doc' && canUserAccessMedia(m));
-      const activeDocSessionIds = new Set(docs.map(d => d.sessionId));
-
-      const availableSessions = currentUser && currentUser.role === 'admin' 
-        ? sessionDatabase 
-        : sessionDatabase.filter(s => activeDocSessionIds.has(s.id));
-
-      const toolbar = document.getElementById('docSessionToolbar');
-      if (availableSessions.length === 0) {
-        toolbar.innerHTML = '';
-      } else {
-        toolbar.innerHTML = `<button class="pill ${currentDocFilter === 'all' ? 'active' : ''}" onclick="currentDocFilter='all'; initDocumentsView();">Tất cả chuyên đề</button>` + 
-          availableSessions.map(s => `<button class="pill ${currentDocFilter === s.id ? 'active' : ''}" onclick="currentDocFilter='${s.id}'; initDocumentsView();">${escapeHTML(s.title)}</button>`).join('');
-      }
-
-      const filtered = docs.filter(d => currentDocFilter === 'all' || d.sessionId === currentDocFilter);
-      const container = document.getElementById('docCardsContainer');
-
-      if (!currentUser.classId && currentUser.role !== 'admin') {
-        container.innerHTML = `<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Bạn chưa được xếp vào lớp học để xem tài liệu.</div>`;
+    // V6: Danh sách buổi thuộc một lớp, không dùng chung sessionId giữa các lớp.
+    // Các buổi V5 chưa có classId được giữ riêng là "buổi cũ" để không làm mất học liệu.
+    function classSessions(classId) {
+      return sessionDatabase.filter(s => String(s.classId || '') === String(classId));
+    }
+    function selectedConcreteClasses(pickerId) {
+      const ids = getSelectedClassIds(pickerId);
+      return ids.includes('all') ? classDatabase.map(c => String(c.id)) : ids;
+    }
+    function mediaClassSessionId(media, classId) {
+      const mapped = media && media.classSessionIds && media.classSessionIds[classId];
+      if (mapped) return String(mapped);
+      const old = media && media.sessionId;
+      const ses = sessionDatabase.find(s => s.id === old);
+      // Chỉ cho dùng sessionId cũ nếu buổi chưa phân lớp hoặc thuộc đúng lớp này.
+      return ses && (!ses.classId || ses.classId === classId) ? String(old) : '';
+    }
+    function sessionTitleForMedia(media, classId = null) {
+      const cid = classId || (currentUser && currentUser.role !== 'admin' ? currentUser.classId : null);
+      const ids = getAssignedClassIds(media);
+      const target = cid || (ids.includes('all') ? classDatabase[0]?.id : ids[0]);
+      const sid = target ? mediaClassSessionId(media,target) : media.sessionId;
+      const match = sessionDatabase.find(s=>s.id===sid);
+      return (match && match.title) || media.sessionName || 'Chưa gán buổi';
+    }
+    function mediaSessionLabelForAdmin(media) {
+      const ids = getAssignedClassIds(media);
+      const concrete = ids.includes('all') ? classDatabase.map(c=>String(c.id)) : ids;
+      const pairs = concrete.map(cid=>({cid,title:sessionTitleForMedia(media,cid)}));
+      if (!pairs.length) return media.sessionName || 'Chưa gán buổi';
+      const titles = [...new Set(pairs.map(p=>p.title))];
+      return titles.length === 1 ? titles[0] : `${pairs.length} lớp • ${titles.length} buổi khác nhau`;
+    }
+    function renderSessionAllocation(pickerId, hostId, initialMap = null, existing = null) {
+      const host = document.getElementById(hostId);
+      if (!host) return;
+      let map = {};
+      try { map = JSON.parse(host.dataset.sessionMap || '{}'); } catch (_) {}
+      if (initialMap) map = {...map,...initialMap};
+      const classIds = selectedConcreteClasses(pickerId);
+      const editing = hostId === 'editMediaSessionAllocation';
+      if (editing && !existing) existing = mediaDatabase.find(m=>m.id===document.getElementById('editMediaId')?.value) || null;
+      // Khi thay đổi danh sách lớp, giữ lựa chọn cũ của lớp khác nhưng chỉ lưu những lớp đã chọn.
+      if (!classIds.length) {
+        host.dataset.sessionMap = JSON.stringify(map);
+        host.innerHTML = '<div class="session-empty">Hãy chọn ít nhất một lớp ở phía trên để hiện danh sách buổi tương ứng.</div>';
         return;
       }
-
-      if (!filtered.length) {
-        container.innerHTML = `<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Chưa có tài liệu nào.</div>`;
-        return;
+      host.innerHTML = `<div class="allocation-head"><span>📚 ${classIds.length} lớp được phân phối • mỗi lớp chọn buổi riêng</span><span>${editing ? 'Có thể đổi buổi bất cứ lúc nào' : 'Bắt buộc chọn đủ buổi'}</span></div>` + (classIds.length >= 10 ? `<input class="allocation-search" aria-label="Lọc lớp trong danh sách buổi" placeholder="🔎 Tìm lớp để chọn buổi..." oninput="filterSessionAllocationRows('${hostId}',this.value)">` : '') + '<div class="allocation-list">' + classIds.map(cid => {
+        const cl = classDatabase.find(c=>String(c.id) === cid);
+        const sessions = classSessions(cid).slice();
+        // Chỉ giữ lựa chọn buổi cũ khi sửa đúng học liệu V5, không gán nhầm cho tài liệu mới.
+        const old = editing && existing && mediaClassSessionId(existing,cid);
+        if (old && !sessions.some(s=>s.id===old)) {
+          const legacy = sessionDatabase.find(s=>s.id===old && !s.classId);
+          if (legacy) sessions.push(legacy);
+        }
+        let chosen = map[cid] || '';
+        if (!sessions.some(s=>s.id===chosen)) chosen = old && sessions.some(s=>s.id===old) ? old : '';
+        map[cid] = chosen;
+        const options = `<option value="">— Chọn buổi của lớp —</option>` + sessions.map(s=>`<option value="${escapeHTML(s.id)}" ${s.id===chosen?'selected':''}>${escapeHTML(s.title)}${!s.classId?' (dữ liệu cũ)':''}</option>`).join('');
+        return `<div class="session-class-row"><strong title="${escapeHTML(cl?.name||'')}">🏫 ${escapeHTML(cl?.name || 'Lớp đã xóa')}</strong><select aria-label="Buổi học của ${escapeHTML(cl?.name||'lớp')}" data-session-class="${escapeHTML(cid)}" onchange="setAllocatedSession('${hostId}',this.dataset.sessionClass,this.value)">${options}</select><button type="button" class="session-add-link" onclick="openSessionManagerModal('${escapeHTML(cid)}')" title="Tạo buổi cho lớp này">+ Buổi</button></div>`;
+      }).join('') + '</div>';
+      host.dataset.sessionMap = JSON.stringify(map);
+    }
+    function filterSessionAllocationRows(hostId, text) {
+      const host=document.getElementById(hostId);
+      if(!host)return;
+      const clean=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase();
+      const q=clean(text.trim());
+      host.querySelectorAll('.session-class-row').forEach(row=>{row.style.display=clean(row.querySelector('strong')?.textContent||'').includes(q)?'':'none';});
+    }
+    function setAllocatedSession(hostId, classId, sessionId) {
+      const host = document.getElementById(hostId);
+      if (!host) return;
+      const map = JSON.parse(host.dataset.sessionMap || '{}');
+      map[classId] = sessionId;
+      host.dataset.sessionMap = JSON.stringify(map);
+    }
+    function validateSessionAllocation(pickerId, hostId) {
+      const classIds = selectedConcreteClasses(pickerId);
+      if (!classIds.length) {alert('Bạn chưa có lớp để phân phối. Hãy tạo và chọn lớp trước.');return null;}
+      const host = document.getElementById(hostId);
+      let map = {};
+      try {map = JSON.parse(host.dataset.sessionMap || '{}');}catch(_){}
+      const result = {};
+      for (const cid of classIds) {
+        const sid = map[cid];
+        const ses = sessionDatabase.find(s=>s.id===sid);
+        if (!ses || (ses.classId && String(ses.classId)!==cid)) {
+          const name = classDatabase.find(c=>String(c.id)===cid)?.name || cid;
+          alert(`Vui lòng chọn buổi học hợp lệ cho lớp: ${name}`);
+          host.querySelector(`[data-session-class="${CSS.escape(cid)}"]`)?.focus();
+          return null;
+        }
+        result[cid] = sid;
       }
-
-      container.innerHTML = filtered.map(doc => `
-        <div class="card">
-          <div class="card-top">
-            <div class="file-icon">📄</div>
-            <span class="tag session-badge">${escapeHTML((sessionDatabase.find(s=>s.id===doc.sessionId)||{}).title || doc.sessionName || 'Chuyên đề')}</span>
-          </div>
-          <h3>${escapeHTML(doc.title)}</h3>
-          <p>${escapeHTML(doc.note || "Tài liệu học tập chuẩn.")}</p>
-          ${getDeadlineBadgeHTML(doc.deadline)}
-          <div class="card-foot">
-            <span class="tag status-class">Word / PPTX / PDF</span>
-            <button class="primary" style="padding:6px 12px;font-size:11.5px;" onclick="openDocViewer('${escapeHTML(doc.url)}', '${escapeHTML(doc.title)}')">
-              👁️ Xem tài liệu
-            </button>
-          </div>
-        </div>
-      `).join('');
+      return result;
+    }
+    function reconcileVisibleSessionAllocations() {
+      const createHost = document.getElementById('mediaSessionAllocation');
+      if (createHost) renderSessionAllocation('mediaClassPicker','mediaSessionAllocation');
+      const modal = document.getElementById('editMediaModal');
+      if (modal && modal.classList.contains('open')) {
+        const m = mediaDatabase.find(x=>x.id===document.getElementById('editMediaId').value);
+        renderSessionAllocation('editMediaClassPicker','editMediaSessionAllocation',null,m);
+      }
     }
 
     function refreshAdminPickers() {
       const mediaSelection = getSelectedClassIds('mediaClassPicker');
-      renderClassPicker('mediaClassPicker', mediaSelection.length ? mediaSelection : ['all']);
-      const sel = document.getElementById('mediaSessionSelect');
-      if (sel) {
-        const previous = sel.value;
-        sel.innerHTML = sessionDatabase.length ? sessionDatabase.map(s => `<option value="${escapeHTML(s.id)}">${escapeHTML(s.title)}</option>`).join('') : '<option value="">⚠️ Hãy tạo buổi học trước</option>';
-        if (sessionDatabase.some(s=>s.id===previous)) sel.value = previous;
-      }
+      // Mặc định chưa chọn lớp để người đăng phải xác định lớp trước khi chọn buổi.
+      renderClassPicker('mediaClassPicker', mediaSelection);
+      renderSessionAllocation('mediaClassPicker','mediaSessionAllocation');
     }
 
     function renderAdminClassDashboard() {
@@ -4132,7 +4247,7 @@
         <div class="media-admin-row">
           <div style="min-width:0;flex:1;">
             <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:4px;">
-              <span class="tag session-badge" style="font-size:9.5px;">${escapeHTML((sessionDatabase.find(s=>s.id===m.sessionId)||{}).title || m.sessionName || 'Chưa gán chuyên đề')}</span>
+              <span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(mediaSessionLabelForAdmin(m))}</span>
               <span class="tag status-class" style="font-size:9.5px;">🏫 ${escapeHTML(getAssignedClassNames(m))}</span>
             </div>
             <b style="font-size:13px;overflow-wrap:anywhere;">${escapeHTML(m.title)}</b>
@@ -4160,18 +4275,19 @@
 
     async function handleUploadMedia(e) {
       e.preventDefault();
-      const sessionId = document.getElementById('mediaSessionSelect').value;
-      const classIds = getSelectedClassIds('mediaClassPicker');
+      const classSessionIds = validateSessionAllocation('mediaClassPicker','mediaSessionAllocation');
+      if (!classSessionIds) return;
+      const classIds = Object.keys(classSessionIds);
+      const sessionId = classSessionIds[classIds[0]];
       const title = document.getElementById('mediaTitle').value.trim();
       const url = document.getElementById('mediaUrl').value.trim();
-      if (!sessionDatabase.some(s=>s.id===sessionId)) return alert('Hãy tạo buổi học trước.');
       if (!classIds.length) return alert('Chọn ít nhất một lớp cho học liệu.');
       if (!title || !url) return alert('Vui lòng nhập tiêu đề và đường dẫn học liệu.');
       const sesObj = sessionDatabase.find(s => s.id === sessionId);
       const newMedia = {
         id: 'med_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
         classId: classIds[0], classIds,
-        sessionId, sessionName: sesObj.title,
+        sessionId, sessionName: sesObj.title, classSessionIds,
         type: document.getElementById('mediaTypeSelect').value,
         title, url,
         note: document.getElementById('mediaNote').value.trim(),
@@ -4183,7 +4299,9 @@
       try {
         await commitRtdbList('media', rows => [newMedia, ...rows]);
         e.target.reset();
-        renderClassPicker('mediaClassPicker',['all']);
+        renderClassPicker('mediaClassPicker',[]);
+        document.getElementById('mediaSessionAllocation').dataset.sessionMap = '{}';
+        renderSessionAllocation('mediaClassPicker','mediaSessionAllocation');
         showToast('Đã đăng học liệu cho ' + getAssignedClassNames(newMedia));
         renderAdminClassDashboard();
       } catch(err) { presentStorageError(err); }
@@ -4196,27 +4314,33 @@
       document.getElementById('editMediaId').value = item.id;
       document.getElementById('editMediaTitle').value = item.title || '';
       document.getElementById('editMediaType').value = item.type || 'drive_doc';
-      document.getElementById('editMediaSession').innerHTML = sessionDatabase.map(s=>`<option value="${escapeHTML(s.id)}">${escapeHTML(s.title)}</option>`).join('');
-      document.getElementById('editMediaSession').value = item.sessionId || '';
+      const assigned = getAssignedClassIds(item);
+      const explicit = item.classSessionIds || {};
+      const legacyMap = {};
+      const concrete = assigned.includes('all') ? classDatabase.map(c=>String(c.id)) : assigned;
+      concrete.forEach(cid=>{ legacyMap[cid] = explicit[cid] || mediaClassSessionId(item,cid); });
       document.getElementById('editMediaUrl').value = item.url || '';
       document.getElementById('editMediaNote').value = item.note || '';
       document.getElementById('editMediaDeadline').value = toDateTimeLocalValue(item.deadline);
-      renderClassPicker('editMediaClassPicker', getAssignedClassIds(item));
+      renderClassPicker('editMediaClassPicker', assigned);
+      document.getElementById('editMediaSessionAllocation').dataset.sessionMap = '{}';
       document.getElementById('editMediaModal').classList.add('open');
+      renderSessionAllocation('editMediaClassPicker','editMediaSessionAllocation',legacyMap,item);
     }
     function closeEditMediaModal() { closeClassPicker(); document.getElementById('editMediaModal').classList.remove('open'); }
 
     async function saveEditedMedia(e) {
       e.preventDefault();
       const id = document.getElementById('editMediaId').value;
-      const classIds = getSelectedClassIds('editMediaClassPicker');
-      const sessionId = document.getElementById('editMediaSession').value;
-      if (!classIds.length) return alert('Hãy chọn ít nhất một lớp.');
+      const classSessionIds = validateSessionAllocation('editMediaClassPicker','editMediaSessionAllocation');
+      if (!classSessionIds) return;
+      const classIds = Object.keys(classSessionIds);
+      const sessionId = classSessionIds[classIds[0]];
       const ses = sessionDatabase.find(s=>s.id===sessionId);
       if (!ses) return alert('Buổi học đã bị xóa, vui lòng chọn lại.');
       const patch = {
         classId: classIds[0], classIds,
-        sessionId, sessionName: ses.title,
+        sessionId, sessionName: ses.title, classSessionIds,
         type: document.getElementById('editMediaType').value,
         title: document.getElementById('editMediaTitle').value.trim(),
         url: document.getElementById('editMediaUrl').value.trim(),
@@ -4262,31 +4386,110 @@
         showToast('Đã tạo lớp học.');
       } catch(err) {presentStorageError(err);}
     }
+    let lastSessionManagerClassId = '';
     async function handleCreateSession(e) {
       e.preventDefault();
       const title = document.getElementById('newSessionTitle').value.trim();
+      const classId = document.getElementById('sessionManagerClassSelect').value;
+      if (!classDatabase.some(c=>String(c.id)===classId)) return alert('Hãy chọn một lớp trước khi tạo buổi học.');
       if (!title) return;
+      if (classSessions(classId).some(s=>s.title.toLocaleLowerCase('vi') === title.toLocaleLowerCase('vi'))) return alert('Lớp này đã có buổi trùng tên.');
+      const btn = e.target.querySelector('[type=submit]');
+      btn.disabled = true;
       try {
-        await commitRtdbList('sessions',rows=>[...rows,{id:'ses_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),title}]);
-        e.target.reset();
-        openSessionManagerModal(); renderAdminClassDashboard();
-        showToast('Đã thêm buổi học.');
+        await commitRtdbList('sessions',rows=>[...rows,{id:'ses_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),classId,title,createdAt:new Date().toISOString()}]);
+        document.getElementById('newSessionTitle').value = '';
+        openSessionManagerModal(classId);
+        reconcileVisibleSessionAllocations();
+        showToast(`Đã tạo buổi riêng cho ${classDatabase.find(c=>String(c.id)===classId)?.name||'lớp'}.`);
+      } catch(err) {presentStorageError(err);}
+      finally {btn.disabled = false;}
+    }
+    function onSessionManagerClassChange() {
+      lastSessionManagerClassId = document.getElementById('sessionManagerClassSelect').value;
+      renderSessionManagerList();
+    }
+    function openSessionManagerModal(preselectedClassId = null) {
+      const select = document.getElementById('sessionManagerClassSelect');
+      const previous = preselectedClassId || (select.value && select.value!=='__legacy__' ? select.value : lastSessionManagerClassId);
+      select.innerHTML = '<option value="">— Chọn lớp học —</option>' + classDatabase.map(c=>`<option value="${escapeHTML(c.id)}">${escapeHTML(c.name)}</option>`).join('') + (sessionDatabase.some(s=>!s.classId) ? '<option value="__legacy__">🗂 Buổi cũ chưa phân lớp</option>':'');
+      if ([...select.options].some(o=>o.value===previous)) select.value=previous;
+      else if (classDatabase.length===1) select.value=String(classDatabase[0].id);
+      else select.value='';
+      lastSessionManagerClassId = select.value;
+      renderSessionManagerList();
+      document.getElementById('sessionManagerModal').classList.add('open');
+    }
+    function renderSessionManagerList() {
+      const id = document.getElementById('sessionManagerClassSelect').value;
+      const isLegacy = id==='__legacy__';
+      const visible = isLegacy ? sessionDatabase.filter(s=>!s.classId) : classSessions(id);
+      const list = document.getElementById('sessionListDisplay');
+      const form = document.getElementById('sessionCreateForm');
+      form.style.display = !id || isLegacy ? 'none' : 'block';
+      document.getElementById('sessionManagerCount').textContent = `(${visible.length} buổi)`;
+      list.innerHTML = !id ? '<div class="notice">Chọn một lớp để xem, thêm, sửa hoặc xóa buổi học của lớp đó.</div>' : (visible.length ? visible.map((s,i)=>`
+        <div class="session-mgr-card">
+          <div style="min-width:0;"><small style="font-size:10px;color:#7a9381;display:block;">${isLegacy?'DỮ LIỆU PHIÊN BẢN CŨ':`BUỔI ${i+1}`}</small><strong>${escapeHTML(s.title)}</strong></div>
+          <div style="display:flex;gap:6px;flex-shrink:0;"><button class="secondary" style="padding:6px 9px;font-size:11px;" onclick="openEditCatalogModal('session','${escapeHTML(s.id)}')">Sửa</button><button class="del-btn" onclick="handleDeleteSession('${escapeHTML(s.id)}')">🗑️</button></div>
+        </div>`).join('') : '<div class="notice">Lớp này chưa có buổi học. Tạo buổi đầu tiên ở phía trên.</div>');
+      const legacyCount = sessionDatabase.filter(s=>!s.classId).length;
+      const banner = document.getElementById('legacySessionBanner');
+      banner.innerHTML = legacyCount ? `<div class="notice" style="line-height:1.55;"><strong>🗂 ${legacyCount} buổi từ phiên bản cũ chưa được phân lớp.</strong><div style="margin-top:5px;">Học liệu cũ vẫn hiển thị. Bạn có thể chuyển dữ liệu cũ sang cấu trúc buổi riêng từng lớp.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;"><button type="button" class="secondary" onclick="document.getElementById('sessionManagerClassSelect').value='__legacy__';onSessionManagerClassChange();">Xem buổi cũ</button><button type="button" class="primary" onclick="migrateLegacySessions()">Phân lớp buổi cũ</button></div></div>` : '';
+    }
+    async function migrateLegacySessions() {
+      const legacy = sessionDatabase.filter(s=>!s.classId);
+      if (!legacy.length) return;
+      if (!classDatabase.length) return alert('Bạn cần tạo lớp trước khi chuyển buổi cũ.');
+      const scope = {};
+      // Chỉ nhân bản những buổi cũ đang được học liệu sử dụng. Buổi chưa có tài liệu vẫn nằm trong nhóm dữ liệu cũ để gán sau.
+      legacy.forEach(s=>{
+        const usedClasses = new Set();
+        mediaDatabase.filter(m=>m.sessionId===s.id).forEach(m=>{
+          const ids = getAssignedClassIds(m);
+          (ids.includes('all') ? classDatabase.map(c=>String(c.id)) : ids).forEach(cid=>{if(classDatabase.some(c=>String(c.id)===cid))usedClasses.add(cid);});
+        });
+        if (usedClasses.size) scope[s.id]=[...usedClasses];
+      });
+      const count = Object.values(scope).reduce((n,ids)=>n+ids.length,0);
+      if (!count) return alert('Những buổi cũ chưa được học liệu sử dụng. Bạn có thể tạo buổi mới cho từng lớp; không tự chuyển dữ liệu không xác định lớp.');
+      if (!confirm(`Chuyển ${Object.keys(scope).length} buổi cũ thành ${count} buổi độc lập theo các lớp đang sử dụng? Học liệu đã đăng sẽ được cập nhật phân phối tương ứng; buổi cũ được giữ lại làm bản dự phòng.`)) return;
+      const lookup = {};
+      const clones = [];
+      for(const oldId of Object.keys(scope)) {
+        const old = legacy.find(s=>s.id===oldId);
+        for(const cid of scope[oldId]) {
+          const existing = sessionDatabase.find(s=>s.legacySourceId===oldId && s.classId===cid);
+          const newId = existing?.id || ('ses_import_'+Date.now()+'_'+Math.random().toString(36).slice(2,8));
+          lookup[oldId+'@@'+cid]=newId;
+          if(!existing) clones.push({id:newId,title:old.title,classId:cid,legacySourceId:oldId,createdAt:new Date().toISOString()});
+        }
+      }
+      try {
+        // Ghi buổi mới trước, sau đó gán media; không bao giờ xóa bản gốc tự động.
+        if(clones.length) await commitRtdbList('sessions',rows=>{
+          const found=new Set(rows.map(s=>s.id));
+          return [...rows,...clones.filter(s=>!found.has(s.id))];
+        });
+        await commitRtdbList('media',rows=>rows.map(m=>{
+          if(!scope[m.sessionId]) return m;
+          const ids=getAssignedClassIds(m);
+          const concrete=ids.includes('all')?classDatabase.map(c=>String(c.id)):ids;
+          const map={...(m.classSessionIds||{})};
+          concrete.forEach(cid=>{const next=lookup[m.sessionId+'@@'+cid];if(next && (!map[cid] || map[cid]===m.sessionId))map[cid]=next;});
+          const first=concrete.find(cid=>map[cid]);
+          return {...m,classId:concrete[0]||m.classId,classIds:concrete,classSessionIds:map,sessionId:first?map[first]:m.sessionId,updatedAt:new Date().toISOString()};
+        }));
+        showToast('Đã phân lớp buổi cũ; giữ lại buổi gốc để tránh mất dữ liệu.');
+        openSessionManagerModal(lastSessionManagerClassId==='__legacy__'?null:lastSessionManagerClassId);
       } catch(err) {presentStorageError(err);}
     }
 
-    function openSessionManagerModal() {
-      document.getElementById('sessionListDisplay').innerHTML = sessionDatabase.map(s=>`
-        <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #edf2ed;">
-          <span style="font-size:13px;">${escapeHTML(s.title)}</span>
-          <div style="display:flex;gap:6px;"><button class="secondary" style="padding:5px 9px;font-size:11px;" onclick="openEditCatalogModal('session','${escapeHTML(s.id)}')">✏️ Sửa</button><button class="del-btn" onclick="handleDeleteSession('${escapeHTML(s.id)}')">🗑️</button></div>
-        </div>`).join('') || '<div class="notice">Chưa có buổi học.</div>';
-      document.getElementById('sessionManagerModal').classList.add('open');
-    }
     function openClassManagerModal() {
       document.getElementById('classListContainer').innerHTML = classDatabase.map(c=>`
         <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #edf2ed;">
           <span style="font-size:13px;">${escapeHTML(c.name)}</span>
-          <div style="display:flex;gap:6px;"><button class="secondary" style="padding:5px 9px;font-size:11px;" onclick="openEditCatalogModal('class','${escapeHTML(c.id)}')">✏️ Sửa</button><button class="del-btn" onclick="handleDeleteClass('${escapeHTML(c.id)}')">🗑️</button></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;"><button class="secondary" style="padding:5px 9px;font-size:11px;" onclick="openSessionManagerModal('${escapeHTML(c.id)}')">📚 Buổi</button><button class="secondary" style="padding:5px 9px;font-size:11px;" onclick="openEditCatalogModal('class','${escapeHTML(c.id)}')">✏️ Sửa</button><button class="del-btn" onclick="handleDeleteClass('${escapeHTML(c.id)}')">🗑️</button></div>
         </div>`).join('') || '<div class="notice">Chưa có lớp học.</div>';
       document.getElementById('classManagerModal').classList.add('open');
     }
@@ -4317,24 +4520,25 @@
         // Các thẻ học liệu được hiển thị qua sessionId => đổi tên sẽ hiện ngay, không đổi ID.
         closeEditCatalogModal();
         if (kind==='class') openClassManagerModal();
-        else openSessionManagerModal();
+        else openSessionManagerModal(lastSessionManagerClassId);
         renderAdminClassDashboard();
         showToast('Đã đổi tên thành công.');
       } catch(err) {presentStorageError(err);}
       finally {btn.disabled=false;}
     }
     async function handleDeleteSession(id) {
-      const used = mediaDatabase.filter(m=>m.sessionId===id);
+      const used = mediaDatabase.filter(m=>m.sessionId===id || Object.values(m.classSessionIds||{}).includes(id));
       if (used.length) return alert(`Buổi học đang chứa ${used.length} học liệu. Hãy chuyển các học liệu sang buổi khác trước khi xóa.`);
       if (!confirm('Xóa buổi học này?')) return;
-      try { await commitRtdbList('sessions',rows=>rows.filter(s=>s.id!==id)); openSessionManagerModal(); renderAdminClassDashboard(); }
+      try { await commitRtdbList('sessions',rows=>rows.filter(s=>s.id!==id)); openSessionManagerModal(lastSessionManagerClassId); renderAdminClassDashboard(); }
       catch(err){presentStorageError(err);}
     }
     async function handleDeleteClass(id) {
       const members = userDatabase.filter(u=>u.classId===id);
       const media = mediaDatabase.filter(m=>getAssignedClassIds(m).includes(id));
       const exams = examsList.filter(e=>getAssignedClassIds(e,true).includes(id));
-      if (members.length || media.length || exams.length) return alert(`Lớp vẫn đang được sử dụng (${members.length} học viên, ${media.length} học liệu, ${exams.length} đề thi). Hãy chuyển các mục này sang lớp khác trước khi xóa.`);
+      const sessions = classSessions(id);
+      if (members.length || media.length || exams.length || sessions.length) return alert(`Lớp vẫn đang được sử dụng (${members.length} học viên, ${media.length} học liệu, ${exams.length} đề thi, ${sessions.length} buổi học). Hãy chuyển hoặc xóa các mục liên quan trước khi xóa lớp.`);
       if (!confirm('Xóa lớp này vĩnh viễn?')) return;
       try { await commitRtdbList('classes',rows=>rows.filter(c=>c.id!==id)); openClassManagerModal(); renderAdminClassDashboard(); }
       catch(err){presentStorageError(err);}
