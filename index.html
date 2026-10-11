@@ -669,6 +669,16 @@
     }
     .toast.show { display: block; animation: fadeIn .2s; }
     
+    /* V7: bảng điểm phản ánh đúng/sai/bỏ trống, không nhầm với dạng câu hỏi Đ/S. */
+    .scoreboard-summary { font-size:12px; color:#486a57; border:1px solid #dbece1; background:#f3faf5; border-radius:11px; padding:10px 12px; margin-bottom:12px; line-height:1.65; }
+    .scoreboard-answer-stat { font-size:11px; line-height:1.65; white-space:nowrap; }
+    .scoreboard-answer-stat .good { color:#15803d; font-weight:800; }
+    .scoreboard-answer-stat .bad { color:#be123c; font-weight:650; }
+    .scoreboard-answer-stat .skip { color:#64748b; }
+    .exam-answer-audit { padding:11px 13px; border-radius:12px; background:#f0fdf4; border:1px solid #b7e4c7; color:#23583f; font-size:12px; line-height:1.65; }
+    .exam-answer-audit.is-warning { background:#fff7ed; border-color:#fdba74; color:#9a3412; }
+    .exam-answer-audit.is-error { background:#fff1f2; border-color:#fda4af; color:#9f1239; }
+    .scoreboard-mini-note { font-size:10.5px; color:#64748b; line-height:1.5; }
     .modal-wrap {
       position: fixed;
       inset: 0;
@@ -933,6 +943,29 @@
     .media-admin-actions { display:flex; gap:6px; flex-shrink:0; }
     @media(max-width:620px){ .media-admin-row {align-items:flex-start;} .media-admin-actions {width:100%;justify-content:flex-end;} }
 
+    /* V8 • Lịch sử lượt làm và phân tích câu hỏi */
+    .exam-v8-switch { display:flex;flex-wrap:wrap;gap:7px;margin:12px 0; }
+    .exam-v8-switch button { border:1px solid #d7e8df;background:white;color:#476653;border-radius:10px;padding:9px 12px;font-size:12px;font-weight:750; }
+    .exam-v8-switch button.active { background:#e5f4ed;color:#17633e;border-color:#80bd9d; }
+    .exam-v8-controls { display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0; }
+    .exam-v8-controls select { max-width:100%;padding:9px 11px;border:1px solid #dce8df;border-radius:10px;background:#fff;color:#23513a;font-size:12px; }
+    .exam-v8-stats-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0; }
+    .exam-v8-stat { background:#f7fbf8;border:1px solid #e1ede6;border-radius:12px;padding:12px; }
+    .exam-v8-stat strong { display:block;font-size:21px;color:#205b3c; }
+    .exam-v8-stat span { color:#6b8374;font-size:11px; }
+    .exam-v8-bar { background:#e6edf0;height:7px;border-radius:9px;overflow:hidden;min-width:95px; }
+    .exam-v8-bar span { display:block;height:100%;background:#369772;border-radius:9px; }
+    .exam-v8-low span {background:#e68a52;}
+    .exam-v8-tbl { width:100%;min-width:810px;border-collapse:collapse;font-size:12px; }
+    .exam-v8-tbl th {text-align:left;background:#eef4f0;color:#476453;font-size:11px;padding:11px;white-space:nowrap;}
+    .exam-v8-tbl td {border-bottom:1px solid #e7efe9;padding:11px;vertical-align:top;}
+    .exam-v8-muted {font-size:11px;color:#708477;line-height:1.65;}
+    .exam-v8-distribution {display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+    .exam-v8-distribution span {background:#eef5ef;padding:3px 6px;border:1px solid #e0eae3;border-radius:6px;font-size:10px;white-space:nowrap;}
+    .exam-v8-answer-badge {display:inline-flex;background:#e9f7ed;color:#16703e;border:1px solid #c9e9d3;border-radius:7px;padding:2px 7px;font-weight:750;}
+    .exam-v8-actions {display:flex;flex-wrap:wrap;gap:7px;margin-top:9px;}
+    .exam-v8-actions button {flex:1;justify-content:center;font-size:11px;}
+    @media(max-width:650px) {.exam-v8-controls{align-items:stretch;flex-direction:column}.exam-v8-controls select{width:100%}}
   </style>
 </head>
 <body>
@@ -1463,12 +1496,45 @@
         </select>
       </div>
 
+      <div class="exam-v8-switch" role="group" aria-label="Chế độ thống kê">
+        <button type="button" id="v8ScoreTabStudents" class="active" onclick="setExamScoreboardTab('students')"><i class="fa-solid fa-users"></i> Lịch sử điểm & lượt làm</button>
+        <button type="button" id="v8ScoreTabQuestions" onclick="setExamScoreboardTab('questions')"><i class="fa-solid fa-chart-column"></i> Phân tích từng câu</button>
+      </div>
+      <div class="exam-v8-controls">
+        <label style="font-size:12px;font-weight:750;color:#355d45" for="v8ScoreAttemptFilter">Thống kê theo:</label>
+        <select id="v8ScoreAttemptFilter" onchange="renderAdminScoreboardContent()">
+          <option value="latest">Lượt gần nhất mỗi học viên (mặc định)</option>
+          <option value="first">Lượt đầu tiên mỗi học viên</option>
+          <option value="best">Lượt điểm cao nhất mỗi học viên</option>
+          <option value="all">Tất cả lượt nộp</option>
+        </select>
+        <label id="v8QuestionTypeLabel" for="v8QuestionType" style="font-size:12px;font-weight:750;color:#355d45;display:none">Loại câu:</label>
+        <select id="v8QuestionType" onchange="renderAdminScoreboardContent()" style="display:none">
+          <option value="all">Tất cả các phần</option><option value="mcq">Trắc nghiệm</option><option value="tf">Đúng/Sai</option><option value="sa">Trả lời ngắn</option>
+        </select>
+        <select id="v8QuestionOrder" onchange="renderAdminScoreboardContent()" aria-label="Sắp xếp thống kê câu" style="display:none">
+          <option value="hardest">Câu có tỷ lệ đúng thấp trước</option><option value="number">Theo thứ tự câu</option><option value="blank">Câu bỏ trống nhiều trước</option>
+        </select>
+      </div>
+      <div id="adminScoreboardSummary" class="scoreboard-summary" role="status"></div>
       <div id="adminScoreboardTableWrapper" style="overflow-x:auto;">
       </div>
 
       <div style="text-align:right; margin-top:16px; border-top:1px solid #e2e8f0; padding-top:10px;">
+        <button class="secondary" type="button" onclick="exportAdminScoreboardCSV()"><i class="fa-solid fa-file-csv"></i> Xuất CSV</button>
         <button class="secondary" onclick="closeAdminScoreboardModal()">Đóng bảng điểm</button>
       </div>
+    </div>
+  </div>
+
+  <!-- V8: lịch sử các lượt nộp của học viên -->
+  <div id="examAttemptHistoryModal" class="modal-wrap" role="dialog" aria-modal="true" aria-labelledby="examAttemptHistoryTitle">
+    <div class="modal-box" style="width:min(100%,780px);max-height:90vh;">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px;">
+        <div><h2 id="examAttemptHistoryTitle" style="margin:0;font-size:18px;color:#1e4635">Lịch sử làm bài</h2><p id="examAttemptHistorySubtitle" class="exam-v8-muted" style="margin:5px 0 0"></p></div>
+        <button type="button" class="secondary" onclick="closeExamAttemptHistory()">Đóng ✕</button>
+      </div>
+      <div id="examAttemptHistoryBody"></div>
     </div>
   </div>
 
@@ -1672,9 +1738,10 @@
 
         <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:10px;">
           <label style="font-weight:700; font-size:12px; color:#92400e;">Phần III: Trả lời ngắn (Chuẩn THPT)</label>
-          <p style="margin:2px 0 6px; font-size:11px; color:#b45309;">Định dạng: 1: 12, 2: 25, 3: 4</p>
+          <p style="margin:2px 0 6px; font-size:11px; color:#b45309;">Định dạng: 1: 12, 2: 25, 3: 4 (hỗ trợ cả số thập phân 0,5)</p>
           <textarea id="inpAdminSaKeys" style="min-height:55px; font-family:monospace; font-size:12px;" placeholder="1: 10, 2: 25, 3: 4, 4: 1.5, 5: 36, 6: 12"></textarea>
         </div>
+        <div id="examAnswerAudit" class="exam-answer-audit" aria-live="polite">Nhập đáp án để xem số câu hệ thống đã nhận diện.</div>
       </div>
 
       <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px; border-top:1px solid #e2e8f0; padding-top:10px;">
@@ -1881,6 +1948,10 @@
     let examDraftCompleted = false;
     const EXAM_DRAFT_PREFIX = 'biobling_exam_draft_v1_';
     let examDraftHeartbeat = null;
+    let activeDraftAttemptId = null;
+    let currentResultSubmissionId = null;
+    let historyExamCode = null;
+    let scoreboardV8Tab = 'students';
 
     function isSuperAdmin() {
       return currentUser && 
@@ -1975,6 +2046,9 @@
       const scoreBoardModal = document.getElementById('adminScoreboardModal');
       if (scoreBoardModal && scoreBoardModal.classList.contains('open')) {
         renderAdminScoreboardContent();
+      }
+      if (historyExamCode && document.getElementById('examAttemptHistoryModal')?.classList.contains('open')) {
+        openExamAttemptHistory(historyExamCode);
       }
     });
 
@@ -2314,6 +2388,159 @@
     /* =========================================================================
        MODULE PHÒNG THI & KHẢO THÍ (BIOBLING EXAM HUB)
        ========================================================================= */
+    /* V8: Một document Firestore cho MỖI lượt, legacy doc vẫn nguyên vẹn. */
+    function compareExamSubmissions(a,b) {
+      const ta = Date.parse(a.submittedAt || '') || 0;
+      const tb = Date.parse(b.submittedAt || '') || 0;
+      if (ta !== tb) return ta - tb;
+      return String(a.id||'').localeCompare(String(b.id||''));
+    }
+    function examSubmissionsFor(examCode, userId = null) {
+      return studentSubmissions.filter(s=>String(s.examCode)===String(examCode) &&
+        (userId===null || String(s.userId)===String(userId))).sort(compareExamSubmissions);
+    }
+    function attemptNumberFor(sub) {
+      if (!sub) return 0;
+      const own = examSubmissionsFor(sub.examCode,sub.userId);
+      const pos = own.findIndex(x=>String(x.id)===String(sub.id));
+      return pos>=0 ? pos+1 : (Number(sub.attemptNo)||1);
+    }
+    function selectedExamSubmissions(examCode,mode='latest') {
+      const subs = examSubmissionsFor(examCode);
+      if (mode==='all') return subs;
+      const byUser = new Map();
+      subs.forEach(s=>{
+        const id=String(s.userId ?? s.username ?? '');
+        if (!byUser.has(id)) byUser.set(id, s);
+        else if(mode==='latest') byUser.set(id,s);
+        else if(mode==='best') {
+          const prev=byUser.get(id);
+          const v=Number(s.score), p=Number(prev.score);
+          if(!s.practiceOnly && Number.isFinite(v) && (prev.practiceOnly || !Number.isFinite(p) || v>=p)) byUser.set(id,s);
+          else if(s.practiceOnly && prev.practiceOnly) byUser.set(id,s);
+        }
+      });
+      return Array.from(byUser.values()).sort(compareExamSubmissions);
+    }
+    function makeExamAttemptId() {
+      const random = (typeof crypto!=='undefined' && crypto.randomUUID) ? crypto.randomUUID() :
+        `${Date.now().toString(36)}_${Math.random().toString(36).slice(2,12)}`;
+      return 'try_' + String(random).replace(/[^a-zA-Z0-9_-]/g,'_');
+    }
+    function formatExamSubmittedAt(sub) {
+      const d = new Date(sub && sub.submittedAt || '');
+      return Number.isNaN(d.getTime()) ? 'Không rõ thời gian' : d.toLocaleString('vi-VN');
+    }
+    function openExamAttemptHistory(examCode) {
+      if(!currentUser) return;
+      const exam = examsList.find(e=>String(e.code)===String(examCode));
+      if(!exam) return;
+      historyExamCode = examCode;
+      const own=examSubmissionsFor(examCode,currentUser.id);
+      setElText('examAttemptHistoryTitle','Lịch sử làm bài · '+exam.title);
+      setElText('examAttemptHistorySubtitle',`${own.length} lượt đã nộp · Mỗi lần làm lại đều được lưu độc lập`);
+      const container=document.getElementById('examAttemptHistoryBody');
+      if(!own.length) container.innerHTML='<div class="notice">Bạn chưa nộp lượt làm nào.</div>';
+      else {
+        const nums=own.filter(s=>!s.practiceOnly && Number.isFinite(Number(s.score)) && s.score!==null).map(s=>Number(s.score));
+        const best=nums.length?Math.max(...nums):null;
+        container.innerHTML=`${best!==null?`<div class="exam-v8-stats-grid"><div class="exam-v8-stat"><strong>${own.length}</strong><span>Tổng số lượt</span></div><div class="exam-v8-stat"><strong>${best.toFixed(2)}</strong><span>Điểm cao nhất</span></div><div class="exam-v8-stat"><strong>${own[own.length-1].practiceOnly?'—':(own[own.length-1].score===null?'—':Number(own[own.length-1].score).toFixed(2))}</strong><span>Điểm lượt gần nhất</span></div></div>`:''}
+          <div style="overflow-x:auto"><table class="exam-v8-tbl" style="min-width:580px"><thead><tr><th>Lượt</th><th>Thời gian nộp</th><th>Kết quả</th><th>Xem bài</th></tr></thead><tbody>
+          ${own.map((s,i)=>`<tr><td><b>Lần ${i+1}</b></td><td>${escapeHTML(formatExamSubmittedAt(s))}</td><td>${s.practiceOnly?'Đã hoàn thành':(s.score===null||s.score===undefined?'—':escapeHTML(s.score)+' điểm')}</td><td><button type="button" class="secondary" style="padding:6px 9px;font-size:11px" onclick="closeExamAttemptHistory();openReviewExamDirectly(${escapeHTML(JSON.stringify(String(examCode)))},null,${escapeHTML(JSON.stringify(String(s.id)))})">Xem lượt này ↗</button></td></tr>`).join('')}
+          </tbody></table></div>`;
+      }
+      document.getElementById('examAttemptHistoryModal').classList.add('open');
+    }
+    function closeExamAttemptHistory(){document.getElementById('examAttemptHistoryModal').classList.remove('open');}
+    function setExamScoreboardTab(tab) {
+      scoreboardV8Tab=tab==='questions'?'questions':'students';
+      renderAdminScoreboardContent();
+    }
+    function verifiedKeysAtSubmission(sub,exam) {
+      if(sub.gradingKeys && typeof sub.gradingKeys==='object') return {
+        mcq: sub.gradingKeys.mcq||{}, tf:sub.gradingKeys.tf||{}, sa:sub.gradingKeys.sa||{}
+      };
+      // Bài cũ không chụp đáp án tại thời điểm nộp: chỉ lấy khi khớp phiên bản.
+      if(sub.examUpdatedAt && exam && sub.examUpdatedAt===exam.updatedAt) return {
+        mcq:exam.mcqKeys||exam.keys||{},tf:exam.tfKeys||{},sa:exam.saKeys||{}
+      };
+      return null;
+    }
+    function collectExamQuestionStats(exam, submissions) {
+      const rows=new Map(); let skipped=0, included=0;
+      const keyOrder={mcq:0,tf:1,sa:2};
+      const hasAnswer=(val)=>val!==null && val!==undefined && String(val).trim()!=='';
+      const ensureRow=(type,q,sub,key)=>{
+        const id=`${type}:${q}${sub?':'+sub:''}`;
+        if(!rows.has(id)) rows.set(id,{id,type,q:String(q),sub:sub||null,key:String(key),keyVariants:{},total:0,correct:0,wrong:0,blank:0,answers:{}});
+        const row=rows.get(id);row.keyVariants[String(key)]=true;return row;
+      };
+      submissions.forEach(s=>{
+        const keys=verifiedKeysAtSubmission(s,exam), answers=s.answers;
+        if(!keys || !answers || typeof answers!=='object') {skipped++;return;}
+        included++;
+        for(const [q,key] of Object.entries(keys.mcq||{})){
+          const row=ensureRow('mcq',q,null,key);
+          const val=answers.mcq&&answers.mcq[q];
+          const pick=hasAnswer(val)?String(val).trim().toUpperCase():'—';
+          row.total++;row.answers[pick]=(row.answers[pick]||0)+1;
+          if(pick==='—')row.blank++;else if(pick===String(key).toUpperCase())row.correct++;else row.wrong++;
+        }
+        for(const [q,subkeys] of Object.entries(keys.tf||{})){
+          for(const sub of ['a','b','c','d']){
+            if(!subkeys || !hasAnswer(subkeys[sub]))continue;
+            const row=ensureRow('tf',q,sub,subkeys[sub]);
+            const val=answers.tf&&answers.tf[q]&&answers.tf[q][sub];
+            const pick=hasAnswer(val)?String(val).trim().toUpperCase():'—';
+            row.total++;row.answers[pick]=(row.answers[pick]||0)+1;
+            if(pick==='—')row.blank++;else if(pick===String(subkeys[sub]).toUpperCase())row.correct++;else row.wrong++;
+          }
+        }
+        for(const [q,key] of Object.entries(keys.sa||{})){
+          const row=ensureRow('sa',q,null,key);
+          const val=answers.sa&&answers.sa[q];
+          const pick=hasAnswer(val)?normalizeShortExamAnswer(val):'—';
+          row.total++;row.answers[pick]=(row.answers[pick]||0)+1;
+          if(pick==='—')row.blank++;else if(pick===normalizeShortExamAnswer(key))row.correct++;else row.wrong++;
+        }
+      });
+      const result=Array.from(rows.values()).sort((a,b)=>keyOrder[a.type]-keyOrder[b.type]||Number(a.q)-Number(b.q)||(a.sub||'').localeCompare(b.sub||''));
+      return {rows:result,skipped,included};
+    }
+    function renderExamQuestionAnalysis(exam, subs) {
+      const wrapper=document.getElementById('adminScoreboardTableWrapper');
+      const summary=document.getElementById('adminScoreboardSummary');
+      const data=collectExamQuestionStats(exam,subs);
+      if(!data.rows.length){
+        summary.textContent='Không có dữ liệu đáp án đã xác minh của những lượt được chọn.';
+        wrapper.innerHTML='<div class="notice">Các bài nộp cũ có thể không lưu ảnh chụp đáp án. Bắt đầu có dữ liệu phân tích chính xác từ các lượt nộp có gradingKeys.</div>';
+        return;
+      }
+      const part=document.getElementById('v8QuestionType')?.value||'all';
+      const order=document.getElementById('v8QuestionOrder')?.value||'hardest';
+      const r=data.rows.filter(x=>part==='all'||x.type===part);
+      if(order==='hardest')r.sort((a,b)=>a.correct/a.total-b.correct/b.total||b.total-a.total);
+      else if(order==='blank')r.sort((a,b)=>b.blank/b.total-a.blank/a.total||b.total-a.total);
+      const answered=data.rows.reduce((n,x)=>n+x.correct+x.wrong,0);
+      const wrong=data.rows.reduce((n,x)=>n+x.wrong,0);
+      const total=data.rows.reduce((n,x)=>n+x.total,0);
+      summary.innerHTML=`<b>${data.included} lượt có thể phân tích</b> · ${data.rows.length} mục câu/ý · Mỗi ý Đ/S được tính riêng.
+        ${data.skipped?`<div style="color:#9a5815">⚠ ${data.skipped} lượt cũ thiếu ảnh chụp đáp án/phiên bản nên không đưa vào thống kê từng câu.</div>`:''}
+        <div class="exam-v8-stats-grid"><div class="exam-v8-stat"><strong>${data.rows.length}</strong><span>Câu và ý được phân tích</span></div><div class="exam-v8-stat"><strong>${total?Math.round(answered/total*100):0}%</strong><span>Tỷ lệ trả lời</span></div><div class="exam-v8-stat"><strong>${wrong}</strong><span>Lượt trả lời sai theo câu/ý</span></div></div>
+        <div class="exam-v8-muted">Tỷ lệ đúng tính trên số lượt có câu đó. Nếu đáp án đã thay đổi, mỗi lượt được so với bộ đáp án chụp tại lúc nộp.</div>`;
+      wrapper.innerHTML=`<div style="overflow-x:auto"><table class="exam-v8-tbl"><thead><tr><th>Câu / ý</th><th>Tỷ lệ đúng</th><th>Đúng</th><th>Sai</th><th>Bỏ trống</th><th>Đáp án đúng</th><th>Phân bố lựa chọn của học viên</th></tr></thead><tbody>
+        ${r.map(x=>{
+          const rate=Math.round(100*x.correct/x.total);
+          const dist=(x.type==='mcq'?['A','B','C','D','—']:(x.type==='tf'?['Đ','S','—']:Object.keys(x.answers).sort((a,b)=>x.answers[b]-x.answers[a]).slice(0,8)))
+            .map(k=>`<span title="${escapeHTML(k==='—'?'Bỏ trống':k)}">${escapeHTML(k==='—'?'Trống':k)}: <b>${x.answers[k]||0}</b></span>`).join('');
+          const section=x.type==='mcq'?'I · TN':x.type==='tf'?'II · Đ/S':'III · TLN';
+          return `<tr><td><b>${escapeHTML(section)}</b><div>Câu ${escapeHTML(x.q)}${x.sub?' ('+escapeHTML(x.sub)+')':''}</div></td>
+            <td><b style="color:${rate<50?'#bf5b23':'#237d52'}">${rate}%</b><div class="exam-v8-bar ${rate<50?'exam-v8-low':''}"><span style="width:${rate}%"></span></div></td>
+            <td style="color:#138244"><b>${x.correct}</b></td><td style="color:#c2514b"><b>${x.wrong}</b></td><td>${x.blank}</td>
+            <td><span class="exam-v8-answer-badge">${escapeHTML(Object.keys(x.keyVariants).join(" / "))}</span>${Object.keys(x.keyVariants).length>1?'<div class="exam-v8-muted">Đáp án theo từng phiên bản đề</div>':''}</td><td><div class="exam-v8-distribution">${dist}</div><div class="exam-v8-muted">${x.total} lượt có câu này</div></td></tr>`;
+        }).join('')}</tbody></table></div>`;
+    }
+
     function openAdminScoreboardModal() {
       const selectExam = document.getElementById('selAdminScoreboardExam');
       if (!selectExam) return;
@@ -2332,83 +2559,150 @@
       document.getElementById('adminScoreboardModal').classList.remove('open');
     }
 
-    function renderAdminScoreboardContent() {
-      const selectExam = document.getElementById('selAdminScoreboardExam');
-      const examCode = selectExam ? selectExam.value : null;
-      const wrapper = document.getElementById('adminScoreboardTableWrapper');
-      if (!wrapper) return;
-
-      if (!examCode) {
-        wrapper.innerHTML = '<div class="notice" style="text-align:center;">Vui lòng chọn bài thi.</div>';
-        return;
+    /* Chỉ số chấm theo LƯỢT NỘP, không lấy số đúng/sai từ đề bị sửa sau đó. */
+    function examSubmissionMetrics(sub, exam) {
+      const answers = sub.answers || {};
+      const mcqK = exam && (exam.mcqKeys || exam.keys) || {};
+      const tfK = exam && exam.tfKeys || {};
+      const saK = exam && exam.saKeys || {};
+      const countFilled = obj => Object.values(obj || {}).filter(x => x !== null && x !== undefined && String(x).trim() !== '').length;
+      const tfFilled = obj => Object.values(obj || {}).reduce((n, v) => n + countFilled(v), 0);
+      function section(type, goodField, totalField, answeredField, currentTotal, currentAnswered) {
+        const correct = typeof sub[goodField] === 'number' ? sub[goodField] : null;
+        const historical = typeof sub[totalField] === 'number';
+        const total = historical ? sub[totalField] : currentTotal;
+        const answerKnown = typeof sub[answeredField] === 'number' || (answers[type] && typeof answers[type] === 'object');
+        const answered = typeof sub[answeredField] === 'number' ? sub[answeredField] : (answerKnown ? currentAnswered : null);
+        // Với lượt nộp cũ, đáp án có thể đã đổi nên không đoán khi dữ liệu mâu thuẫn.
+        const coherent = correct !== null && answered !== null && answered >= correct && total >= answered && total >= correct;
+        const wrong = coherent ? Math.max(0, answered - correct) : null;
+        const blank = coherent ? Math.max(0, total - answered) : null;
+        return {correct, total:(!historical && total < (correct || 0)) ? null : total,
+          answered, wrong, blank, historical};
       }
-
-      const subs = studentSubmissions.filter(s => s.examCode === examCode);
-
-      if (!subs.length) {
-        wrapper.innerHTML = `
-          <div class="notice" style="text-align:center; padding:24px;">
-            Chưa có học viên nào nộp bài cho đề thi này.
-          </div>
-        `;
-        return;
-      }
-
-      wrapper.innerHTML = `
-        <table style="width:100%; border-collapse:collapse; font-size:12.5px; text-align:left;">
-          <thead>
-            <tr style="background:#f1f5f9; color:#475569; border-bottom:2px solid #cbd5e1;">
-              <th style="padding:10px 12px;">Học viên</th>
-              <th style="padding:10px 12px;">Thời gian nộp</th>
-              <th style="padding:10px 12px; text-align:center;">Trắc nghiệm</th>
-              <th style="padding:10px 12px; text-align:center;">Đúng/Sai</th>
-              <th style="padding:10px 12px; text-align:center;">Trả lời ngắn</th>
-              <th style="padding:10px 12px; text-align:center;">Điểm số</th>
-              <th style="padding:10px 12px; text-align:center;">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${subs.map(s => {
-              const dateStr = s.submittedAt ? new Date(s.submittedAt).toLocaleString('vi-VN') : '---';
-              const scoreBadge = s.practiceOnly 
-                ? '<span class="tag session-badge">Hoàn thành</span>' 
-                : `<strong style="font-size:14px; color:#2563eb;">${s.score !== null ? s.score : '---'}</strong>`;
-
-              return `
-                <tr style="border-bottom:1px solid #e2e8f0;">
-                  <td style="padding:10px 12px;">
-                    <strong style="color:#1e293b; display:block;">${escapeHTML(s.fullName || s.username)}</strong>
-                    <span style="font-size:11px; color:#64748b;">@${escapeHTML(s.username)}</span>
-                  </td>
-                  <td style="padding:10px 12px; color:#64748b; font-size:11.5px;">${dateStr}</td>
-                  <td style="padding:10px 12px; text-align:center; font-weight:600; color:#1e40af;">${s.mcqCorrect || 0} câu</td>
-                  <td style="padding:10px 12px; text-align:center; font-weight:600; color:#166534;">${s.tfCorrectSubCount || 0} ý</td>
-                  <td style="padding:10px 12px; text-align:center; font-weight:600; color:#92400e;">${s.saCorrect || 0} câu</td>
-                  <td style="padding:10px 12px; text-align:center;">${scoreBadge}</td>
-                  <td style="padding:10px 12px; text-align:center;">
-                    <button class="secondary" style="padding:4px 8px; font-size:11px;" onclick="closeAdminScoreboardModal(); openReviewExamDirectly('${escapeHTML(s.examCode)}', ${s.userId});">
-                      👁️ Xem bài làm
-                    </button>
-                  </td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      `;
+      return {
+        mcq: section('mcq','mcqCorrect','mcqTotal','mcqAnswered', Object.keys(mcqK).length, countFilled(answers.mcq)),
+        tf: section('tf','tfCorrectSubCount','tfTotalSubCount','tfAnsweredSubCount', Object.keys(tfK).length*4, tfFilled(answers.tf)),
+        sa: section('sa','saCorrect','saTotal','saAnswered', Object.keys(saK).length, countFilled(answers.sa))
+      };
     }
 
-    function openReviewExamDirectly(examCode, targetUserId = null) {
+    function formatScoreboardPart(p, unit) {
+      if (p.total === 0 && (!p.correct || p.correct === 0)) return '<span class="scoreboard-mini-note">Không có phần này</span>';
+      const correctText = p.correct === null ? '—' : String(p.correct);
+      const totalText = p.total > 0 ? '/' + p.total : ' (chưa rõ tổng)';
+      let html = `<div class="scoreboard-answer-stat"><span class="good">${correctText}${totalText} đúng</span>${unit === 'ý' ? ' (ý)' : ''}`;
+      if (p.wrong !== null) html += `<div class="bad">${p.wrong} sai</div>`;
+      if (p.blank !== null) html += `<div class="skip">${p.blank} bỏ trống</div>`;
+      if (p.wrong === null || p.blank === null) html += '<div class="scoreboard-mini-note">Thiếu dữ liệu để tách sai/bỏ trống</div>';
+      return html + '</div>';
+    }
+
+    function exportAdminScoreboardCSV() {
+      if (scoreboardV8Tab==='questions') return exportExamQuestionAnalysisCSV();
+      const examCode = document.getElementById('selAdminScoreboardExam')?.value;
       const exam = examsList.find(x => x.code === examCode);
-      if (!exam) return alert("Không tìm thấy đề thi!");
+      if (!examCode || !exam) return showToast('Hãy chọn một đề thi để xuất.');
+      const lines = [[ 'Học viên','Username','Lượt làm','Thời gian nộp','TN đúng','TN sai','TN bỏ trống','Đ/S ý đúng','Đ/S ý sai','Đ/S ý bỏ trống','TLN đúng','TLN sai','TLN bỏ trống','Điểm' ]];
+      selectedExamSubmissions(examCode,document.getElementById('v8ScoreAttemptFilter')?.value||'latest').forEach(sub => {
+        const m = examSubmissionMetrics(sub,exam);
+        lines.push([sub.fullName || sub.username || '',sub.username || '',attemptNumberFor(sub),sub.submittedAt || '',m.mcq.correct,m.mcq.wrong,m.mcq.blank,m.tf.correct,m.tf.wrong,m.tf.blank,m.sa.correct,m.sa.wrong,m.sa.blank,sub.practiceOnly ? 'Hoàn thành' : sub.score]);
+      });
+      // Chống chuỗi công thức ngoài ý muốn khi mở CSV trong Excel.
+      const csvField = value => { let t = value === null || value === undefined ? '' : String(value); if (/^[\s]*[=+@-]/.test(t) && !/^-?\d+(?:\.\d+)?$/.test(t.trim())) t = "'" + t; return '"' + t.replace(/"/g,'""') + '"'; };
+      const csv = '\uFEFF' + lines.map(row=>row.map(csvField).join(',')).join('\r\n');
+      const url = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+      const a = document.createElement('a'); a.href = url; a.download = `BioBling_Diem_${String(examCode).replace(/[^a-z0-9_-]/gi,'_')}.csv`;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
 
-      const uid = targetUserId || (currentUser ? currentUser.id : null);
-      const submission = studentSubmissions.find(s => s.examCode === examCode && s.userId === uid);
+    function exportExamQuestionAnalysisCSV() {
+      const examCode=document.getElementById('selAdminScoreboardExam')?.value;
+      const exam=examsList.find(e=>e.code===examCode);
+      if(!exam)return showToast('Hãy chọn đề thi.');
+      const mode=document.getElementById('v8ScoreAttemptFilter')?.value||'latest';
+      const data=collectExamQuestionStats(exam,selectedExamSubmissions(examCode,mode));
+      const part=document.getElementById('v8QuestionType')?.value||'all';
+      const rows=data.rows.filter(r=>part==='all'||r.type===part);
+      if(!rows.length)return showToast('Không có dữ liệu câu hỏi để xuất.');
+      const table=[['Mã đề','Phần','Câu','Ý','Số lượt hợp lệ','Đúng','Sai','Bỏ trống','Tỷ lệ đúng (%)','Đáp án theo từng phiên bản','Phân bố câu trả lời']];
+      rows.forEach(r=>table.push([examCode,r.type,r.q,r.sub||'',r.total,r.correct,r.wrong,r.blank,Math.round(r.correct/r.total*100),Object.keys(r.keyVariants).join(' / '),Object.entries(r.answers).map(([a,n])=>`${a}:${n}`).join(' | ')]));
+      const csvField=value=>{let t=value==null?'':String(value);if(/^[\s]*[=+@-]/.test(t)&&!/^-[0-9.]+$/.test(t.trim()))t="'"+t;return '"'+t.replace(/"/g,'""')+'"';};
+      const csv='\uFEFF'+table.map(row=>row.map(csvField).join(',')).join('\r\n');
+      const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+      const a=document.createElement('a');a.href=url;a.download=`BioBling_TheoCau_${String(examCode).replace(/[^a-z0-9_-]/gi,'_')}.csv`;
+      document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
 
-      if (!submission) return alert("Không tìm thấy bài làm của học viên này!");
+    function renderAdminScoreboardContent() {
+      const examCode = document.getElementById('selAdminScoreboardExam')?.value;
+      const wrapper = document.getElementById('adminScoreboardTableWrapper');
+      const summary = document.getElementById('adminScoreboardSummary');
+      if (!wrapper || !summary) return;
+      const exam = examsList.find(e=>e.code === examCode);
+      const questionTab=scoreboardV8Tab==='questions';
+      document.getElementById('v8ScoreTabStudents')?.classList.toggle('active',!questionTab);
+      document.getElementById('v8ScoreTabQuestions')?.classList.toggle('active',questionTab);
+      ['v8QuestionType','v8QuestionOrder','v8QuestionTypeLabel'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=questionTab?'':'none';});
+      if (!examCode || !exam) {
+        summary.textContent = 'Chọn bài thi để xem thống kê.';
+        wrapper.innerHTML = '<div class="notice">Chưa chọn bài thi.</div>';
+        return;
+      }
+      const mode=document.getElementById('v8ScoreAttemptFilter')?.value||'latest';
+      const subs=selectedExamSubmissions(examCode,mode);
+      const all=examSubmissionsFor(examCode);
+      if (!subs.length) {
+        summary.textContent='Chưa có bài làm đã nộp.';
+        wrapper.innerHTML='<div class="notice" style="text-align:center;padding:24px;">Chưa có học viên nào nộp bài cho đề thi này.</div>';
+        return;
+      }
+      if(questionTab){renderExamQuestionAnalysis(exam,subs);return;}
+      const isOld = subs.some(s => typeof s.mcqTotal !== 'number' || typeof s.tfTotalSubCount !== 'number' || typeof s.saTotal !== 'number');
+      summary.innerHTML = `<b>${subs.length} lượt đang xem</b> / ${all.length} lượt đã lưu · <b>${new Set(all.map(s=>String(s.userId))).size} học viên</b>. Các số thể hiện đúng / sai / bỏ trống từng phần; Đ/S đếm theo ý.
+        ${isOld ? '<div style="margin-top:4px;color:#92400e">ℹ Bài nộp cũ có thể thiếu mẫu số theo phiên bản đề khi nộp. Điểm gốc không bị thay đổi.</div>' : ''}`;
+      wrapper.innerHTML = `
+        <table style="width:100%;border-collapse:collapse;font-size:12px;text-align:left;min-width:840px;">
+          <thead><tr style="background:#f1f5f9;color:#475569;border-bottom:2px solid #cbd5e1;">
+            <th style="padding:10px 12px">Học viên / lượt</th><th style="padding:10px 12px">Thời gian nộp</th>
+            <th style="padding:10px 12px">Phần I · Trắc nghiệm</th><th style="padding:10px 12px">Phần II · Đ/S</th>
+            <th style="padding:10px 12px">Phần III · TL ngắn</th><th style="padding:10px 12px">Kết quả</th><th style="padding:10px 12px">Xem</th>
+          </tr></thead><tbody>
+          ${subs.map(sub=>{
+            const m = examSubmissionMetrics(sub,exam);
+            const dateStr=escapeHTML(formatExamSubmittedAt(sub));
+            const mark = sub.practiceOnly ? '<span class="tag session-badge">Hoàn thành</span>' : `<strong style="color:#2563eb">${sub.score !== null && sub.score !== undefined ? escapeHTML(sub.score) : '—'}</strong>`;
+            return `<tr style="border-bottom:1px solid #e2e8f0;vertical-align:top">
+              <td style="padding:10px 12px"><b>${escapeHTML(sub.fullName || sub.username || 'Học viên')}</b><div class="scoreboard-mini-note">@${escapeHTML(sub.username || '')} · Lần ${attemptNumberFor(sub)}</div></td>
+              <td style="padding:10px 12px;color:#64748b;white-space:nowrap">${dateStr}</td>
+              <td style="padding:10px 12px">${formatScoreboardPart(m.mcq,'câu')}</td>
+              <td style="padding:10px 12px">${formatScoreboardPart(m.tf,'ý')}</td>
+              <td style="padding:10px 12px">${formatScoreboardPart(m.sa,'câu')}</td>
+              <td style="padding:10px 12px">${mark}</td>
+              <td style="padding:10px 12px"><button class="secondary" style="font-size:11px;padding:6px 9px" onclick="closeAdminScoreboardModal();openReviewExamDirectly(${escapeHTML(JSON.stringify(String(sub.examCode)))},null,${escapeHTML(JSON.stringify(String(sub.id)))});">👁 Xem lượt này</button></td>
+            </tr>`;
+          }).join('')}
+          </tbody></table>`;
+    }
 
-      studentLiveAnswers = submission.answers || { mcq: {}, tf: {}, sa: {} };
-      startExamRoom(exam, true);
+    function openReviewExamDirectly(examCode, targetUserId = null, submissionId = null) {
+      const exam = examsList.find(x => String(x.code) === String(examCode));
+      if (!exam || !currentUser) return alert('Không tìm thấy đề thi hoặc phiên đăng nhập đã hết hạn!');
+      const uid=targetUserId===null ? currentUser.id : targetUserId;
+      // Khi có ID lượt nộp thì dùng CHÍNH XÁC lượt đó, không dùng .find() khiến xem sai lượt.
+      let submission = submissionId ? studentSubmissions.find(s=>String(s.id)===String(submissionId) && String(s.examCode)===String(examCode)) : null;
+      if(!submission && !submissionId) submission = examSubmissionsFor(examCode,uid).slice(-1)[0];
+      if(!submission) return alert('Không tìm thấy bài làm đã nộp!');
+      if(currentUser.role!=='admin' && String(submission.userId)!==String(currentUser.id)) return alert('Bạn không có quyền xem lượt thi của học viên khác.');
+      currentResultSubmissionId=String(submission.id);
+      studentLiveAnswers = JSON.parse(JSON.stringify(submission.answers || {mcq:{},tf:{},sa:{}}));
+      const reviewExam = submission.gradingKeys ? {...exam,
+        mcqKeys: submission.gradingKeys.mcq || {}, tfKeys: submission.gradingKeys.tf || {}, saKeys: submission.gradingKeys.sa || {},
+        rawDocsUrl:submission.rawDocsUrl || exam.rawDocsUrl, embedUrl:submission.embedUrl || exam.embedUrl
+      } : {...exam};
+      startExamRoom(reviewExam, true);
+      if(!submission.gradingKeys && (!submission.examUpdatedAt || exam.updatedAt!==submission.examUpdatedAt))
+        showToast('Lượt thi cũ chưa lưu đáp án gốc: cần đối chiếu nếu đề đã chỉnh sửa.');
     }
 
     function populateExamClassSelectOptions() {
@@ -2487,37 +2781,38 @@
         const isDeadlineValid = deadlineDate && !isNaN(deadlineDate.getTime());
         const isOverdue = !!(isDeadlineValid && Date.now() > deadlineDate.getTime());
 
-        const userSubmission = currentUser 
-          ? studentSubmissions.find(s => s.examCode === e.code && s.userId === currentUser.id)
-          : null;
-        const savedDraft = !isAdmin && !userSubmission ? readExamDraft(e) : null;
+        const myAttempts = !isAdmin && currentUser ? examSubmissionsFor(e.code,currentUser.id) : [];
+        const userSubmission = myAttempts.length ? myAttempts[myAttempts.length-1] : null;
+        const savedDraft = !isAdmin ? readExamDraft(e) : null;
 
         let examActionHtml = '';
         if (userSubmission && !isAdmin) {
           const scoreText = userSubmission.practiceOnly ? 'Đã hoàn thành' : `${userSubmission.score} đ`;
+          const scores=myAttempts.filter(s=>!s.practiceOnly && s.score!==null && Number.isFinite(Number(s.score))).map(s=>Number(s.score));
+          const bestText=scores.length ? `Điểm cao nhất: ${Math.max(...scores).toFixed(2)}` : `${myAttempts.length} lượt luyện tập`;
           examActionHtml = `
             <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:10px 12px; margin-top:8px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:11px; font-weight:700; color:#166534;">KẾT QUẢ ĐÃ NỘP:</span>
-                <span style="font-size:14px; font-weight:800; color:#15803d;">${scoreText}</span>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;gap:8px;">
+                <span style="font-size:11px; font-weight:700; color:#166534;">ĐÃ NỘP ${myAttempts.length} LƯỢT</span>
+                <span style="font-size:13px; font-weight:800; color:#15803d;">${escapeHTML(scoreText)}</span>
               </div>
-              <button class="secondary" style="width:100%; justify-content:center; padding:8px; font-size:12px; border-color:#86efac; color:#166534;" onclick="openReviewExamDirectly('${escapeHTML(e.code)}')">
-                <i class="fa-solid fa-eye"></i> Xem Lại Bài Làm
-              </button>
-            </div>
-          `;
+              <div style="font-size:10.5px;color:#5a7965;">${escapeHTML(bestText)} · Gần nhất: ${escapeHTML(formatExamSubmittedAt(userSubmission))}</div>
+              <div class="exam-v8-actions">
+                <button type="button" class="secondary" onclick="openExamAttemptHistory(${escapeHTML(JSON.stringify(String(e.code)))})"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử (${myAttempts.length})</button>
+                <button type="button" class="secondary" onclick="openReviewExamDirectly(${escapeHTML(JSON.stringify(String(e.code)))})"><i class="fa-solid fa-eye"></i> Xem lượt cuối</button>
+              </div>
+              ${!isOverdue ? `<div class="exam-v8-actions"><button type="button" class="primary" style="background:#217951" onclick="promptStartExam(${escapeHTML(JSON.stringify(String(e.code)))})"><i class="fa-solid fa-rotate"></i> ${savedDraft?'Tiếp tục lượt đang làm':'Làm lại bài (lượt '+(myAttempts.length+1)+')'}</button></div>` : '<small style="color:#b91c1c;display:block;margin-top:6px;">Đã hết hạn — chỉ xem được lịch sử bài nộp</small>'}
+              ${savedDraft?'<small style="color:#16814b;display:block;margin-top:7px">💾 Lượt đang làm đã lưu trên trình duyệt</small>':''}
+            </div>`;
         } else if (!isAdmin && isOverdue) {
           examActionHtml = `
             <div class="card-foot" style="padding-top:10px;">
-              <button class="secondary" disabled style="width:100%; justify-content:center; padding:10px; font-size:12.5px; color:#b91c1c; border-color:#fecaca; background:#fef2f2; cursor:not-allowed; opacity:1;">
-                <i class="fa-solid fa-lock"></i> Đã hết hạn làm bài
-              </button>
-            </div>
-          `;
+              <button class="secondary" disabled style="width:100%;justify-content:center;color:#b91c1c;border-color:#fecaca;background:#fef2f2;cursor:not-allowed;">Đã hết hạn làm bài</button>
+            </div>`;
         } else {
           examActionHtml = `
             <div class="card-foot" style="padding-top:10px;">
-              <button class="primary" style="width:100%; justify-content:center; padding:10px; font-size:12.5px; background:#2563eb; border-color:#2563eb;" onclick="promptStartExam('${escapeHTML(e.code)}')">
+              <button class="primary" style="width:100%; justify-content:center; padding:10px; font-size:12.5px; background:#2563eb; border-color:#2563eb;" onclick="promptStartExam(${escapeHTML(JSON.stringify(String(e.code)))})">
                 <i class="fa-solid fa-pencil"></i> ${savedDraft ? '↩ Tiếp tục bài đang làm' : 'Làm Bài Thi Ngay'}
               </button>
             </div>
@@ -2529,7 +2824,7 @@
         if (isAdmin) {
           adminActionsHtml = `
             <div style="display:flex; gap:6px; align-items:center; margin-top:10px; border-top:1px solid #edf2ed; padding-top:10px;">
-              <button onclick="promptStartExam('${escapeHTML(e.code)}')" class="primary" style="padding:5px 10px; font-size:11px; background:#10b981; border-color:#10b981;">
+              <button onclick="promptStartExam(${escapeHTML(JSON.stringify(String(e.code)))})" class="primary" style="padding:5px 10px; font-size:11px; background:#10b981; border-color:#10b981;">
                 Làm thử
               </button>
               <button onclick="editAdminExam('${escapeHTML(e.code)}')" class="secondary" style="padding:5px 10px; font-size:11px;">
@@ -2587,6 +2882,11 @@
         const d = JSON.parse(raw);
         if (!d || String(d.userId)!==String(currentUser.id) || String(d.examCode)!==String(exam.code)) return null;
         if (!d.answers || typeof d.answers!=='object') return null;
+        // Tránh khôi phục bản nháp đã nộp mà trình duyệt chưa kịp xóa khi mất điện.
+        if (d.attemptId && studentSubmissions.some(s=>String(s.attemptId)===String(d.attemptId) && String(s.userId)===String(currentUser.id) && String(s.examCode)===String(exam.code))) {
+          try { localStorage.removeItem(key); } catch(e){}
+          return null;
+        }
         return d;
       } catch(e) { console.warn('Không đọc được bản lưu bài làm:',e); return null; }
     }
@@ -2602,7 +2902,8 @@
       const key = examDraftKey();
       if (!key) return false;
       const snapshot = {
-        version:1,
+        version:2,
+        attemptId: activeDraftAttemptId,
         examCode: String(activeExam.code),
         userId: String(currentUser.id),
         startedAt: activeDraftStartedAt || Date.now(),
@@ -2656,7 +2957,7 @@
         <div style="margin-bottom:8px;">${isUnlimited ? '📌 <strong>Chế độ:</strong> Đề cương thời gian vô hạn.' : `⏱️ <strong>Thời gian làm bài:</strong> ${exam.timeLimit || 50} phút.`}</div>
         ${exam.deadline ? `<div style="margin-bottom:8px;color:#c2410c;">📅 <strong>Hạn làm bài:</strong> ${escapeHTML(formatDeadline(exam.deadline))}</div>` : ''}
         <div style="color:#b91c1c; font-size:12px; font-weight:600; background:#fef2f2; border:1px solid #fee2e2; border-radius:8px; padding:8px 10px;">
-          💾 Hệ thống tự động lưu mỗi câu trả lời vào trình duyệt. Nếu mất mạng, thoát tab hoặc F5, bạn có thể quay lại làm tiếp; đồng hồ vẫn tính theo thời gian đã bắt đầu.
+          💾 Mỗi lần nộp sẽ tạo một lượt riêng, không ghi đè điểm cũ. Hệ thống lưu nháp trên trình duyệt để tiếp tục khi bị thoát. Đồng hồ vẫn chạy theo mốc bắt đầu.
         </div>
       `;
 
@@ -2710,6 +3011,8 @@
       }
 
       if (!reviewOnly) {
+        currentResultSubmissionId = null;
+        activeDraftAttemptId = (restoredDraft && restoredDraft.attemptId) || makeExamAttemptId();
         const answers = restoredDraft && restoredDraft.answers;
         studentLiveAnswers = {
           mcq: {...(answers && answers.mcq || {})},
@@ -2873,7 +3176,7 @@
           
           const val = studentLiveAnswers.sa[q] || "";
           const correctVal = saKeys[q];
-          const isCorrect = isLiveReviewMode && (val.trim().toLowerCase() === (correctVal||'').toString().trim().toLowerCase());
+          const isCorrect = isLiveReviewMode && (normalizeShortExamAnswer(val) === normalizeShortExamAnswer(correctVal) && String(val).trim() !== '');
 
           let inputSt = "border:1px solid #cbd5e1; border-radius:6px; padding:4px 8px; font-size:12px; font-family:monospace; width:110px; outline:none; ";
           if (isLiveReviewMode) {
@@ -2976,9 +3279,17 @@
       }
     }
 
+    function normalizeShortExamAnswer(value) {
+      const str=String(value ?? '').trim().replace(/\s+/g,' ');
+      if (/^[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(str)) return String(Number(str.replace(',','.')));
+      return str.toLowerCase();
+    }
+
     async function submitLiveExam() {
       if (examSubmitting || !activeExam || isLiveReviewMode) return;
       examSubmitting = true;
+      const submitButton=document.getElementById('btnLiveSubmitExam');
+      if(submitButton)submitButton.disabled=true;
       persistExamDraft();
       stopExamDraftHeartbeat();
       clearInterval(examCountdownTimer);
@@ -3019,8 +3330,8 @@
       // 3. Chấm Trả lời ngắn
       let saTotalScore = 0;
       for (let q in saKeys) {
-        const uAns = (studentLiveAnswers.sa[q] || "").trim().toLowerCase();
-        const kAns = (saKeys[q] || "").toString().trim().toLowerCase();
+        const uAns = normalizeShortExamAnswer(studentLiveAnswers.sa[q]);
+        const kAns = normalizeShortExamAnswer(saKeys[q]);
         if (uAns === kAns && uAns !== "") {
           saCorrect++;
           saTotalScore += 1.0;
@@ -3063,7 +3374,14 @@
 
       if (currentUser) {
         try {
-          await db.collection("submissions").doc(`${currentUser.id}_${activeExam.code}`).set({
+          const docId=`${String(currentUser.id)}_${String(activeExam.code).replace(/[^a-zA-Z0-9_-]/g,'_')}_${activeDraftAttemptId || makeExamAttemptId()}`;
+          const submissionRef = db.collection("submissions").doc(docId);
+          const submissionPayload = {
+            attemptId: activeDraftAttemptId,
+            attemptNo: examSubmissionsFor(activeExam.code,currentUser.id).length + 1,
+            startedAt: activeDraftStartedAt ? new Date(activeDraftStartedAt).toISOString() : null,
+            rawDocsUrl: activeExam.rawDocsUrl || null,
+            embedUrl: activeExam.embedUrl || null,
             userId: currentUser.id,
             username: currentUser.username,
             fullName: currentUser.fullName || currentUser.username,
@@ -3075,15 +3393,49 @@
             mcqCorrect,
             tfCorrectSubCount,
             saCorrect,
-            answers: studentLiveAnswers,
+            mcqTotal: totalMcq,
+            mcqAnswered: Object.keys(mcqKeys).filter(q => !!studentLiveAnswers.mcq[q]).length,
+            tfTotalSubCount: totalTf * 4,
+            tfAnsweredSubCount: Object.keys(tfKeys).reduce((sum, q) => sum + ['a','b','c','d'].filter(x => !!(studentLiveAnswers.tf[q] || {})[x]).length, 0),
+            saTotal: totalSa,
+            saAnswered: Object.keys(saKeys).filter(q => String(studentLiveAnswers.sa[q] || '').trim() !== '').length,
+            examUpdatedAt: activeExam.updatedAt || null,
+            gradingKeys: {mcq: JSON.parse(JSON.stringify(mcqKeys)), tf: JSON.parse(JSON.stringify(tfKeys)), sa: JSON.parse(JSON.stringify(saKeys))},
+            answers: JSON.parse(JSON.stringify(studentLiveAnswers)),
             submittedAt: new Date().toISOString()
-          });
+          };
+          // Giao dịch chỉ-tạo-mới: không ghi đè lượt đã nộp ngay cả khi mở lại bản nháp cũ.
+          if (typeof db.runTransaction === 'function') {
+            await db.runTransaction(async transaction => {
+              const existing = await transaction.get(submissionRef);
+              if (existing.exists) {
+                const duplicateError = new Error('Lượt làm này đã được gửi thành công trước đó.');
+                duplicateError.code = 'already-exists';
+                throw duplicateError;
+              }
+              transaction.set(submissionRef, submissionPayload);
+            });
+          } else {
+            // Chỉ dùng trong môi trường mock / bản Firebase không hỗ trợ transaction.
+            await submissionRef.set(submissionPayload);
+          }
+          currentResultSubmissionId=docId;
           clearExamDraft();
         } catch (err) {
+          if (err && err.code === 'already-exists') {
+            // Bản lưu cũ đã nộp rồi: giữ bản nộp trên Firebase, không chấm/ghi đè lần thứ hai.
+            clearExamDraft();
+            examSubmitting = false;
+            examDraftCompleted = true;
+            alert('Lượt này đã được nộp trước đó và đã có trong lịch sử. Không ghi đè kết quả cũ.');
+            exitExamToHome();
+            return;
+          }
           console.error('Lỗi lưu điểm thi:', err);
           showExamDraftStatus('⚠️ Chưa gửi được bài lên Firebase. Bản nháp vẫn an toàn trên thiết bị; hãy kết nối mạng và bấm Nộp bài lại.', true);
           alert('Chưa thể gửi bài thi lên Firebase. Bài làm đã được lưu trên thiết bị. Hãy kiểm tra kết nối mạng và bấm Nộp bài lại.');
           examSubmitting = false;
+          if(submitButton)submitButton.disabled=false;
           return;
         }
       } else {
@@ -3104,6 +3456,8 @@
       stopExamDraftHeartbeat();
       activeDraftExpiresAt = null;
       activeDraftStartedAt = null;
+      activeDraftAttemptId = null;
+      currentResultSubmissionId = null;
       isLiveReviewMode = false;
       renderExamsList();
     }
@@ -3111,6 +3465,7 @@
     function reviewExamQuestionsOnly() {
       document.getElementById('examResultScoreModal').classList.remove('open');
       isLiveReviewMode = true;
+      // Bài vừa nộp: dùng câu trả lời đang hiển thị, tránh nhảy sang lượt cũ do listener trễ.
       startExamRoom(activeExam, true);
     }
 
@@ -3212,6 +3567,7 @@
       document.getElementById('chkAdminPracticeOnly').checked = false;
       document.getElementById('inpAdminExamDeadline').value = "";
       renderClassPicker('examClassPicker', ['all']);
+      renderExamAnswerAudit();
       document.getElementById('adminExamFormModal').classList.add('open');
     }
 
@@ -3225,8 +3581,73 @@
       document.getElementById('inpAdminMcqKeys').value = "1.A 2.B 3.C 4.D 5.A 6.B 7.C 8.D 9.A 10.B 11.C 12.D 13.A 14.B 15.C 16.D 17.A 18.B";
       document.getElementById('inpAdminTfKeys').value = "1: Đ S Đ S\n2: S S Đ Đ\n3: Đ Đ S Đ\n4: S Đ S S";
       document.getElementById('inpAdminSaKeys').value = "1: 12\n2: 25\n3: 4\n4: 1.5\n5: 36\n6: 24";
+      renderExamAnswerAudit();
       showToast("Đã điền mẫu đề chuẩn Sinh 2025!");
     }
+
+    // V7: phân tích từng câu trước khi ghi vào Firestore, cảnh báo thay vì âm thầm bỏ câu.
+    function parseNumberedSegments(raw, extraSpaceDelimiter = false) {
+      const text = String(raw || '').trim();
+      if (!text) return [];
+      const re = extraSpaceDelimiter
+        ? /(?:^|[\s,;])(?:Câu\s*)?(\d+)\s*(?:[.):-]|(?=\s+[A-Da-d](?:\s|$)))\s*/gim
+        : /(?:^|[\s,;])(?:Câu\s*)?(\d+)\s*[.):-]\s*/gim;
+      const matches = [...text.matchAll(re)];
+      return matches.map((m,i) => ({
+        num:String(Number(m[1])),
+        value:text.slice(m.index + m[0].length, i+1 < matches.length ? matches[i+1].index : text.length).trim().replace(/^[,;\s]+|[,;\s]+$/g,''),
+      }));
+    }
+    function parseExamAnswerKeys(rawMcq, rawTf, rawSa) {
+      const warnings=[], errors=[];
+      const mcqKeys={},tfKeys={},saKeys={};
+      const sections=[['Phần I',rawMcq,mcqKeys],['Phần II',rawTf,tfKeys],['Phần III',rawSa,saKeys]];
+      sections.forEach(([name, raw, out], idx) => {
+        if (!String(raw||'').trim()) return;
+        const chunks = parseNumberedSegments(raw,idx===0);
+        if (!chunks.length) { errors.push(name+': không tìm được số câu (ví dụ 1.A hoặc 1: Đ S Đ S).'); return; }
+        chunks.forEach(({num,value}) => {
+          if (!Number(num) || Number(num)>10000) { errors.push(name+': số thứ tự câu không hợp lệ.'); return; }
+          if (Object.hasOwn(out,num)) { errors.push(`${name}: câu ${num} bị trùng số thứ tự.`); return; }
+          if (idx===0) {
+            const pick=value.trim().toUpperCase();
+            if (/^[A-D]$/.test(pick)) out[num]=pick;
+            else errors.push(`${name}: câu ${num} cần 1 lựa chọn A/B/C/D (đang nhận "${value.slice(0,25)}").`);
+          } else if (idx===1) {
+            const canonical=value.toUpperCase().trim();
+            const toks=canonical.match(/ĐÚNG|SAI|TRUE|FALSE|[ĐDSTF]/g) || [];
+            const residue=canonical.replace(/ĐÚNG|SAI|TRUE|FALSE|[ĐDSTF]/g,'').replace(/[\s,;/|()]+/g,'');
+            if (toks.length !== 4 || residue) {errors.push(`Phần II: câu ${num} phải có đúng 4 ý Đ/S (đang nhận "${value.slice(0,35)}").`); return;}
+            const choice=v=>(v==='Đ'||v==='D'||v==='T'||v==='TRUE'||v==='ĐÚNG') ? 'Đ' : 'S';
+            tfKeys[num]={a:choice(toks[0]),b:choice(toks[1]),c:choice(toks[2]),d:choice(toks[3])};
+          } else {
+            const ans=value.trim().replace(/[;,]\s*$/,'');
+            if (!ans) errors.push(`Phần III: câu ${num} chưa nhập đáp án.`);
+            else saKeys[num]=ans;
+          }
+        });
+        if (chunks.length && Object.keys(out).length !== chunks.length)
+          warnings.push(`${name}: ${chunks.length} câu được đánh số, chỉ ${Object.keys(out).length} câu hợp lệ.`);
+      });
+      const total=Object.keys(mcqKeys).length+Object.keys(tfKeys).length+Object.keys(saKeys).length;
+      if (total === 0 && !errors.length)
+        warnings.push('Đề không có đáp án; học sinh sẽ không có phiếu trả lời để làm bài.');
+      return {mcqKeys,tfKeys,saKeys,warnings,errors};
+    }
+    function renderExamAnswerAudit() {
+      const panel = document.getElementById('examAnswerAudit');
+      if (!panel) return;
+      const get=id=>document.getElementById(id)?.value||'';
+      const parsed=parseExamAnswerKeys(get('inpAdminMcqKeys'),get('inpAdminTfKeys'),get('inpAdminSaKeys'));
+      panel.classList.toggle('is-error',!!parsed.errors.length);
+      panel.classList.toggle('is-warning',!parsed.errors.length && !!parsed.warnings.length);
+      const counts=`✅ Nhận diện: <b>${Object.keys(parsed.mcqKeys).length} câu trắc nghiệm</b> · <b>${Object.keys(parsed.tfKeys).length} câu Đ/S</b> · <b>${Object.keys(parsed.saKeys).length} câu trả lời ngắn</b>`;
+      const issues=[...parsed.errors.map(s=>'⛔ '+s),...parsed.warnings.map(s=>'⚠ '+s)];
+      panel.innerHTML=counts+(issues.length ? '<div style="margin-top:6px">'+issues.map(x=>escapeHTML(x)).join('<br>')+'</div>' : '<div style="margin-top:4px">Định dạng đáp án hợp lệ, hệ thống sẽ nhận đủ các câu ở trên.</div>');
+    }
+    ['inpAdminMcqKeys','inpAdminTfKeys','inpAdminSaKeys'].forEach(id=>{
+      document.getElementById(id)?.addEventListener('input',renderExamAnswerAudit);
+    });
 
     async function saveAdminExamToFirestore() {
       const code = document.getElementById('inpAdminExamCode').value.trim();
@@ -3249,33 +3670,23 @@
         alert("Vui lòng điền đủ: Mã đề, Tiêu đề và Link Google Docs!");
         return;
       }
+      const priorExam = examsList.find(e => e.code === code);
+      const editingExisting = document.getElementById('inpAdminExamCode').disabled;
+      if (priorExam && !editingExisting) {
+        alert(`Mã đề ${code} đã tồn tại. Hãy dùng nút Sửa của đề cũ hoặc chọn mã mới. Điều này giúp tránh ghi đè kết quả học viên.`);
+        return;
+      }
 
-      const mcqKeys = {};
-      const reg1 = /(\d+)\s*[\.\:\-\s]\s*([A-Da-d])/g;
-      let m1;
-      while ((m1 = reg1.exec(rawMcq)) !== null) mcqKeys[parseInt(m1[1])] = m1[2].toUpperCase();
-
-      const tfKeys = {};
-      rawTf.split(/[\n,;]/).forEach(l => {
-        const m = l.match(/(\d+)\s*[\:\-\.]\s*([Đ|D|S|T|F|\s]+)/i);
-        if (m) {
-          const t = m[2].trim().toUpperCase().split(/\s+/).filter(Boolean);
-          if (t.length >= 4) {
-            tfKeys[parseInt(m[1])] = {
-              a: (t[0]==='Đ'||t[0]==='D'||t[0]==='T')?'Đ':'S',
-              b: (t[1]==='Đ'||t[1]==='D'||t[1]==='T')?'Đ':'S',
-              c: (t[2]==='Đ'||t[2]==='D'||t[2]==='T')?'Đ':'S',
-              d: (t[3]==='Đ'||t[3]==='D'||t[3]==='T')?'Đ':'S',
-            };
-          }
-        }
-      });
-
-      const saKeys = {};
-      rawSa.split(/[\n,;]/).forEach(l => {
-        const m = l.match(/(\d+)\s*[\:\-\.]\s*([^,;\n]+)/);
-        if (m) saKeys[parseInt(m[1])] = m[2].trim();
-      });
+      const audited = parseExamAnswerKeys(rawMcq,rawTf,rawSa);
+      renderExamAnswerAudit();
+      if (audited.errors.length) return alert('Đáp án chưa hợp lệ:\n- ' + audited.errors.join('\n- '));
+      if (audited.warnings.length && !confirm('Cần kiểm tra lại đáp án:\n- ' + audited.warnings.join('\n- ') + '\n\nBạn vẫn muốn lưu đề này?')) return;
+      const { mcqKeys,tfKeys,saKeys } = audited;
+      if (priorExam && studentSubmissions.some(x=>x.examCode===code)) {
+        const oldKeys = JSON.stringify([priorExam.mcqKeys || priorExam.keys || {},priorExam.tfKeys || {},priorExam.saKeys || {}]);
+        const nextKeys = JSON.stringify([mcqKeys,tfKeys,saKeys]);
+        if (oldKeys !== nextKeys && !confirm('Đề này đã có bài nộp. Thay đáp án/cấu trúc đề sẽ KHÔNG chấm lại điểm số cũ, và có thể làm lệch chế độ xem lại của bài nộp đời trước. Bạn xác nhận muốn sửa đáp án?')) return;
+      }
 
       btn.disabled = true;
       btn.innerText = "Đang lưu lên Firebase...";
@@ -3338,9 +3749,13 @@
       document.getElementById('chkAdminPracticeOnly').checked = !!exam.practiceOnly;
       document.getElementById('inpAdminExamDeadline').value = toDateTimeLocalValue(exam.deadline);
       document.getElementById('inpAdminDocsUrl').value = exam.rawDocsUrl || exam.embedUrl || "";
-      document.getElementById('inpAdminMcqKeys').value = exam.rawMcq || exam.rawKeys || "";
-      document.getElementById('inpAdminTfKeys').value = exam.rawTf || "";
-      document.getElementById('inpAdminSaKeys').value = exam.rawSa || "";
+      document.getElementById('inpAdminMcqKeys').value = exam.rawMcq || exam.rawKeys ||
+        Object.entries(exam.mcqKeys || exam.keys || {}).sort((a,b)=>Number(a[0])-Number(b[0])).map(([q,a])=>`${q}.${a}`).join(' ');
+      document.getElementById('inpAdminTfKeys').value = exam.rawTf ||
+        Object.entries(exam.tfKeys || {}).sort((a,b)=>Number(a[0])-Number(b[0])).map(([q,a])=>`${q}: ${['a','b','c','d'].map(k=>a[k]).join(' ')}`).join('\n');
+      document.getElementById('inpAdminSaKeys').value = exam.rawSa ||
+        Object.entries(exam.saKeys || {}).sort((a,b)=>Number(a[0])-Number(b[0])).map(([q,a])=>`${q}: ${a}`).join('\n');
+      renderExamAnswerAudit();
     }
 
     async function deleteAdminExam(code) {
