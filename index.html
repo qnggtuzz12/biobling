@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="22" fill="%231f503c"/%3E%3Ctext x="50" y="64" font-family="Inter,Arial,sans-serif" font-size="44" font-weight="800" fill="%23dcfce7" text-anchor="middle"%3E2B%3C/text%3E%3C/svg%3E">
   
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -943,6 +943,317 @@
     .media-admin-actions { display:flex; gap:6px; flex-shrink:0; }
     @media(max-width:620px){ .media-admin-row {align-items:flex-start;} .media-admin-actions {width:100%;justify-content:flex-end;} }
 
+    
+    /* V9 • Lọc theo lớp bắt buộc (Video, Tài liệu, Khảo thí) & Chế độ xem đề dễ quan sát */
+    .class-step-panel {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .class-step-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .class-step-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #173d2e;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .class-chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .class-chip-btn {
+      border: 1.5px solid #dce8df;
+      background: #f8fbf9;
+      color: #2c5440;
+      padding: 9px 15px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 750;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .16s ease;
+    }
+    .class-chip-btn:hover {
+      border-color: #287c54;
+      background: #edf7f0;
+      transform: translateY(-1px);
+    }
+    .class-chip-btn.active {
+      background: #23694b;
+      color: #fff;
+      border-color: #23694b;
+      box-shadow: 0 6px 16px rgba(35, 105, 75, .22);
+    }
+    .class-chip-btn .chip-count {
+      background: rgba(35, 105, 75, .12);
+      color: #1f5c40;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .class-chip-btn.active .chip-count {
+      background: rgba(255, 255, 255, .22);
+      color: #fff;
+    }
+    .empty-class-prompt {
+      background: #fff;
+      border: 1.5px dashed #bfd8c7;
+      border-radius: 18px;
+      padding: 36px 24px;
+      text-align: center;
+      color: #355c47;
+    }
+    .empty-class-prompt i {
+      font-size: 34px;
+      color: #287c54;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .empty-class-prompt h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      color: #173d2e;
+    }
+    .empty-class-prompt p {
+      margin: 0;
+      font-size: 12.5px;
+      color: #647f70;
+    }
+    .exam-toolbar-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #edf2ed;
+    }
+    .exam-search-box {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+      max-width: 380px;
+    }
+    .exam-search-box input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      border: 1px solid #d5e4da;
+      border-radius: 10px;
+      font-size: 12.5px;
+      background: #f9fcfa;
+    }
+    .exam-search-box i {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b8877;
+      font-size: 12px;
+    }
+    .exam-view-toggle {
+      display: inline-flex;
+      background: #f1f6f2;
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid #dce8df;
+    }
+    .exam-view-toggle button {
+      border: 0;
+      background: transparent;
+      color: #567062;
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 750;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .exam-view-toggle button.active {
+      background: #fff;
+      color: #1e6042;
+      box-shadow: 0 2px 5px rgba(0,0,0,.06);
+    }
+    .exam-compact-table-wrap {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      overflow-x: auto;
+      box-shadow: var(--shadow);
+    }
+    .exam-compact-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      min-width: 760px;
+    }
+    .exam-compact-table th {
+      background: #eef6f0;
+      color: #26543d;
+      text-align: left;
+      padding: 12px 14px;
+      font-size: 11.5px;
+      font-weight: 800;
+      border-bottom: 1px solid #dce8df;
+      white-space: nowrap;
+    }
+    .exam-compact-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #edf3ee;
+      vertical-align: middle;
+    }
+    .exam-compact-table tr:hover td {
+      background: #f9fcfa;
+    }
+    /* Tối ưu khung nhìn đề thi trong Phòng Thi (Live Exam Room) */
+    #liveExamDocsScroll {
+      padding: 8px !important;
+    }
+    #examZoomWrapper {
+      max-width: 100% !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: calc(100vh - 108px) !important;
+      border-radius: 10px !important;
+    }
+    #liveExamRightPanel {
+      width: 340px;
+      min-width: 290px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      transition: width .2s ease, min-width .2s ease;
+    }
+    #liveExamRightPanel.collapsed {
+      width: 0 !important;
+      min-width: 0 !important;
+      overflow: hidden !important;
+      border: none !important;
+    }
+    #liveExamModal.doc-wide-mode #liveExamRightPanel {
+      width: 280px;
+      min-width: 250px;
+    }
+
+    
+    /* V10 • Phân quyền đa lớp học viên, Bảng quản lý thành viên gọn ("làm lạnh") & Kiểm tra tài khoản cho Super Admin */
+    .member-mgmt-toolbar {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .member-mgmt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .member-compact-table-wrap {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      overflow-x: auto;
+      box-shadow: var(--shadow);
+    }
+    .member-compact-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      min-width: 820px;
+    }
+    .member-compact-table th {
+      background: #eef6f0;
+      color: #205039;
+      text-align: left;
+      padding: 11px 14px;
+      font-size: 11.5px;
+      font-weight: 800;
+      border-bottom: 1px solid #dce8df;
+      white-space: nowrap;
+    }
+    .member-compact-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #edf3ee;
+      vertical-align: middle;
+    }
+    .member-compact-table tr:hover td {
+      background: #f8fcfa;
+    }
+    .cred-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff8eb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 4px 9px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .cred-box button {
+      border: 0;
+      background: transparent;
+      color: #b45309;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .cred-box button:hover {
+      background: #fef3c7;
+    }
+    .class-tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      align-items: center;
+    }
+    .class-tag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      padding: 3px 8px;
+      border-radius: 99px;
+      font-size: 10.5px;
+      font-weight: 750;
+    }
+    .class-tag-chip button {
+      border: 0;
+      background: transparent;
+      color: #be123c;
+      font-weight: 800;
+      padding: 0 2px;
+      font-size: 11px;
+      line-height: 1;
+    }
+
     /* V8 • Lịch sử lượt làm và phân tích câu hỏi */
     .exam-v8-switch { display:flex;flex-wrap:wrap;gap:7px;margin:12px 0; }
     .exam-v8-switch button { border:1px solid #d7e8df;background:white;color:#476653;border-radius:10px;padding:9px 12px;font-size:12px;font-weight:750; }
@@ -975,7 +1286,7 @@
     <div class="auth-card">
       <div style="text-align:center;margin-bottom:20px;">
         <div class="brand-mark" style="margin:0 auto 12px;width:96px;height:96px;border-radius:22px;background:#244916;box-shadow:0 10px 28px rgba(27,73,52,.18);">
-          <img src="favicon.png" alt="BioBling logo" style="width:100%;height:100%;object-fit:cover;display:block;">
+          <img src="data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="22" fill="%231f503c"/%3E%3Ctext x="50" y="64" font-family="Inter,Arial,sans-serif" font-size="44" font-weight="800" fill="%23dcfce7" text-anchor="middle"%3E2B%3C/text%3E%3C/svg%3E" alt="BioBling logo" style="width:100%;height:100%;object-fit:cover;display:block;">
         </div>
         <h2 style="margin:0;font-size:20px;color:#173d2e;">BioBling - 2B | LMS</h2>
         <p style="margin:4px 0 0;font-size:12px;color:#6b8275;">Đăng nhập để vào không gian học tập Sinh học</p>
@@ -986,6 +1297,7 @@
         <button id="btnTabRegister" class="auth-tab-btn" onclick="switchAuthTab('register')">Đăng ký mới</button>
       </div>
 
+      <div id="authNoticeBox" style="display:none; padding:10px 12px; border-radius:10px; font-size:12px; font-weight:650; margin-bottom:14px; line-height:1.45;"></div>
       <!-- Form Đăng Nhập -->
       <form id="formLogin" onsubmit="handleLogin(event)">
         <div class="field">
@@ -1042,7 +1354,7 @@
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-mark">
-          <img src="favicon.png" alt="Logo">
+          <img src="data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="22" fill="%231f503c"/%3E%3Ctext x="50" y="64" font-family="Inter,Arial,sans-serif" font-size="44" font-weight="800" fill="%23dcfce7" text-anchor="middle"%3E2B%3C/text%3E%3C/svg%3E" alt="Logo">
         </div>
         <div>
           <strong>BioBling - 2B</strong>
@@ -1153,19 +1465,43 @@
             </div>
           </div>
 
-          <div class="panel" style="margin-bottom:20px; padding:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-              <div style="font-size:13px; color:#2c5440; font-weight:600;" id="examViewSubtitle">
-                Danh sách đề thi và đề cương được giao:
+          <div class="class-step-panel">
+            <div class="class-step-head">
+              <div class="class-step-title">
+                <i class="fa-solid fa-school" style="color:#287c54;"></i>
+                <span id="examViewSubtitle">Bước 1: Chọn lớp học để hiển thị đề thi của lớp đó</span>
               </div>
-              <div id="examClassFilterWrap" style="display:none; align-items:center; gap:8px;">
-                <label style="font-size:12px; font-weight:700; color:#23694b;">Lọc theo lớp:</label>
-                <select id="examClassFilterSelect" onchange="renderExamsList()" style="padding:6px 12px; border-radius:10px; border:1px solid #dce8df; font-size:12.5px;"></select>
+              <div id="examClassFilterWrap" style="display:flex; align-items:center; gap:8px;">
+                <label for="examClassFilterSelect" style="font-size:11.5px; font-weight:750; color:#23694b;">Chọn nhanh:</label>
+                <select id="examClassFilterSelect" onchange="selectExamClassFilter(this.value)" style="padding:6px 12px; border-radius:10px; border:1px solid #dce8df; font-size:12px; font-weight:650;"></select>
+              </div>
+            </div>
+            <div id="examClassButtonsBar" class="class-chip-grid"></div>
+
+            <div class="exam-toolbar-controls" id="examSecondaryToolbar" style="display:none;">
+              <div class="exam-search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="examSearchInput" placeholder="Tìm nhanh theo tên đề hoặc mã đề..." oninput="onExamSearchInput(this.value)">
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <select id="examTypeQuickFilter" onchange="onExamTypeFilterChange(this.value)" style="padding:7px 11px; border-radius:10px; border:1px solid #dce8df; font-size:12px; font-weight:650; color:#23533c;">
+                  <option value="all">Tất cả loại đề</option>
+                  <option value="test">Bài kiểm tra / Thi</option>
+                  <option value="practice">Đề cương luyện tập</option>
+                </select>
+                <div class="exam-view-toggle" role="group" aria-label="Chế độ quan sát đề">
+                  <button type="button" id="btnExamViewTable" class="active" onclick="setExamListViewMode('table')" title="Dạng bảng gọn dễ nhìn, bao quát nhanh">
+                    <i class="fa-solid fa-table-list"></i> Bảng gọn dễ nhìn
+                  </button>
+                  <button type="button" id="btnExamViewGrid" onclick="setExamListViewMode('grid')" title="Dạng thẻ chi tiết">
+                    <i class="fa-solid fa-grip"></i> Dạng thẻ
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          <div id="examsCardsContainer" class="grid-3"></div>
+          <div id="examsCardsContainer"></div>
         </section>
 
         <!-- 1. DASHBOARD TỔNG QUAN -->
@@ -1228,14 +1564,50 @@
           <div class="page-header">
             <div>
               <h1 id="myClassPageTitle">Không Gian Lớp Học Sinh Học</h1>
-              <p id="myClassPageSubtitle">Danh sách học viên và tiến độ học tập tại trung tâm BioBling - 2B.</p>
+              <p id="myClassPageSubtitle">Danh sách học viên và quản lý thành viên theo từng lớp học tại BioBling - 2B.</p>
             </div>
-            <div id="adminClassSelectorWrap" style="display:none; align-items:center; gap:8px;">
-              <label style="font-size:12px; font-weight:700; color:#23694b;">Chọn lớp sinh học:</label>
+            <div id="adminClassSelectorWrap" style="display:none; align-items:center; gap:8px; flex-wrap:wrap;">
+              <label for="adminSelectClassView" style="font-size:12px; font-weight:700; color:#23694b;">Chọn nhanh:</label>
               <select id="adminSelectClassView" onchange="renderClassMembersView(this.value)" style="padding:6px 12px; border-radius:10px; border:1px solid #dce8df; font-weight:600;"></select>
             </div>
           </div>
-          <div id="classMembersGrid" class="grid-3"></div>
+
+          <div class="member-mgmt-toolbar">
+            <div class="member-mgmt-row">
+              <div class="class-step-title">
+                <i class="fa-solid fa-users-rectangle" style="color:#287c54;"></i>
+                <span id="memberClassStepTitle">Chọn lớp học để xem & quản lý thành viên</span>
+              </div>
+              <div id="memberHeaderActions" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;"></div>
+            </div>
+
+            <div id="memberClassButtonsBar" class="class-chip-grid"></div>
+
+            <div class="exam-toolbar-controls" id="memberSecondaryToolbar" style="margin-top:4px;">
+              <div class="exam-search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="memberSearchInput" placeholder="Tìm học viên theo họ tên, @username..." oninput="onMemberSearchInput(this.value)">
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <select id="memberStatusQuickFilter" onchange="onMemberStatusFilterChange(this.value)" style="padding:7px 11px; border-radius:10px; border:1px solid #dce8df; font-size:12px; font-weight:650; color:#23533c;">
+                  <option value="all">Tất cả trạng thái</option>
+                  <option value="online">Đang Online</option>
+                  <option value="approved">Đã duyệt</option>
+                  <option value="pending">Chờ duyệt</option>
+                </select>
+                <div class="exam-view-toggle" role="group" aria-label="Chế độ xem danh sách thành viên">
+                  <button type="button" id="btnMemberViewTable" class="active" onclick="setMemberListViewMode('table')" title="Danh sách bảng gọn dễ quản lý">
+                    <i class="fa-solid fa-table-list"></i> Bảng gọn dễ quản lý
+                  </button>
+                  <button type="button" id="btnMemberViewGrid" onclick="setMemberListViewMode('grid')" title="Dạng thẻ">
+                    <i class="fa-solid fa-grip"></i> Dạng thẻ
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="classMembersGrid"></div>
         </section>
 
         <!-- 3. VIDEO BÀI GIẢNG -->
@@ -1247,9 +1619,25 @@
             </div>
           </div>
 
+          <div class="class-step-panel">
+            <div class="class-step-head">
+              <div class="class-step-title">
+                <i class="fa-solid fa-chalkboard-user" style="color:#287c54;"></i>
+                <span id="videoClassStepLabel">Bước 1: Chọn lớp học để xem video bài giảng của lớp đó</span>
+              </div>
+            </div>
+            <div id="videoClassToolbar" class="class-chip-grid"></div>
+          </div>
+
           <div class="toolbar" id="videoSessionToolbar"></div>
 
-          <div class="drive-player-layout">
+          <div id="videoClassEmptyPrompt" class="empty-class-prompt" style="display:none;">
+            <i class="fa-solid fa-circle-play"></i>
+            <h3>Vui lòng chọn một lớp học ở phía trên</h3>
+            <p>Video bài giảng và các buổi học sẽ chỉ hiển thị theo đúng lớp bạn đang chọn để tránh bị rối.</p>
+          </div>
+
+          <div class="drive-player-layout" id="videoMainPlayerLayout">
             <div>
               <div class="drive-video-wrapper" id="driveVideoContainer"></div>
               <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:14px;">
@@ -1275,6 +1663,16 @@
               <h1>Thư Viện Tài Liệu & Đề Thi Sinh Học</h1>
               <p>Xem trực tiếp file Word, Slide PPTX bài giảng và PDF đề thi theo từng chuyên đề không cần tải về máy.</p>
             </div>
+          </div>
+
+          <div class="class-step-panel">
+            <div class="class-step-head">
+              <div class="class-step-title">
+                <i class="fa-solid fa-folder-open" style="color:#287c54;"></i>
+                <span id="docClassStepLabel">Bước 1: Chọn lớp học để xem tài liệu của lớp đó</span>
+              </div>
+            </div>
+            <div id="docClassToolbar" class="class-chip-grid"></div>
           </div>
 
           <div class="toolbar" id="docSessionToolbar"></div>
@@ -1397,6 +1795,22 @@
               <h3>Danh Sách Quản Trị Viên Hiện Tại</h3>
               <div id="adminListSuperView" style="display:grid; gap:10px; max-height:480px; overflow-y:auto; margin-top:10px;"></div>
             </div>
+          </div>
+
+          <div class="panel" style="margin-top:18px; border:1.5px solid #fde68a; background:#fffdf7;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+              <div>
+                <h3 style="margin:0; color:#92400e; display:flex; align-items:center; gap:8px;">
+                  <i class="fa-solid fa-user-lock"></i> Tra Cứu Tài Khoản & Mật Khẩu Học Viên (Đặc Quyền Super Admin)
+                </h3>
+                <p style="margin:4px 0 0; font-size:12px; color:#78716c;">Kiểm tra tên đăng nhập, mật khẩu, lớp học đang tham gia và đổi mật khẩu nhanh cho học viên.</p>
+              </div>
+              <div class="exam-search-box" style="max-width:300px;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="superStudentAccountSearch" placeholder="Tìm tên hoặc @username học viên..." oninput="renderSuperAdminView()">
+              </div>
+            </div>
+            <div id="superStudentAccountsTableWrap" class="member-compact-table-wrap"></div>
           </div>
         </section>
 
@@ -1597,10 +2011,16 @@
             <button onclick="setExamTool('eraser')" class="speed-btn" style="padding:4px 8px;">Tẩy</button>
             <button onclick="clearExamCanvas()" class="speed-btn" style="padding:4px 8px; color:#dc2626;"><i class="fa-solid fa-trash-can"></i></button>
           </div>
-          <div style="display:flex; align-items:center; gap:6px;">
-            <button onclick="adjustExamZoom(-0.1)" class="speed-btn" style="padding:4px 8px;">-</button>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <button type="button" onclick="openCurrentExamPreviewModal()" class="speed-btn" style="padding:4px 9px; color:#0369a1; border-color:#bae6fd; background:#f0f9ff;" title="Mở đề toàn màn hình cực rộng">
+              <i class="fa-solid fa-up-right-and-down-left-from-center"></i> Xem đề cỡ lớn
+            </button>
+            <button type="button" onclick="toggleExamWideDocMode()" id="btnToggleWideDoc" class="speed-btn" style="padding:4px 9px;" title="Thu gọn hoặc ẩn phiếu trả lời để nhìn đề rộng toàn màn hình">
+              <i class="fa-solid fa-arrows-left-right-to-line"></i> Mở rộng đề
+            </button>
+            <button type="button" onclick="adjustExamZoom(-0.1)" class="speed-btn" style="padding:4px 8px;">-</button>
             <span id="examZoomLevelTxt" style="font-family:monospace; min-width:38px; text-align:center;">100%</span>
-            <button onclick="adjustExamZoom(0.1)" class="speed-btn" style="padding:4px 8px;">+</button>
+            <button type="button" onclick="adjustExamZoom(0.1)" class="speed-btn" style="padding:4px 8px;">+</button>
           </div>
         </div>
 
@@ -1613,7 +2033,7 @@
       </div>
 
       <!-- Phải: Phiếu Trả Lời -->
-      <div style="width:360px; min-width:320px; background:#fff; display:flex; flex-direction:column;">
+      <div id="liveExamRightPanel">
         <div style="padding:14px; border-bottom:1px solid #e2e8f0;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12.5px; font-weight:700;">
             <span style="color:#1e293b;">Phiếu Trả Lời</span>
@@ -1799,9 +2219,13 @@
         <h2 style="margin:0; font-size:18px; color:#183d2e;" id="assignModalTitle">➕ Thêm học viên vào lớp</h2>
         <button class="del-btn" onclick="closeAssignMemberModal()">✕</button>
       </div>
-      <p style="font-size:12px; color:#6b8275; margin:0 0 14px;">
-        Chọn học viên bên dưới để thêm vào lớp học hiện tại:
+      <p style="font-size:12px; color:#6b8275; margin:0 0 10px;">
+        Chọn học viên bên dưới để thêm vào lớp học hiện tại (học viên có thể tham gia nhiều lớp):
       </p>
+      <div class="exam-search-box" style="max-width:100%; margin-bottom:12px;">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" id="assignCandidateSearch" placeholder="Tìm nhanh học viên theo tên hoặc @username..." oninput="renderAssignCandidatesList()">
+      </div>
       
       <div id="assignCandidateList" style="display:grid; gap:8px; max-height:360px; overflow-y:auto; padding-right:4px;"></div>
 
@@ -1888,6 +2312,62 @@
 
   <!-- LOGIC HỆ THỐNG TOÀN DIỆN & TÍCH HỢP PHÒNG THI -->
   <script>
+    /* ================= SAFE STORAGE & DIALOG HELPERS (TƯƠNG THÍCH CANVAS & MỌI TRÌNH DUYỆT) ================= */
+    const _memoryStore = {};
+    const safeStorage = {
+      getItem(k) {
+        try { return window.safeStorage.getItem(k); } catch (e) { return Object.prototype.hasOwnProperty.call(_memoryStore, k) ? _memoryStore[k] : null; }
+      },
+      setItem(k, v) {
+        try { window.safeStorage.setItem(k, String(v)); } catch (e) { _memoryStore[k] = String(v); }
+      },
+      removeItem(k) {
+        try { window.safeStorage.removeItem(k); } catch (e) { delete _memoryStore[k]; }
+      }
+    };
+
+    function showAuthNotice(msg, isSuccess = false) {
+      const box = document.getElementById('authNoticeBox');
+      if (box) {
+        box.style.display = 'block';
+        box.style.background = isSuccess ? '#dcfce7' : '#fef2f2';
+        box.style.color = isSuccess ? '#166534' : '#b91c1c';
+        box.style.border = isSuccess ? '1px solid #bbf7d0' : '1px solid #fecaca';
+        box.textContent = msg;
+      }
+      if (typeof showToast === 'function') showToast(msg);
+    }
+
+    
+    function safeConfirm(msg) {
+      try {
+        if (window.parent !== window) return true;
+        return window.safeConfirm(msg);
+      } catch (e) {
+        return true;
+      }
+    }
+
+    function safeAlert(msg) {
+      showAuthNotice(String(msg || ''), false);
+    }
+
+    const DEFAULT_ADMIN_ACCOUNTS = [
+      { id: 1, username: "admin1", fullName: "Casta Nguyễn", password: "Meocon@123", role: "admin", status: "approved", classId: "all", avatar: "", bio: "BioBling - 2B", createdAt: "2026-10-01" },
+      { id: 2, username: "tranducanh", fullName: "Trần Đức Anh", password: "12345678", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Giảng viên Sinh học BioBling - 2B", createdAt: "2026-10-01" },
+      { id: 3, username: "admin2", fullName: "Admin BioBling", password: "05012009", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Trợ giảng chuyên đề BioBling - 2B", createdAt: "2026-10-01" }
+    ];
+
+    function mergeDefaultAdmins(list) {
+      const arr = Array.isArray(list) ? list.filter(Boolean) : (list && typeof list === 'object' ? Object.values(list).filter(Boolean) : []);
+      DEFAULT_ADMIN_ACCOUNTS.forEach(def => {
+        if (!arr.some(u => u && String(u.username || '').toLowerCase() === def.username.toLowerCase())) {
+          arr.push({ ...def });
+        }
+      });
+      return arr;
+    }
+
     /* ================= STORAGE KEYS ================= */
     const AUTH_STORAGE_KEY = "atelier_auth_users_v9";
     const SESSION_STORAGE_KEY = "atelier_current_session_v9";
@@ -1915,19 +2395,15 @@
     let liveOnlineStatus = {};
 
     /* ================= STATE GỐC ================= */
-    let userDatabase = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY)) || [
-      { id: 1, username: "admin1", fullName: "Casta Nguyễn", password: "Meocon@123", role: "admin", status: "approved", classId: "all", avatar: "", bio: "BioBling - 2B", createdAt: "2026-10-01" },
-      { id: 2, username: "tranducanh", fullName: "Trần Đức Anh", password: "12345678", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Giảng viên Sinh học BioBling - 2B", createdAt: "2026-10-01" },
-      { id: 3, username: "admin2", fullName: "Admin BioBling", password: "05012009", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Trợ giảng chuyên đề BioBling - 2B", createdAt: "2026-10-01" }
-    ];
-    let classDatabase = JSON.parse(localStorage.getItem(CLASSES_STORAGE_KEY)) || [{ id: "cls_a1", name: "Lớp Sinh Học Chuyên Sâu - BioBling 2B" }];
-    let sessionDatabase = JSON.parse(localStorage.getItem(SESSIONS_STORAGE_KEY)) || [
+    let userDatabase = mergeDefaultAdmins(JSON.parse(safeStorage.getItem(AUTH_STORAGE_KEY) || "null"));
+    let classDatabase = JSON.parse(safeStorage.getItem(CLASSES_STORAGE_KEY)) || [{ id: "cls_a1", name: "Lớp Sinh Học Chuyên Sâu - BioBling 2B" }];
+    let sessionDatabase = JSON.parse(safeStorage.getItem(SESSIONS_STORAGE_KEY)) || [
       { id: "ses_1", title: "Chuyên đề 01: Cơ sở vật chất & Cơ chế di truyền ADN" },
       { id: "ses_2", title: "Chuyên đề 02: Phiên mã, Dịch mã & Điều hòa hoạt động Gen" }
     ];
-    let mediaDatabase = JSON.parse(localStorage.getItem(MEDIA_STORAGE_KEY)) || [];
-    let currentUser = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY)) || null;
-    let notesDatabase = JSON.parse(localStorage.getItem(NOTES_STORAGE_KEY)) || [
+    let mediaDatabase = JSON.parse(safeStorage.getItem(MEDIA_STORAGE_KEY)) || [];
+    let currentUser = JSON.parse(safeStorage.getItem(SESSION_STORAGE_KEY)) || null;
+    let notesDatabase = JSON.parse(safeStorage.getItem(NOTES_STORAGE_KEY)) || [
       { id: "note_1", content: "Nguyên tắc bổ sung trong phân tử ADN: A-T (2 liên kết hydro), G-X (3 liên kết hydro).", time: "10:15 - 01/10/2026" }
     ];
 
@@ -1964,25 +2440,28 @@
       const data = snapshot.val();
       if (data) {
         classDatabase = Array.isArray(data) ? data : Object.values(data);
-        localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase));
+        safeStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classDatabase));
       } else {
         classDatabase = [];
-        localStorage.setItem(CLASSES_STORAGE_KEY, '[]');
+        safeStorage.setItem(CLASSES_STORAGE_KEY, '[]');
       }
       populateExamClassSelectOptions();
       if (document.getElementById('classManagerModal').classList.contains('open')) openClassManagerModal();
       if (document.getElementById('sessionManagerModal').classList.contains('open')) openSessionManagerModal(lastSessionManagerClassId);
       if (document.querySelector('.page.active')?.id === 'class_admin') renderAdminClassDashboard();
+      if (document.querySelector('.page.active')?.id === 'videos') initVideosView();
+      if (document.querySelector('.page.active')?.id === 'documents') initDocumentsView();
+      if (document.querySelector('.page.active')?.id === 'exams') initExamsView();
     });
 
     rtdb.ref('/sessions').on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
         sessionDatabase = Array.isArray(data) ? data : Object.values(data);
-        localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessionDatabase));
+        safeStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessionDatabase));
       } else {
         sessionDatabase = [];
-        localStorage.setItem(SESSIONS_STORAGE_KEY, '[]');
+        safeStorage.setItem(SESSIONS_STORAGE_KEY, '[]');
       }
       if (document.getElementById('sessionManagerModal').classList.contains('open')) openSessionManagerModal(lastSessionManagerClassId);
       if (document.querySelector('.page.active')?.id === 'class_admin') renderAdminClassDashboard();
@@ -1993,11 +2472,11 @@
       const data = snapshot.val();
       if (data) {
         mediaDatabase = Array.isArray(data) ? data : Object.values(data);
-        localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
+        safeStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaDatabase));
       } else {
         // Không tạo lại học liệu đã bị xóa hết bởi người quản trị khác.
         mediaDatabase = [];
-        localStorage.setItem(MEDIA_STORAGE_KEY, '[]');
+        safeStorage.setItem(MEDIA_STORAGE_KEY, '[]');
       }
       if (document.querySelector('.page.active')?.id === 'class_admin') renderAdminClassDashboard();
       if (document.querySelector('.page.active')?.id === 'documents') initDocumentsView();
@@ -2008,14 +2487,14 @@
     rtdb.ref('/users').on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        userDatabase = Array.isArray(data) ? data : Object.values(data);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+        userDatabase = mergeDefaultAdmins(data);
+        safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
         
         if (currentUser) {
           const fresh = userDatabase.find(u => u.id === currentUser.id);
           if (fresh) {
             currentUser = fresh;
-            localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+            safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
             updateUserUI();
           }
         }
@@ -2058,6 +2537,7 @@
       snapshot.forEach(doc => {
         examsList.push(doc.data());
       });
+      populateExamClassSelectOptions();
       const activePage = document.querySelector('.page.active');
       if (activePage && activePage.id === 'exams') {
         renderExamsList();
@@ -2084,10 +2564,10 @@
     }
 
     function getOrCreateDeviceId() {
-      let devId = localStorage.getItem(DEVICE_ID_KEY);
+      let devId = safeStorage.getItem(DEVICE_ID_KEY);
       if (!devId) {
         devId = "dev_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now();
-        localStorage.setItem(DEVICE_ID_KEY, devId);
+        safeStorage.setItem(DEVICE_ID_KEY, devId);
       }
       return devId;
     }
@@ -2312,10 +2792,45 @@
     });
     window.addEventListener('resize', positionClassPickerPopup);
     window.addEventListener('scroll', positionClassPickerPopup, true);
+    // Hỗ trợ học viên tham gia 1 hoặc nhiều lớp (user.classIds + tương thích ngược user.classId)
+    function getUserEnrolledClassIds(user) {
+      if (!user) return [];
+      if (user.role === 'admin') return classDatabase.map(c => String(c.id));
+      const validIds = new Set(classDatabase.map(c => String(c.id)));
+      const raw = [];
+      if (Array.isArray(user.classIds)) raw.push(...user.classIds);
+      if (user.classId && user.classId !== 'all') raw.push(user.classId);
+      return [...new Set(raw.filter(Boolean).map(String))].filter(id => validIds.has(id));
+    }
+
+    function isUserInClass(user, classId) {
+      if (!user || !classId) return false;
+      if (user.role === 'admin') return true;
+      return getUserEnrolledClassIds(user).includes(String(classId));
+    }
+
+    function setUserEnrolledClassIds(user, classIds) {
+      if (!user) return;
+      const validIds = new Set(classDatabase.map(c => String(c.id)));
+      const clean = [...new Set((Array.isArray(classIds) ? classIds : []).filter(Boolean).map(String))].filter(id => validIds.has(id));
+      user.classIds = clean;
+      user.classId = clean[0] || "";
+    }
+
+    function getUserEnrolledClassNames(user) {
+      if (!user) return 'Chưa xếp lớp';
+      if (user.role === 'admin') return 'Toàn hệ thống (Giảng viên)';
+      const ids = getUserEnrolledClassIds(user);
+      if (!ids.length) return 'Chưa xếp lớp';
+      return ids.map(id => (classDatabase.find(c => String(c.id) === id) || {}).name || id).join(', ');
+    }
+
     function canUserAccessMedia(m) {
       if (!currentUser) return false;
       if (currentUser.role === 'admin') return true;
-      return !!currentUser.classId && isForClass(m, currentUser.classId);
+      const myClasses = getUserEnrolledClassIds(currentUser);
+      if (!myClasses.length) return false;
+      return myClasses.some(cid => isForClass(m, cid));
     }
     // Transaction tránh việc nhiều quản trị viên ghi đè dữ liệu của nhau.
     async function commitRtdbList(path, modifier) {
@@ -2328,7 +2843,7 @@
     }
     function presentStorageError(err) {
       console.error(err);
-      alert('Không thể đồng bộ lên Firebase: ' + (err && err.message || 'Lỗi kết nối. Vui lòng thử lại.'));
+      safeAlert('Không thể đồng bộ lên Firebase: ' + (err && err.message || 'Lỗi kết nối. Vui lòng thử lại.'));
     }
 
     let toastTimer;
@@ -2687,13 +3202,13 @@
 
     function openReviewExamDirectly(examCode, targetUserId = null, submissionId = null) {
       const exam = examsList.find(x => String(x.code) === String(examCode));
-      if (!exam || !currentUser) return alert('Không tìm thấy đề thi hoặc phiên đăng nhập đã hết hạn!');
+      if (!exam || !currentUser) return safeAlert('Không tìm thấy đề thi hoặc phiên đăng nhập đã hết hạn!');
       const uid=targetUserId===null ? currentUser.id : targetUserId;
       // Khi có ID lượt nộp thì dùng CHÍNH XÁC lượt đó, không dùng .find() khiến xem sai lượt.
       let submission = submissionId ? studentSubmissions.find(s=>String(s.id)===String(submissionId) && String(s.examCode)===String(examCode)) : null;
       if(!submission && !submissionId) submission = examSubmissionsFor(examCode,uid).slice(-1)[0];
-      if(!submission) return alert('Không tìm thấy bài làm đã nộp!');
-      if(currentUser.role!=='admin' && String(submission.userId)!==String(currentUser.id)) return alert('Bạn không có quyền xem lượt thi của học viên khác.');
+      if(!submission) return safeAlert('Không tìm thấy bài làm đã nộp!');
+      if(currentUser.role!=='admin' && String(submission.userId)!==String(currentUser.id)) return safeAlert('Bạn không có quyền xem lượt thi của học viên khác.');
       currentResultSubmissionId=String(submission.id);
       studentLiveAnswers = JSON.parse(JSON.stringify(submission.answers || {mcq:{},tf:{},sa:{}}));
       const reviewExam = submission.gradingKeys ? {...exam,
@@ -2705,15 +3220,116 @@
         showToast('Lượt thi cũ chưa lưu đáp án gốc: cần đối chiếu nếu đề đã chỉnh sửa.');
     }
 
+    // V9: Lọc đề thi theo từng lớp (chọn lớp nào mới hiện đề của lớp đó; đề gán cho cả 2 lớp sẽ hiện ở cả 2 lớp)
+    let currentExamClassFilter = '';
+    let currentExamListViewMode = 'table'; // Mặc định dạng bảng gọn giúp dễ quan sát đề
+    let currentExamSearchQuery = '';
+    let currentExamTypeFilter = 'all';
+
+    function getUserAccessibleClasses() {
+      const isAdmin = currentUser && currentUser.role === 'admin';
+      if (isAdmin) return classDatabase.slice();
+      const myClassIds = getUserEnrolledClassIds(currentUser);
+      if (!myClassIds.length) return [];
+      return classDatabase.filter(c => myClassIds.includes(String(c.id)));
+    }
+
+    function countExamsForClass(classId) {
+      if (!classId) return 0;
+      return examsList.filter(e => isForClass(e, classId, true)).length;
+    }
+
     function populateExamClassSelectOptions() {
       const selected = getSelectedClassIds('examClassPicker');
       renderClassPicker('examClassPicker', selected.length ? selected : ['all']);
       const filter = document.getElementById('examClassFilterSelect');
       if (!filter) return;
-      const current = filter.value || 'all_filter';
-      filter.innerHTML = '<option value="all_filter">Tất cả đề thi</option><option value="all">🌐 Đề công khai</option>' +
-        classDatabase.map(c => `<option value="${escapeHTML(c.id)}">${escapeHTML(c.name)}</option>`).join('');
-      filter.value = Array.from(filter.options).some(x=>x.value===current) ? current : 'all_filter';
+      const accessible = getUserAccessibleClasses();
+      if (currentExamClassFilter && !accessible.some(c => String(c.id) === String(currentExamClassFilter))) {
+        currentExamClassFilter = '';
+      }
+      if (!currentExamClassFilter && accessible.length === 1) {
+        currentExamClassFilter = String(accessible[0].id);
+      }
+      filter.innerHTML = '<option value="">-- Chọn lớp để xem đề --</option>' +
+        accessible.map(c => `<option value="${escapeHTML(c.id)}">${escapeHTML(c.name)} (${countExamsForClass(c.id)} đề)</option>`).join('');
+      filter.value = currentExamClassFilter || '';
+    }
+
+    function selectExamClassFilter(classId) {
+      currentExamClassFilter = String(classId || '');
+      const filter = document.getElementById('examClassFilterSelect');
+      if (filter && filter.value !== currentExamClassFilter) {
+        filter.value = currentExamClassFilter;
+      }
+      renderExamClassButtons();
+      renderExamsList();
+    }
+
+    function onExamSearchInput(val) {
+      currentExamSearchQuery = String(val || '');
+      renderExamsList();
+    }
+
+    function onExamTypeFilterChange(val) {
+      currentExamTypeFilter = val || 'all';
+      renderExamsList();
+    }
+
+    function setExamListViewMode(mode) {
+      currentExamListViewMode = mode === 'grid' ? 'grid' : 'table';
+      document.getElementById('btnExamViewTable')?.classList.toggle('active', currentExamListViewMode === 'table');
+      document.getElementById('btnExamViewGrid')?.classList.toggle('active', currentExamListViewMode === 'grid');
+      renderExamsList();
+    }
+
+    function previewExamDocQuickly(examCode) {
+      const exam = examsList.find(x => String(x.code) === String(examCode));
+      if (!exam) return;
+      const rawUrl = exam.rawDocsUrl || exam.embedUrl || '';
+      if (!rawUrl) return showToast('Đề thi này chưa có đường dẫn tài liệu.');
+      openDocViewer(rawUrl, `Xem đề: ${exam.title} (${exam.code})`);
+    }
+
+    function openCurrentExamPreviewModal() {
+      if (!activeExam) return;
+      const rawUrl = activeExam.rawDocsUrl || activeExam.embedUrl || '';
+      if (!rawUrl) return;
+      openDocViewer(rawUrl, `Đề thi cỡ lớn: ${activeExam.title} (${activeExam.code})`);
+    }
+
+    function toggleExamWideDocMode() {
+      const rightPanel = document.getElementById('liveExamRightPanel');
+      const btn = document.getElementById('btnToggleWideDoc');
+      if (!rightPanel) return;
+      const collapsed = rightPanel.classList.toggle('collapsed');
+      if (btn) {
+        btn.innerHTML = collapsed
+          ? '<i class="fa-solid fa-table-columns"></i> Hiện phiếu trả lời'
+          : '<i class="fa-solid fa-arrows-left-right-to-line"></i> Mở rộng đề';
+        btn.style.background = collapsed ? '#dcfce7' : '';
+        btn.style.color = collapsed ? '#166534' : '';
+      }
+      setTimeout(() => initExamCanvas(), 220);
+    }
+
+    function renderExamClassButtons() {
+      const bar = document.getElementById('examClassButtonsBar');
+      if (!bar) return;
+      const accessible = getUserAccessibleClasses();
+      if (!accessible.length) {
+        bar.innerHTML = '<div class="notice" style="width:100%;">Chưa có lớp học nào. Hãy tạo lớp trong mục Quản Lý Lớp & Học Liệu trước.</div>';
+        return;
+      }
+      bar.innerHTML = accessible.map(c => {
+        const cid = String(c.id);
+        const active = cid === String(currentExamClassFilter);
+        const cnt = countExamsForClass(cid);
+        return `<button type="button" class="class-chip-btn ${active ? 'active' : ''}" onclick="selectExamClassFilter('${escapeHTML(cid)}')">
+          <span>🏫 ${escapeHTML(c.name)}</span>
+          <span class="chip-count">${cnt} đề</span>
+        </button>`;
+      }).join('');
     }
 
     function initExamsView() {
@@ -2722,50 +3338,224 @@
       const filterWrap = document.getElementById('examClassFilterWrap');
 
       populateExamClassSelectOptions();
+      renderExamClassButtons();
 
       if (isAdmin) {
         adminBtnWrap.style.display = 'block';
         filterWrap.style.display = 'flex';
-        setElText('examViewSubtitle', 'Khu vực quản lý đề thi và đề cương luyện tập của Giáo viên:');
+        setElText('examViewSubtitle', 'Bước 1: Chọn lớp học để quản lý & quan sát đề thi của lớp đó');
       } else {
         adminBtnWrap.style.display = 'none';
-        filterWrap.style.display = 'none';
-        const userClass = classDatabase.find(c => c.id === (currentUser ? currentUser.classId : ''));
-        const clsName = userClass ? userClass.name : 'Đề tự do / Chung';
-        setElText('examViewSubtitle', `Đề thi dành riêng cho lớp: ${clsName}`);
+        const accessible = getUserAccessibleClasses();
+        filterWrap.style.display = accessible.length > 1 ? 'flex' : 'none';
+        const clsName = accessible.length ? accessible.map(c => c.name).join(', ') : 'Chưa được xếp vào lớp nào';
+        setElText('examViewSubtitle', accessible.length > 1 ? 'Bước 1: Chọn lớp của bạn để xem đề thi' : `Đề thi của lớp: ${clsName}`);
       }
+
+      document.getElementById('btnExamViewTable')?.classList.toggle('active', currentExamListViewMode === 'table');
+      document.getElementById('btnExamViewGrid')?.classList.toggle('active', currentExamListViewMode === 'grid');
 
       renderExamsList();
     }
 
     function renderExamsList() {
       const container = document.getElementById('examsCardsContainer');
+      const secondaryToolbar = document.getElementById('examSecondaryToolbar');
       if (!container) return;
 
+      renderExamClassButtons();
+
       const isAdmin = currentUser && currentUser.role === 'admin';
-      const filterSelect = document.getElementById('examClassFilterSelect');
-      const filterVal = filterSelect ? filterSelect.value : 'all_filter';
+      const accessibleClasses = getUserAccessibleClasses();
+      if (!accessibleClasses.length && !isAdmin) {
+        if (secondaryToolbar) secondaryToolbar.style.display = 'none';
+        container.className = '';
+        container.innerHTML = `<div class="notice" style="text-align:center; padding: 30px;">Tài khoản của bạn chưa được thêm vào lớp học nào. Khi Giảng viên thêm bạn vào lớp, danh sách lớp và đề thi của lớp đó sẽ hiển thị tại đây.</div>`;
+        return;
+      }
+      if (!isAdmin && currentExamClassFilter && !accessibleClasses.some(c => String(c.id) === String(currentExamClassFilter))) {
+        currentExamClassFilter = '';
+      }
 
-      let visible = examsList.filter(e => {
-        if (isAdmin) {
-          if (filterVal === 'all_filter') return true;
-          return getAssignedClassIds(e, true).includes(filterVal);
-        }
-        return !!currentUser && isForClass(e, currentUser.classId, true);
-      });
-
-      if (!visible.length) {
+      // Bắt buộc chọn 1 lớp cụ thể trước khi hiển thị danh sách đề
+      if (!currentExamClassFilter) {
+        if (secondaryToolbar) secondaryToolbar.style.display = 'none';
+        container.className = '';
         container.innerHTML = `
-          <div class="notice" style="grid-column: 1/-1; text-align:center; padding: 30px;">
-            ${isAdmin ? 'Chưa có đề thi nào trong danh sách. Bấm "Thêm Đề Thi Mới" để tạo đề bằng Link Docs!' : 'Hiện tại chưa có đề thi hoặc đề cương nào được mở cho lớp của bạn.'}
+          <div class="empty-class-prompt">
+            <i class="fa-solid fa-hand-pointer"></i>
+            <h3>Hãy chọn một lớp học ở phía trên để xem đề thi</h3>
+            <p>Đề thi được phân theo từng lớp rõ ràng — chọn lớp nào hệ thống sẽ chỉ hiện đề của lớp đó (đề giao cho nhiều lớp vẫn sẽ xuất hiện ở từng lớp tương ứng).</p>
           </div>
         `;
         return;
       }
 
-      const classMap = { 'all': 'Tất cả các lớp' };
-      classDatabase.forEach(c => classMap[c.id] = c.name);
+      if (secondaryToolbar) secondaryToolbar.style.display = 'flex';
 
+      const selectedClassObj = classDatabase.find(c => String(c.id) === String(currentExamClassFilter));
+      const selectedClassName = selectedClassObj ? selectedClassObj.name : 'Lớp đã chọn';
+
+      const normalizeText = str => String(str || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+      const qNorm = normalizeText(currentExamSearchQuery.trim());
+
+      let visible = examsList.filter(e => {
+        if (!isForClass(e, currentExamClassFilter, true)) return false;
+        if (currentExamTypeFilter === 'practice' && !e.practiceOnly) return false;
+        if (currentExamTypeFilter === 'test' && e.practiceOnly) return false;
+        if (qNorm) {
+          const hay = normalizeText(`${e.title || ''} ${e.code || ''}`);
+          if (!hay.includes(qNorm)) return false;
+        }
+        return true;
+      });
+
+      if (!visible.length) {
+        container.className = '';
+        container.innerHTML = `
+          <div class="notice" style="text-align:center; padding: 30px;">
+            Không có đề thi nào trong <strong>${escapeHTML(selectedClassName)}</strong> ${qNorm || currentExamTypeFilter !== 'all' ? 'khớp với bộ lọc tìm kiếm hiện tại.' : 'ở thời điểm hiện tại.'}
+          </div>
+        `;
+        return;
+      }
+
+      // Chế độ 1: BẢNG GỌN DỄ QUAN SÁT (Mặc định) + Nút Xem Nhanh Đề Cỡ Lớn
+      if (currentExamListViewMode === 'table') {
+        container.className = '';
+        container.innerHTML = `
+          <div class="exam-compact-table-wrap">
+            <table class="exam-compact-table">
+              <thead>
+                <tr>
+                  <th style="width:46px;">STT</th>
+                  <th>Tên Đề Thi / Đề Cương</th>
+                  <th>Cấu Trúc & Thời Lượng</th>
+                  <th>Lớp Áp Dụng</th>
+                  <th>Hạn Nộp / Trạng Thái</th>
+                  <th style="text-align:right;">Quan Sát & Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${visible.map((e, idx) => {
+                  const countMcq = Object.keys(e.mcqKeys || e.keys || {}).length;
+                  const countTf = Object.keys(e.tfKeys || {}).length;
+                  const countSa = Object.keys(e.saKeys || {}).length;
+                  const isUnlimited = !!e.isUnlimited;
+                  const isPractice = !!e.practiceOnly;
+                  const timeBadge = isUnlimited ? 'Vô hạn' : `${e.timeLimit || 50} phút`;
+                  const targetClassName = getAssignedClassNames(e, true);
+                  const deadlineDate = e.deadline ? new Date(e.deadline) : null;
+                  const isDeadlineValid = deadlineDate && !isNaN(deadlineDate.getTime());
+                  const isOverdue = !!(isDeadlineValid && Date.now() > deadlineDate.getTime());
+
+                  const myAttempts = !isAdmin && currentUser ? examSubmissionsFor(e.code, currentUser.id) : [];
+                  const userSubmission = myAttempts.length ? myAttempts[myAttempts.length - 1] : null;
+                  const savedDraft = !isAdmin ? readExamDraft(e) : null;
+                  const allExamSubs = isAdmin ? examSubmissionsFor(e.code) : [];
+
+                  let statusCol = '';
+                  if (isAdmin) {
+                    const uniqueStudents = new Set(allExamSubs.map(s => String(s.userId))).size;
+                    statusCol = `
+                      <div style="font-size:11.5px; font-weight:700; color:#1e40af;">📊 ${uniqueStudents} HV đã nộp (${allExamSubs.length} lượt)</div>
+                      <div style="font-size:11px; color:${isOverdue ? '#b91c1c' : '#64748b'}; margin-top:2px;">
+                        ${isDeadlineValid ? (isOverdue ? 'Đã quá hạn: ' : 'Hạn: ') + escapeHTML(formatDeadline(e.deadline)) : 'Không giới hạn hạn nộp'}
+                      </div>
+                    `;
+                  } else if (userSubmission) {
+                    const scoreText = userSubmission.practiceOnly ? 'Hoàn thành' : `${userSubmission.score} điểm`;
+                    statusCol = `
+                      <span class="tag status-done" style="font-size:10.5px;">Đã nộp (${myAttempts.length} lượt) · ${escapeHTML(scoreText)}</span>
+                      ${isDeadlineValid ? `<div style="font-size:10.5px; color:#64748b; margin-top:3px;">Hạn: ${escapeHTML(formatDeadline(e.deadline))}</div>` : ''}
+                    `;
+                  } else {
+                    statusCol = `
+                      <span class="tag ${isOverdue ? 'status-pending' : 'session-badge'}" style="font-size:10.5px; ${isOverdue ? 'background:#fef2f2;color:#b91c1c;border-color:#fecaca;' : ''}">
+                        ${isOverdue ? 'Đã hết hạn' : (savedDraft ? '💾 Đang làm dở' : 'Chưa làm bài')}
+                      </span>
+                      ${isDeadlineValid ? `<div style="font-size:10.5px; color:${isOverdue ? '#b91c1c' : '#c2410c'}; margin-top:3px;">Hạn: ${escapeHTML(formatDeadline(e.deadline))}</div>` : '<div style="font-size:10.5px; color:#64748b; margin-top:3px;">Tự do</div>'}
+                    `;
+                  }
+
+                  let actionButtons = `
+                    <button type="button" class="secondary" style="padding:6px 10px; font-size:11.5px; color:#0369a1; border-color:#bae6fd; background:#f0f9ff;" onclick="previewExamDocQuickly(${escapeHTML(JSON.stringify(String(e.code)))})" title="Mở xem trực tiếp file đề thi toàn màn hình">
+                      <i class="fa-solid fa-eye"></i> Xem đề
+                    </button>
+                  `;
+
+                  if (isAdmin) {
+                    actionButtons += `
+                      <button type="button" onclick="promptStartExam(${escapeHTML(JSON.stringify(String(e.code)))})" class="primary" style="padding:6px 10px; font-size:11.5px; background:#10b981; border-color:#10b981;">
+                        Làm thử
+                      </button>
+                      <button type="button" onclick="editAdminExam('${escapeHTML(e.code)}')" class="secondary" style="padding:6px 10px; font-size:11.5px;">
+                        Sửa
+                      </button>
+                      <button type="button" onclick="deleteAdminExam('${escapeHTML(e.code)}')" class="super-del-btn" style="padding:6px 9px; font-size:11.5px;">
+                        Xóa
+                      </button>
+                    `;
+                  } else {
+                    if (userSubmission) {
+                      actionButtons += `
+                        <button type="button" class="secondary" style="padding:6px 10px; font-size:11.5px;" onclick="openReviewExamDirectly(${escapeHTML(JSON.stringify(String(e.code)))})">
+                          KQ lượt cuối
+                        </button>
+                      `;
+                    }
+                    if (!isOverdue) {
+                      actionButtons += `
+                        <button type="button" class="primary" style="padding:6px 11px; font-size:11.5px; background:#2563eb; border-color:#2563eb;" onclick="promptStartExam(${escapeHTML(JSON.stringify(String(e.code)))})">
+                          <i class="fa-solid fa-pencil"></i> ${savedDraft ? 'Làm tiếp' : (userSubmission ? 'Làm lại' : 'Làm bài')}
+                        </button>
+                      `;
+                    }
+                  }
+
+                  return `
+                    <tr>
+                      <td style="font-weight:800; color:#64748b;">#${idx + 1}</td>
+                      <td>
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                          <span class="tag ${isPractice ? 'session-badge' : 'status-done'}" style="font-size:9.5px; padding:2px 7px;">
+                            ${isPractice ? 'Đề cương' : 'Đề thi'}
+                          </span>
+                          <span style="font-family:monospace; font-size:11px; font-weight:800; color:#2563eb; background:#eff6ff; padding:2px 6px; border-radius:6px;">
+                            ${escapeHTML(e.code)}
+                          </span>
+                        </div>
+                        <div style="font-weight:750; font-size:13.5px; color:#173d2e; margin-top:4px;">${escapeHTML(e.title)}</div>
+                      </td>
+                      <td>
+                        <div style="font-weight:700; color:#1e293b;">⏱️ ${timeBadge}</div>
+                        <div style="font-size:11px; color:#526b5c; margin-top:2px;">
+                          <strong>${countMcq}</strong> TN · <strong>${countTf}</strong> Đ/S · <strong>${countSa}</strong> TLN
+                        </div>
+                      </td>
+                      <td>
+                        <span class="tag status-class" style="font-size:10px; white-space:normal; display:inline-block; max-width:210px; line-height:1.35;">
+                          🏫 ${escapeHTML(targetClassName)}
+                        </span>
+                      </td>
+                      <td>${statusCol}</td>
+                      <td style="text-align:right; white-space:nowrap;">
+                        <div style="display:inline-flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+                          ${actionButtons}
+                        </div>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+        return;
+      }
+
+      // Chế độ 2: DẠNG THẺ (Grid) có bổ sung nút Xem Đề Cỡ Lớn
+      container.className = 'grid-3';
       container.innerHTML = visible.map(e => {
         const countMcq = Object.keys(e.mcqKeys || e.keys || {}).length;
         const countTf = Object.keys(e.tfKeys || {}).length;
@@ -2798,22 +3588,27 @@
               </div>
               <div style="font-size:10.5px;color:#5a7965;">${escapeHTML(bestText)} · Gần nhất: ${escapeHTML(formatExamSubmittedAt(userSubmission))}</div>
               <div class="exam-v8-actions">
+                <button type="button" class="secondary" onclick="previewExamDocQuickly(${escapeHTML(JSON.stringify(String(e.code)))})"><i class="fa-solid fa-file-lines"></i> Xem đề</button>
                 <button type="button" class="secondary" onclick="openExamAttemptHistory(${escapeHTML(JSON.stringify(String(e.code)))})"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử (${myAttempts.length})</button>
-                <button type="button" class="secondary" onclick="openReviewExamDirectly(${escapeHTML(JSON.stringify(String(e.code)))})"><i class="fa-solid fa-eye"></i> Xem lượt cuối</button>
+                <button type="button" class="secondary" onclick="openReviewExamDirectly(${escapeHTML(JSON.stringify(String(e.code)))})"><i class="fa-solid fa-eye"></i> Xem KQ</button>
               </div>
               ${!isOverdue ? `<div class="exam-v8-actions"><button type="button" class="primary" style="background:#217951" onclick="promptStartExam(${escapeHTML(JSON.stringify(String(e.code)))})"><i class="fa-solid fa-rotate"></i> ${savedDraft?'Tiếp tục lượt đang làm':'Làm lại bài (lượt '+(myAttempts.length+1)+')'}</button></div>` : '<small style="color:#b91c1c;display:block;margin-top:6px;">Đã hết hạn — chỉ xem được lịch sử bài nộp</small>'}
               ${savedDraft?'<small style="color:#16814b;display:block;margin-top:7px">💾 Lượt đang làm đã lưu trên trình duyệt</small>':''}
             </div>`;
         } else if (!isAdmin && isOverdue) {
           examActionHtml = `
-            <div class="card-foot" style="padding-top:10px;">
-              <button class="secondary" disabled style="width:100%;justify-content:center;color:#b91c1c;border-color:#fecaca;background:#fef2f2;cursor:not-allowed;">Đã hết hạn làm bài</button>
+            <div class="card-foot" style="padding-top:10px; gap:8px;">
+              <button type="button" class="secondary" onclick="previewExamDocQuickly(${escapeHTML(JSON.stringify(String(e.code)))})"><i class="fa-solid fa-eye"></i> Xem đề</button>
+              <button class="secondary" disabled style="flex:1;justify-content:center;color:#b91c1c;border-color:#fecaca;background:#fef2f2;cursor:not-allowed;">Đã hết hạn</button>
             </div>`;
         } else {
           examActionHtml = `
-            <div class="card-foot" style="padding-top:10px;">
-              <button class="primary" style="width:100%; justify-content:center; padding:10px; font-size:12.5px; background:#2563eb; border-color:#2563eb;" onclick="promptStartExam(${escapeHTML(JSON.stringify(String(e.code)))})">
-                <i class="fa-solid fa-pencil"></i> ${savedDraft ? '↩ Tiếp tục bài đang làm' : 'Làm Bài Thi Ngay'}
+            <div class="card-foot" style="padding-top:10px; gap:8px;">
+              <button type="button" class="secondary" style="padding:10px; font-size:12px; color:#0369a1; border-color:#bae6fd; background:#f0f9ff;" onclick="previewExamDocQuickly(${escapeHTML(JSON.stringify(String(e.code)))})">
+                <i class="fa-solid fa-eye"></i> Xem đề
+              </button>
+              <button class="primary" style="flex:1; justify-content:center; padding:10px; font-size:12.5px; background:#2563eb; border-color:#2563eb;" onclick="promptStartExam(${escapeHTML(JSON.stringify(String(e.code)))})">
+                <i class="fa-solid fa-pencil"></i> ${savedDraft ? '↩ Tiếp tục' : 'Làm Bài Ngay'}
               </button>
             </div>
             ${savedDraft ? '<small style="color:#15803d;font-weight:650;">💾 Đã có bài làm lưu trên thiết bị này</small>' : ''}
@@ -2823,7 +3618,10 @@
         let adminActionsHtml = '';
         if (isAdmin) {
           adminActionsHtml = `
-            <div style="display:flex; gap:6px; align-items:center; margin-top:10px; border-top:1px solid #edf2ed; padding-top:10px;">
+            <div style="display:flex; gap:6px; align-items:center; margin-top:10px; border-top:1px solid #edf2ed; padding-top:10px; flex-wrap:wrap;">
+              <button onclick="previewExamDocQuickly(${escapeHTML(JSON.stringify(String(e.code)))})" class="secondary" style="padding:5px 10px; font-size:11px; color:#0369a1; border-color:#bae6fd; background:#f0f9ff;">
+                <i class="fa-solid fa-eye"></i> Xem đề
+              </button>
               <button onclick="promptStartExam(${escapeHTML(JSON.stringify(String(e.code)))})" class="primary" style="padding:5px 10px; font-size:11px; background:#10b981; border-color:#10b981;">
                 Làm thử
               </button>
@@ -2877,14 +3675,14 @@
       const key = examDraftKey(exam);
       if (!key) return null;
       try {
-        const raw = localStorage.getItem(key);
+        const raw = safeStorage.getItem(key);
         if (!raw) return null;
         const d = JSON.parse(raw);
         if (!d || String(d.userId)!==String(currentUser.id) || String(d.examCode)!==String(exam.code)) return null;
         if (!d.answers || typeof d.answers!=='object') return null;
         // Tránh khôi phục bản nháp đã nộp mà trình duyệt chưa kịp xóa khi mất điện.
         if (d.attemptId && studentSubmissions.some(s=>String(s.attemptId)===String(d.attemptId) && String(s.userId)===String(currentUser.id) && String(s.examCode)===String(exam.code))) {
-          try { localStorage.removeItem(key); } catch(e){}
+          try { safeStorage.removeItem(key); } catch(e){}
           return null;
         }
         return d;
@@ -2912,7 +3710,7 @@
         savedAt: Date.now()
       };
       try {
-        localStorage.setItem(key, JSON.stringify(snapshot));
+        safeStorage.setItem(key, JSON.stringify(snapshot));
         showExamDraftStatus(`✅ Đã tự động lưu lúc ${formatDraftClock(snapshot.savedAt)} · Có thể trở lại làm tiếp trên trình duyệt này`);
         return true;
       } catch(err) {
@@ -2923,7 +3721,7 @@
     }
     function clearExamDraft(exam = activeExam) {
       const key = examDraftKey(exam);
-      if (key) try { localStorage.removeItem(key); } catch(e) { console.warn(e); }
+      if (key) try { safeStorage.removeItem(key); } catch(e) { console.warn(e); }
     }
     function stopExamDraftHeartbeat() {
       clearInterval(examDraftHeartbeat);
@@ -2937,14 +3735,21 @@
     function promptStartExam(examCode) {
       const exam = examsList.find(x => String(x.code).trim() === String(examCode).trim());
       if (!exam) {
-        alert("Không tìm thấy dữ liệu đề thi này!");
+        safeAlert("Không tìm thấy dữ liệu đề thi này!");
         return;
+      }
+      if (currentUser && currentUser.role !== 'admin') {
+        const myClasses = getUserEnrolledClassIds(currentUser);
+        if (!myClasses.some(cid => isForClass(exam, cid, true))) {
+          safeAlert("Bạn không thuộc lớp được giao đề thi này!");
+          return;
+        }
       }
 
       if (currentUser && currentUser.role !== 'admin' && exam.deadline) {
         const deadlineDate = new Date(exam.deadline);
         if (!isNaN(deadlineDate.getTime()) && Date.now() > deadlineDate.getTime()) {
-          alert(`Bài thi này đã hết hạn lúc ${formatDeadline(exam.deadline)}. Bạn không thể bắt đầu bài mới.`);
+          safeAlert(`Bài thi này đã hết hạn lúc ${formatDeadline(exam.deadline)}. Bạn không thể bắt đầu bài mới.`);
           return;
         }
       }
@@ -2966,7 +3771,7 @@
         const draft = readExamDraft(exam);
         if (draft) {
           const savedAt = draft.savedAt ? formatDraftClock(draft.savedAt) : 'trước đó';
-          if (confirm(`Đã tìm thấy bài làm lưu lúc ${savedAt}.\nBấm OK để TIẾP TỤC bài cũ (không đặt lại đồng hồ).\nBấm Hủy để bắt đầu lại từ đầu và xóa bản lưu cũ.`)) {
+          if (safeConfirm(`Đã tìm thấy bài làm lưu lúc ${savedAt}.\nBấm OK để TIẾP TỤC bài cũ (không đặt lại đồng hồ).\nBấm Hủy để bắt đầu lại từ đầu và xóa bản lưu cũ.`)) {
             startExamRoom(exam, false, draft);
           } else {
             clearExamDraft(exam);
@@ -2984,7 +3789,7 @@
 
     function startExamRoom(exam, reviewOnly = false, restoredDraft = null) {
       if (!exam) {
-        alert("Lỗi: Không tìm thấy dữ liệu bài thi!");
+        safeAlert("Lỗi: Không tìm thấy dữ liệu bài thi!");
         return;
       }
 
@@ -3258,7 +4063,7 @@
     }
 
     function confirmLiveSubmit() {
-      if (confirm("Bạn có chắc chắn muốn nộp bài thi ngay bây giờ không?")) {
+      if (safeConfirm("Bạn có chắc chắn muốn nộp bài thi ngay bây giờ không?")) {
         submitLiveExam();
       }
     }
@@ -3268,7 +4073,7 @@
         exitExamToHome();
         return;
       }
-      if (confirm('Bài làm đã được tự động lưu trên thiết bị. Bạn có muốn rời phòng thi và quay lại làm tiếp sau không?\nLưu ý: đồng hồ của đề có giới hạn thời gian vẫn tiếp tục chạy.')) {
+      if (safeConfirm('Bài làm đã được tự động lưu trên thiết bị. Bạn có muốn rời phòng thi và quay lại làm tiếp sau không?\nLưu ý: đồng hồ của đề có giới hạn thời gian vẫn tiếp tục chạy.')) {
         persistExamDraft();
         stopExamDraftHeartbeat();
         clearInterval(examCountdownTimer);
@@ -3427,13 +4232,13 @@
             clearExamDraft();
             examSubmitting = false;
             examDraftCompleted = true;
-            alert('Lượt này đã được nộp trước đó và đã có trong lịch sử. Không ghi đè kết quả cũ.');
+            safeAlert('Lượt này đã được nộp trước đó và đã có trong lịch sử. Không ghi đè kết quả cũ.');
             exitExamToHome();
             return;
           }
           console.error('Lỗi lưu điểm thi:', err);
           showExamDraftStatus('⚠️ Chưa gửi được bài lên Firebase. Bản nháp vẫn an toàn trên thiết bị; hãy kết nối mạng và bấm Nộp bài lại.', true);
-          alert('Chưa thể gửi bài thi lên Firebase. Bài làm đã được lưu trên thiết bị. Hãy kiểm tra kết nối mạng và bấm Nộp bài lại.');
+          safeAlert('Chưa thể gửi bài thi lên Firebase. Bài làm đã được lưu trên thiết bị. Hãy kiểm tra kết nối mạng và bấm Nộp bài lại.');
           examSubmitting = false;
           if(submitButton)submitButton.disabled=false;
           return;
@@ -3654,7 +4459,7 @@
       const title = document.getElementById('inpAdminExamTitle').value.trim();
       const timeLimit = parseInt(document.getElementById('inpAdminExamTime').value) || 50;
       const targetClassIds = getSelectedClassIds('examClassPicker');
-      if (!targetClassIds.length) return alert('Vui lòng chọn ít nhất một lớp cho đề thi.');
+      if (!targetClassIds.length) return safeAlert('Vui lòng chọn ít nhất một lớp cho đề thi.');
       const targetClassId = targetClassIds[0];
       const isUnlimited = document.getElementById('chkAdminIsUnlimited').checked;
       const practiceOnly = document.getElementById('chkAdminPracticeOnly').checked;
@@ -3667,25 +4472,25 @@
       const btn = document.getElementById('btnSaveAdminExam');
 
       if (!code || !title || !rawDocsUrl) {
-        alert("Vui lòng điền đủ: Mã đề, Tiêu đề và Link Google Docs!");
+        safeAlert("Vui lòng điền đủ: Mã đề, Tiêu đề và Link Google Docs!");
         return;
       }
       const priorExam = examsList.find(e => e.code === code);
       const editingExisting = document.getElementById('inpAdminExamCode').disabled;
       if (priorExam && !editingExisting) {
-        alert(`Mã đề ${code} đã tồn tại. Hãy dùng nút Sửa của đề cũ hoặc chọn mã mới. Điều này giúp tránh ghi đè kết quả học viên.`);
+        safeAlert(`Mã đề ${code} đã tồn tại. Hãy dùng nút Sửa của đề cũ hoặc chọn mã mới. Điều này giúp tránh ghi đè kết quả học viên.`);
         return;
       }
 
       const audited = parseExamAnswerKeys(rawMcq,rawTf,rawSa);
       renderExamAnswerAudit();
-      if (audited.errors.length) return alert('Đáp án chưa hợp lệ:\n- ' + audited.errors.join('\n- '));
-      if (audited.warnings.length && !confirm('Cần kiểm tra lại đáp án:\n- ' + audited.warnings.join('\n- ') + '\n\nBạn vẫn muốn lưu đề này?')) return;
+      if (audited.errors.length) return safeAlert('Đáp án chưa hợp lệ:\n- ' + audited.errors.join('\n- '));
+      if (audited.warnings.length && !safeConfirm('Cần kiểm tra lại đáp án:\n- ' + audited.warnings.join('\n- ') + '\n\nBạn vẫn muốn lưu đề này?')) return;
       const { mcqKeys,tfKeys,saKeys } = audited;
       if (priorExam && studentSubmissions.some(x=>x.examCode===code)) {
         const oldKeys = JSON.stringify([priorExam.mcqKeys || priorExam.keys || {},priorExam.tfKeys || {},priorExam.saKeys || {}]);
         const nextKeys = JSON.stringify([mcqKeys,tfKeys,saKeys]);
-        if (oldKeys !== nextKeys && !confirm('Đề này đã có bài nộp. Thay đáp án/cấu trúc đề sẽ KHÔNG chấm lại điểm số cũ, và có thể làm lệch chế độ xem lại của bài nộp đời trước. Bạn xác nhận muốn sửa đáp án?')) return;
+        if (oldKeys !== nextKeys && !safeConfirm('Đề này đã có bài nộp. Thay đáp án/cấu trúc đề sẽ KHÔNG chấm lại điểm số cũ, và có thể làm lệch chế độ xem lại của bài nộp đời trước. Bạn xác nhận muốn sửa đáp án?')) return;
       }
 
       btn.disabled = true;
@@ -3717,7 +4522,7 @@
         showToast("Đã lưu đề thi thành công!");
         closeAdminExamModal();
       } catch (err) {
-        alert("Lỗi Firestore: " + err.message);
+        safeAlert("Lỗi Firestore: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "Lưu Đề Thi";
@@ -3759,12 +4564,12 @@
     }
 
     async function deleteAdminExam(code) {
-      if (confirm(`Bạn có chắc chắn muốn xóa đề thi [${code}] vĩnh viễn không?`)) {
+      if (safeConfirm(`Bạn có chắc chắn muốn xóa đề thi [${code}] vĩnh viễn không?`)) {
         try {
           await db.collection("exams").doc(code).delete();
           showToast(`Đã xóa đề thi ${code}!`);
         } catch (err) {
-          alert("Lỗi khi xóa: " + err.message);
+          safeAlert("Lỗi khi xóa: " + err.message);
         }
       }
     }
@@ -3897,6 +4702,8 @@
     }
 
     function switchAuthTab(tab) {
+      const box = document.getElementById('authNoticeBox');
+      if (box) box.style.display = 'none';
       document.getElementById('btnTabLogin').classList.toggle('active', tab==='login');
       document.getElementById('btnTabRegister').classList.toggle('active', tab==='register');
       document.getElementById('formLogin').style.display = tab==='login' ? 'block' : 'none';
@@ -3905,30 +4712,32 @@
 
     function handleLogin(e) {
       e.preventDefault();
+      userDatabase = mergeDefaultAdmins(userDatabase);
       const enteredUsername = document.getElementById('loginUsername').value.trim().toLowerCase();
-      const enteredPassword = document.getElementById('loginPassword').value;
+      const enteredPassword = document.getElementById('loginPassword').value.trim();
 
-      const userIdx = userDatabase.findIndex(u => u.username.toLowerCase() === enteredUsername && u.password === enteredPassword);
-      if (userIdx === -1) return alert("Sai tên đăng nhập hoặc mật khẩu!");
+      const userIdx = userDatabase.findIndex(u => u && String(u.username || '').trim().toLowerCase() === enteredUsername && String(u.password || '').trim() === enteredPassword);
+      if (userIdx === -1) {
+        showAuthNotice("Sai tên đăng nhập hoặc mật khẩu!", false);
+        return;
+      }
       
       const user = userDatabase[userIdx];
-      if (user.status === "pending") return alert("Tài khoản đang chờ duyệt từ Quản trị viên BioBling!");
+      if (user.status === "pending") {
+        showAuthNotice("Tài khoản đang chờ duyệt từ Quản trị viên BioBling!", false);
+        return;
+      }
 
-      if (!user.activeSessions) user.activeSessions = [];
+      if (!Array.isArray(user.activeSessions)) user.activeSessions = [];
       const currentDevId = getOrCreateDeviceId();
-      const existingSessionIdx = user.activeSessions.findIndex(s => s.deviceId === currentDevId);
+      const existingSessionIdx = user.activeSessions.findIndex(s => s && s.deviceId === currentDevId);
 
       if (existingSessionIdx !== -1) {
         user.activeSessions[existingSessionIdx].lastActive = new Date().toLocaleString('vi-VN');
       } else {
         if (user.activeSessions.length >= 2) {
-          const confirmReplace = confirm(
-            "⚠️ TÀI KHOẢN ĐÃ ĐẠT GIỚI HẠN 2 THIẾT BỊ!\n\n" +
-            "Thiết bị cũ nhất sẽ bị đăng xuất để nhường chỗ cho thiết bị này.\n" +
-            "Bạn có muốn tiếp tục đăng nhập không?"
-          );
-          if (!confirmReplace) return;
           user.activeSessions.shift();
+          showToast("Đã tự động thay thế phiên thiết bị cũ nhất.");
         }
 
         user.activeSessions.push({
@@ -3939,25 +4748,34 @@
       }
 
       userDatabase[userIdx] = user;
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-      rtdb.ref('/users').set(userDatabase);
+      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      try { rtdb.ref('/users').set(userDatabase); } catch (err) { console.warn(err); }
 
       currentUser = user;
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
+      safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
+      const box = document.getElementById('authNoticeBox');
+      if (box) box.style.display = 'none';
       checkAuthSession();
+      showToast("Đăng nhập thành công!");
     }
 
     function handleRegister(e) {
       e.preventDefault();
       const un = document.getElementById('regUsername').value.trim().toLowerCase();
-      if(userDatabase.some(u=>u.username.toLowerCase()===un)) return alert("Tên đăng nhập đã tồn tại!");
-      if(document.getElementById('regPassword').value !== document.getElementById('regConfirmPassword').value) return alert("Mật khẩu xác nhận không khớp!");
+      if(userDatabase.some(u=>u && String(u.username || '').toLowerCase()===un)) {
+        showAuthNotice("Tên đăng nhập đã tồn tại!", false);
+        return;
+      }
+      if(document.getElementById('regPassword').value !== document.getElementById('regConfirmPassword').value) {
+        showAuthNotice("Mật khẩu xác nhận không khớp!", false);
+        return;
+      }
       
       const newUser = { 
         id: Date.now(), 
         username: un, 
         fullName: document.getElementById('regFullName').value.trim(), 
-        password: document.getElementById('regPassword').value, 
+        password: document.getElementById('regPassword').value.trim(), 
         role: "student", 
         status: "pending", 
         classId: "", 
@@ -3967,32 +4785,33 @@
       };
       
       userDatabase.push(newUser);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-      rtdb.ref('/users').set(userDatabase);
+      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      try { rtdb.ref('/users').set(userDatabase); } catch (err) { console.warn(err); }
 
-      alert("Đăng ký thành công! Vui lòng chờ Giảng viên BioBling duyệt."); 
       switchAuthTab('login');
+      showAuthNotice("Đăng ký thành công! Vui lòng chờ Giảng viên BioBling duyệt.", true);
     }
 
     function handleLogout() {
-      if (confirm("Bạn có chắc chắn muốn đăng xuất?")) {
-        if (currentUser) {
+      if (currentUser) {
+        try {
           rtdb.ref('/status/' + currentUser.username.toLowerCase()).set({
             state: 'offline',
             lastChanged: firebase.database.ServerValue.TIMESTAMP
           });
           const currentDevId = getOrCreateDeviceId();
-          const user = userDatabase.find(u => u.id === currentUser.id);
-          if (user && user.activeSessions) {
-            user.activeSessions = user.activeSessions.filter(s => s.deviceId !== currentDevId);
-            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+          const user = userDatabase.find(u => u && u.id === currentUser.id);
+          if (user && Array.isArray(user.activeSessions)) {
+            user.activeSessions = user.activeSessions.filter(s => s && s.deviceId !== currentDevId);
+            safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
             rtdb.ref('/users').set(userDatabase);
           }
-        }
-        currentUser = null;
-        localStorage.removeItem(SESSION_STORAGE_KEY);
-        checkAuthSession();
+        } catch (err) { console.warn(err); }
       }
+      currentUser = null;
+      safeStorage.removeItem(SESSION_STORAGE_KEY);
+      checkAuthSession();
+      showToast("Đã đăng xuất khỏi hệ thống.");
     }
 
     function updateUserUI() {
@@ -4001,7 +4820,7 @@
       const freshUser = userDatabase.find(u => u.id === currentUser.id);
       if (freshUser) {
         currentUser = freshUser;
-        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+        safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
       }
 
       const name = currentUser.fullName || currentUser.username;
@@ -4012,8 +4831,8 @@
         if (currentUser.role === 'admin') {
           roleTextEl.textContent = isSuperAdmin() ? "Super Admin (Master)" : "Quản trị viên / Giảng viên";
         } else {
-          const userClass = classDatabase.find(c => c.id === currentUser.classId);
-          roleTextEl.textContent = userClass ? `Học viên · ${userClass.name}` : "Học viên (Chưa xếp lớp)";
+          const myClasses = getUserAccessibleClasses();
+          roleTextEl.textContent = myClasses.length ? `Học viên · ${myClasses.map(c => c.name).join(', ')}` : "Học viên (Chưa xếp lớp)";
         }
       }
 
@@ -4037,16 +4856,16 @@
 
     function deleteUserPermanently(userId) {
       if (!isSuperAdmin()) {
-        alert("Chỉ tài khoản admin1 mới có quyền xóa tài khoản!");
+        safeAlert("Chỉ tài khoản admin1 mới có quyền xóa tài khoản!");
         return;
       }
       const userToDelete = userDatabase.find(u => u.id === userId);
       if (!userToDelete || userToDelete.username.toLowerCase() === 'admin1') return;
 
-      if (!confirm(`Xác nhận xóa vĩnh viễn tài khoản @${userToDelete.username}?`)) return;
+      if (!safeConfirm(`Xác nhận xóa vĩnh viễn tài khoản @${userToDelete.username}?`)) return;
 
       userDatabase = userDatabase.filter(u => u.id !== userId);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
       rtdb.ref('/users').set(userDatabase).then(() => {
         rtdb.ref('/status/' + userToDelete.username.toLowerCase()).remove();
         showToast(`Đã xóa vĩnh viễn tài khoản @${userToDelete.username}!`);
@@ -4054,6 +4873,52 @@
 
       renderClassMembersView(currentClassViewId);
       renderAdminClassDashboard();
+      renderSuperAdminView();
+    }
+
+    let revealedAccountIds = {};
+
+    function toggleRevealPassword(userId) {
+      if (!isSuperAdmin()) return;
+      revealedAccountIds[userId] = !revealedAccountIds[userId];
+      renderClassMembersView(currentClassViewId);
+      renderSuperAdminView();
+    }
+
+    function copyAccountCredentials(username, password) {
+      if (!isSuperAdmin()) return;
+      const text = `Tài khoản: ${username} | Mật khẩu: ${password}`;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        showToast(`Đã sao chép TK & MK của @${username}`);
+      } catch (e) {
+        showToast(text);
+      }
+    }
+
+    function updateStudentPasswordByMaster(userId, newPwd) {
+      if (!isSuperAdmin()) return;
+      const u = userDatabase.find(x => x && x.id === userId);
+      if (!u) return;
+      const clean = String(newPwd || '').trim();
+      if (clean.length < 4) {
+        showToast("Mật khẩu phải có ít nhất 4 ký tự!");
+        return;
+      }
+      u.password = clean;
+      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      try { rtdb.ref('/users').set(userDatabase); } catch (e) {}
+      showToast(`Đã cập nhật mật khẩu mới cho @${u.username}!`);
+      renderClassMembersView(currentClassViewId);
       renderSuperAdminView();
     }
 
@@ -4065,21 +4930,25 @@
       const container = document.getElementById('adminListSuperView');
       if (!container) return;
 
-      const adminUsers = userDatabase.filter(u => u.role === 'admin');
+      const adminUsers = userDatabase.filter(u => u && u.role === 'admin');
       container.innerHTML = adminUsers.map(admin => {
         const isMasterSelf = admin.username.toLowerCase() === 'admin1';
+        const showPass = !!revealedAccountIds[admin.id];
         return `
-          <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #dce8df; padding:12px 14px; border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #dce8df; padding:12px 14px; border-radius:12px; gap:10px; flex-wrap:wrap;">
             <div style="display:flex; align-items:center; gap:10px;">
               <div class="user-avatar-small" style="background:${isMasterSelf ? '#b91c1c' : '#287c54'}; font-size:12px;">
                 ${admin.avatar ? `<img src="${admin.avatar}">` : admin.username.charAt(0).toUpperCase()}
               </div>
               <div>
                 <b style="font-size:13.5px; color:#173d2e;">${escapeHTML(admin.fullName || admin.username)}</b>
-                <span style="font-size:11px; color:#6a8274; display:block;">@${escapeHTML(admin.username)}</span>
+                <span style="font-size:11px; color:#6a8274; display:block;">TK: <strong>@${escapeHTML(admin.username)}</strong> · MK: <code>${showPass ? escapeHTML(admin.password || '') : '••••••••'}</code></span>
               </div>
             </div>
-            <div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button type="button" class="secondary" style="padding:4px 8px; font-size:11px;" onclick="toggleRevealPassword(${admin.id})">
+                <i class="fa-solid ${showPass ? 'fa-eye-slash' : 'fa-eye'}"></i> ${showPass ? 'Ẩn MK' : 'Xem MK'}
+              </button>
               ${!isMasterSelf ? `
                 <button onclick="deleteUserPermanently(${admin.id})" class="super-del-btn">
                   <i class="fa-solid fa-trash-can"></i> Xóa
@@ -4089,18 +4958,92 @@
           </div>
         `;
       }).join('');
+
+      const studentTableWrap = document.getElementById('superStudentAccountsTableWrap');
+      if (!studentTableWrap) return;
+      const q = (document.getElementById('superStudentAccountSearch')?.value || '').trim().toLowerCase();
+      const students = userDatabase.filter(u => u && u.role !== 'admin' && (
+        !q || String(u.fullName || '').toLowerCase().includes(q) || String(u.username || '').toLowerCase().includes(q)
+      ));
+
+      if (!students.length) {
+        studentTableWrap.innerHTML = `<div class="notice" style="margin:12px;">Chưa có tài khoản học viên nào khớp với tìm kiếm.</div>`;
+        return;
+      }
+
+      studentTableWrap.innerHTML = `
+        <table class="member-compact-table">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Họ và Tên Học Viên</th>
+              <th>Tên Đăng Nhập (Username)</th>
+              <th>Mật Khẩu (Password)</th>
+              <th>Đổi Mật Khẩu Nhanh</th>
+              <th>Lớp Đang Học</th>
+              <th>Trạng Thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${students.map((st, idx) => {
+              const showPass = !!revealedAccountIds[st.id];
+              return `
+                <tr>
+                  <td style="font-weight:700; color:#64748b;">#${idx + 1}</td>
+                  <td>
+                    <b style="color:#173d2e;">${escapeHTML(st.fullName || st.username)}</b>
+                    <div style="font-size:10.5px; color:#64748b;">Tạo: ${escapeHTML(st.createdAt || '---')}</div>
+                  </td>
+                  <td>
+                    <span style="font-family:monospace; font-weight:800; color:#1e40af; background:#eff6ff; padding:3px 8px; border-radius:6px;">
+                      @${escapeHTML(st.username)}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="cred-box">
+                      <span>${showPass ? escapeHTML(st.password || '') : '••••••••'}</span>
+                      <button type="button" onclick="toggleRevealPassword(${st.id})" title="${showPass ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}">
+                        <i class="fa-solid ${showPass ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                      </button>
+                      <button type="button" onclick="copyAccountCredentials(${escapeHTML(JSON.stringify(String(st.username || '')))}, ${escapeHTML(JSON.stringify(String(st.password || '')))})" title="Sao chép tên đăng nhập & mật khẩu">
+                        <i class="fa-regular fa-copy"></i>
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <div style="display:flex; gap:4px; align-items:center;">
+                      <input type="text" id="inpMasterPwd_${st.id}" placeholder="Mật khẩu mới..." style="padding:5px 8px; border:1px solid #cbd5e1; border-radius:7px; font-size:11.5px; width:115px;">
+                      <button type="button" class="secondary" style="padding:5px 8px; font-size:11px;" onclick="updateStudentPasswordByMaster(${st.id}, document.getElementById('inpMasterPwd_${st.id}').value)">
+                        Lưu
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <span style="font-size:11.5px; font-weight:650; color:#23694b;">${escapeHTML(getUserEnrolledClassNames(st))}</span>
+                  </td>
+                  <td>
+                    <span class="tag ${st.status === 'pending' ? 'session-badge' : 'status-done'}" style="font-size:10px;">
+                      ${st.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
+                    </span>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
     }
 
     function handleCreateAdmin(e) {
       e.preventDefault();
-      if (!isSuperAdmin()) return alert("Chỉ admin1 mới có quyền tạo thêm admin!");
+      if (!isSuperAdmin()) return safeAlert("Chỉ admin1 mới có quyền tạo thêm admin!");
 
       const username = document.getElementById('newAdminUser').value.trim().toLowerCase();
       const fullName = document.getElementById('newAdminFullName').value.trim();
       const password = document.getElementById('newAdminPassword').value;
       const bio = document.getElementById('newAdminBio').value.trim();
 
-      if (userDatabase.some(u => u.username.toLowerCase() === username)) return alert("Tên đăng nhập đã tồn tại!");
+      if (userDatabase.some(u => u.username.toLowerCase() === username)) return safeAlert("Tên đăng nhập đã tồn tại!");
 
       const newAdmin = {
         id: Date.now(),
@@ -4116,7 +5059,7 @@
       };
 
       userDatabase.push(newAdmin);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
       rtdb.ref('/users').set(userDatabase).then(() => {
         showToast(`Đã tạo thành công tài khoản Admin [@${username}]!`);
       });
@@ -4138,20 +5081,20 @@
 
     function getUserStudyData() {
       if (!currentUser) return { dates: {}, streak: 1, lastStudyDate: "" };
-      const allLogs = JSON.parse(localStorage.getItem(STUDY_LOG_KEY)) || {};
+      const allLogs = JSON.parse(safeStorage.getItem(STUDY_LOG_KEY)) || {};
       const userKey = `user_${currentUser.id}`;
       if (!allLogs[userKey]) {
         allLogs[userKey] = { dates: {}, streak: 1, lastStudyDate: getTodayKey() };
-        localStorage.setItem(STUDY_LOG_KEY, JSON.stringify(allLogs));
+        safeStorage.setItem(STUDY_LOG_KEY, JSON.stringify(allLogs));
       }
       return allLogs[userKey];
     }
 
     function saveUserStudyData(userData) {
       if (!currentUser) return;
-      const allLogs = JSON.parse(localStorage.getItem(STUDY_LOG_KEY)) || {};
+      const allLogs = JSON.parse(safeStorage.getItem(STUDY_LOG_KEY)) || {};
       allLogs[`user_${currentUser.id}`] = userData;
-      localStorage.setItem(STUDY_LOG_KEY, JSON.stringify(allLogs));
+      safeStorage.setItem(STUDY_LOG_KEY, JSON.stringify(allLogs));
     }
 
     function calculateAndUpdateStreak() {
@@ -4216,19 +5159,19 @@
       setElText('dashStudyStreak', `${currentStreak} ngày`);
 
       let currentClassName = "Chưa xếp lớp";
+      const myClasses = getUserAccessibleClasses();
       if (currentUser.role === 'admin') {
         currentClassName = "Ban Giảng Viên BioBling";
-      } else if (currentUser.classId) {
-        const userClass = classDatabase.find(c => c.id === currentUser.classId);
-        if (userClass) currentClassName = userClass.name;
+      } else if (myClasses.length) {
+        currentClassName = myClasses.map(c => c.name).join(', ');
       }
       setElText('dashCurrentClassName', currentClassName);
 
       const container = document.getElementById('dashboardAssignmentsContainer');
       const visible = mediaDatabase.filter(canUserAccessMedia).slice(0, 6);
       
-      if (!currentUser.classId && currentUser.role !== 'admin') {
-        container.innerHTML = `<div class="notice" style="grid-column:1/-1;">Tài khoản của bạn chưa được xếp vào lớp học. Vui lòng liên hệ giảng viên.</div>`;
+      if (!myClasses.length && currentUser.role !== 'admin') {
+        container.innerHTML = `<div class="notice" style="grid-column:1/-1;">Tài khoản của bạn chưa được xếp vào lớp học. Vui lòng liên hệ giảng viên để được thêm vào lớp.</div>`;
         return;
       }
 
@@ -4252,7 +5195,10 @@
       }).join('');
     }
 
-    let currentClassViewId = 'all_users';
+    let currentClassViewId = '';
+    let currentMemberListViewMode = 'table'; // Mặc định dạng bảng gọn ("làm lạnh" danh sách để dễ quản lý)
+    let currentMemberSearchQuery = '';
+    let currentMemberStatusFilter = 'all';
 
     function isUserOnline(user) {
       if (!user || !user.username) return false;
@@ -4260,87 +5206,360 @@
       return statusObj && statusObj.state === 'online';
     }
 
+    function countStudentsInClass(classId) {
+      if (!classId) return 0;
+      if (classId === 'all_users') return userDatabase.filter(u => u && u.role !== 'admin').length;
+      if (classId === 'unassigned') return userDatabase.filter(u => u && u.role !== 'admin' && getUserEnrolledClassIds(u).length === 0).length;
+      return userDatabase.filter(u => u && u.role !== 'admin' && isUserInClass(u, classId)).length;
+    }
+
+    function onMemberSearchInput(val) {
+      currentMemberSearchQuery = String(val || '');
+      renderClassMembersView(currentClassViewId);
+    }
+
+    function onMemberStatusFilterChange(val) {
+      currentMemberStatusFilter = val || 'all';
+      renderClassMembersView(currentClassViewId);
+    }
+
+    function setMemberListViewMode(mode) {
+      currentMemberListViewMode = mode === 'grid' ? 'grid' : 'table';
+      document.getElementById('btnMemberViewTable')?.classList.toggle('active', currentMemberListViewMode === 'table');
+      document.getElementById('btnMemberViewGrid')?.classList.toggle('active', currentMemberListViewMode === 'grid');
+      renderClassMembersView(currentClassViewId);
+    }
+
+    function renderMemberClassButtons() {
+      const bar = document.getElementById('memberClassButtonsBar');
+      if (!bar) return;
+      const isAdmin = currentUser && currentUser.role === 'admin';
+      const accessible = getUserAccessibleClasses();
+
+      if (!isAdmin && !accessible.length) {
+        bar.innerHTML = '<div class="notice" style="width:100%;">Bạn chưa được thêm vào lớp học nào.</div>';
+        return;
+      }
+
+      let buttonsHtml = '';
+      if (isAdmin) {
+        buttonsHtml += accessible.map(c => {
+          const cid = String(c.id);
+          const active = String(currentClassViewId) === cid;
+          const cnt = countStudentsInClass(cid);
+          return `<button type="button" class="class-chip-btn ${active ? 'active' : ''}" onclick="renderClassMembersView('${escapeHTML(cid)}')">
+            <span>🏫 ${escapeHTML(c.name)}</span>
+            <span class="chip-count">${cnt} HV</span>
+          </button>`;
+        }).join('');
+
+        const unassignedCnt = countStudentsInClass('unassigned');
+        buttonsHtml += `<button type="button" class="class-chip-btn ${currentClassViewId === 'unassigned' ? 'active' : ''}" onclick="renderClassMembersView('unassigned')">
+          <span>⏳ Chưa xếp lớp</span>
+          <span class="chip-count">${unassignedCnt}</span>
+        </button>`;
+
+        const totalAll = userDatabase.length;
+        buttonsHtml += `<button type="button" class="class-chip-btn ${currentClassViewId === 'all_users' ? 'active' : ''}" onclick="renderClassMembersView('all_users')">
+          <span>👥 Tất cả tài khoản</span>
+          <span class="chip-count">${totalAll}</span>
+        </button>`;
+      } else {
+        buttonsHtml = accessible.map(c => {
+          const cid = String(c.id);
+          const active = String(currentClassViewId) === cid;
+          const cnt = countStudentsInClass(cid);
+          return `<button type="button" class="class-chip-btn ${active ? 'active' : ''}" onclick="renderClassMembersView('${escapeHTML(cid)}')">
+            <span>🏫 ${escapeHTML(c.name)}</span>
+            <span class="chip-count">${cnt} thành viên</span>
+          </button>`;
+        }).join('');
+      }
+
+      bar.innerHTML = buttonsHtml;
+    }
+
     function initMyClassView() {
       const isAdmin = currentUser && currentUser.role === 'admin';
       const selectorWrap = document.getElementById('adminClassSelectorWrap');
       const selector = document.getElementById('adminSelectClassView');
+      const accessible = getUserAccessibleClasses();
+
+      document.getElementById('btnMemberViewTable')?.classList.toggle('active', currentMemberListViewMode === 'table');
+      document.getElementById('btnMemberViewGrid')?.classList.toggle('active', currentMemberListViewMode === 'grid');
 
       if (isAdmin) {
         selectorWrap.style.display = 'flex';
-        selector.innerHTML = `
-          <option value="all_users">-- Tất cả học viên (${userDatabase.filter(u=>u.role!=='admin').length}) --</option>
-        ` + classDatabase.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join('');
-        
-        currentClassViewId = selector.value || "all_users";
+        selector.innerHTML = `<option value="">-- Chọn lớp để quản lý --</option>` +
+          classDatabase.map(c => `<option value="${escapeHTML(c.id)}">🏫 ${escapeHTML(c.name)} (${countStudentsInClass(c.id)} HV)</option>`).join('') +
+          `<option value="unassigned">⏳ Học viên chưa xếp lớp (${countStudentsInClass('unassigned')})</option>` +
+          `<option value="all_users">👥 Toàn bộ tài khoản (${userDatabase.length})</option>`;
+
+        if (currentClassViewId && [...selector.options].some(o => o.value === currentClassViewId)) {
+          selector.value = currentClassViewId;
+        } else if (classDatabase.length === 1) {
+          currentClassViewId = String(classDatabase[0].id);
+          selector.value = currentClassViewId;
+        } else {
+          currentClassViewId = '';
+          selector.value = '';
+        }
         renderClassMembersView(currentClassViewId);
       } else {
         selectorWrap.style.display = 'none';
-        currentClassViewId = currentUser ? currentUser.classId : "";
+        if (currentClassViewId && !accessible.some(c => String(c.id) === String(currentClassViewId))) {
+          currentClassViewId = '';
+        }
+        if (!currentClassViewId && accessible.length === 1) {
+          currentClassViewId = String(accessible[0].id);
+        }
         renderClassMembersView(currentClassViewId);
       }
     }
 
     function renderClassMembersView(classId) {
-      currentClassViewId = classId;
+      currentClassViewId = String(classId || '');
       const container = document.getElementById('classMembersGrid');
+      const headerActions = document.getElementById('memberHeaderActions');
+      const secondaryToolbar = document.getElementById('memberSecondaryToolbar');
+      const selector = document.getElementById('adminSelectClassView');
       if (!container) return;
+
+      if (selector && selector.value !== currentClassViewId) {
+        selector.value = currentClassViewId;
+      }
+
+      renderMemberClassButtons();
 
       const isAdmin = currentUser && currentUser.role === 'admin';
       const isMaster = isSuperAdmin();
+      const accessible = getUserAccessibleClasses();
+
+      if (headerActions) headerActions.innerHTML = '';
+
+      if (!isAdmin && !accessible.length) {
+        if (secondaryToolbar) secondaryToolbar.style.display = 'none';
+        setElText('myClassPageTitle', 'Lớp Học Của Tôi');
+        setElText('myClassPageSubtitle', 'Bạn chưa được thêm vào lớp học nào.');
+        container.className = '';
+        container.innerHTML = `<div class="notice" style="text-align:center; padding:30px;">Tài khoản của bạn hiện chưa được Giảng viên thêm vào lớp học nào.</div>`;
+        return;
+      }
+
+      if (!currentClassViewId) {
+        if (secondaryToolbar) secondaryToolbar.style.display = 'none';
+        setElText('myClassPageTitle', 'Quản Lý Thành Viên Theo Lớp');
+        setElText('myClassPageSubtitle', 'Chọn một lớp học ở bên dưới để xem danh sách học viên hoặc thêm/gỡ thành viên.');
+        container.className = '';
+        container.innerHTML = `
+          <div class="empty-class-prompt">
+            <i class="fa-solid fa-users-gear"></i>
+            <h3>Hãy chọn một lớp học ở phía trên</h3>
+            <p>Danh sách học viên sẽ hiển thị gọn gàng theo từng lớp bạn chọn để dễ dàng tra cứu, thêm học viên hoặc kiểm tra tài khoản.</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (secondaryToolbar) secondaryToolbar.style.display = 'flex';
+
       let members = [];
+      const targetClass = classDatabase.find(c => String(c.id) === currentClassViewId);
 
-      const classMap = {};
-      classDatabase.forEach(c => classMap[c.id] = c.name);
+      if (currentClassViewId === 'all_users' && isAdmin) {
+        setElText('myClassPageTitle', 'Toàn Bộ Tài Khoản Hệ Thống');
+        setElText('myClassPageSubtitle', isMaster ? 'Chế độ Super Admin: Kiểm tra tên đăng nhập, mật khẩu và phân lớp của mọi tài khoản.' : 'Danh sách tổng hợp tất cả tài khoản trong hệ thống BioBling - 2B.');
+        members = userDatabase.slice();
+      } else if (currentClassViewId === 'unassigned' && isAdmin) {
+        setElText('myClassPageTitle', 'Học Viên Chưa Xếp Lớp');
+        setElText('myClassPageSubtitle', 'Danh sách các học viên đã đăng ký nhưng chưa được gán vào lớp học nào.');
+        members = userDatabase.filter(u => u && u.role !== 'admin' && getUserEnrolledClassIds(u).length === 0);
+      } else if (targetClass) {
+        if (!isAdmin && !isUserInClass(currentUser, targetClass.id)) {
+          currentClassViewId = '';
+          renderClassMembersView('');
+          return;
+        }
+        setElText('myClassPageTitle', `Lớp: ${targetClass.name}`);
+        setElText('myClassPageSubtitle', `Danh sách học viên đang tham gia lớp ${targetClass.name}.`);
+        members = userDatabase.filter(u => u && u.role !== 'admin' && isUserInClass(u, targetClass.id));
 
-      const oldAddBtn = document.getElementById('btnOpenAddMemberModal');
-      if (oldAddBtn) oldAddBtn.remove();
-
-      if (classId === 'all_users') {
-        setElText('myClassPageTitle', 'Toàn Bộ Thành Viên BioBling');
-        setElText('myClassPageSubtitle', 'Danh sách tổng hợp tất cả tài khoản trong hệ thống BioBling - 2B.');
-        members = userDatabase;
-      } else {
-        const targetClass = classDatabase.find(c => c.id === classId);
-        const className = targetClass ? targetClass.name : "Chưa phân lớp";
-        setElText('myClassPageTitle', `Lớp: ${className}`);
-        setElText('myClassPageSubtitle', `Danh sách học viên đang theo học tại lớp này.`);
-        members = userDatabase.filter(u => u.classId === classId);
-
-        if (isAdmin && targetClass) {
-          const addBtn = document.createElement('button');
-          addBtn.id = 'btnOpenAddMemberModal';
-          addBtn.className = 'primary';
-          addBtn.style.cssText = 'padding: 6px 12px; font-size: 12px; margin-left: 10px;';
-          addBtn.innerHTML = `➕ Thêm học viên vào lớp`;
-          addBtn.onclick = () => openAssignMemberModal(classId);
-          document.getElementById('adminClassSelectorWrap').appendChild(addBtn);
+        if (isAdmin && headerActions) {
+          headerActions.innerHTML = `
+            <button type="button" id="btnOpenAddMemberModal" class="primary" style="padding:7px 13px; font-size:12px;" onclick="openAssignMemberModal('${escapeHTML(targetClass.id)}')">
+              <i class="fa-solid fa-user-plus"></i> Thêm học viên vào lớp này
+            </button>
+          `;
         }
       }
 
+      const norm = str => String(str || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+      const q = norm(currentMemberSearchQuery.trim());
+
+      members = members.filter(m => {
+        if (!m) return false;
+        if (currentMemberStatusFilter === 'online' && !isUserOnline(m)) return false;
+        if (currentMemberStatusFilter === 'approved' && m.status !== 'approved') return false;
+        if (currentMemberStatusFilter === 'pending' && m.status !== 'pending') return false;
+        if (q) {
+          const hay = norm(`${m.fullName || ''} ${m.username || ''} ${m.bio || ''}`);
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
       if (!members.length) {
+        container.className = '';
         container.innerHTML = `
-          <div class="notice" style="grid-column: 1/-1; text-align:center; padding: 30px;">
-            Chưa có thành viên nào trong lớp này.
+          <div class="notice" style="text-align:center; padding: 30px;">
+            Không có thành viên nào trong danh sách này${q || currentMemberStatusFilter !== 'all' ? ' khớp với bộ lọc hiện tại' : ''}.
           </div>`;
         return;
       }
 
+      // Chế độ 1: BẢNG GỌN DỄ QUẢN LÝ ("Làm lạnh" danh sách)
+      if (currentMemberListViewMode === 'table') {
+        container.className = '';
+        container.innerHTML = `
+          <div class="member-compact-table-wrap">
+            <table class="member-compact-table">
+              <thead>
+                <tr>
+                  <th style="width:44px;">STT</th>
+                  <th>Thành Viên</th>
+                  <th>Tên Đăng Nhập (Account)</th>
+                  ${isMaster ? '<th>Mật Khẩu (Super Admin)</th>' : ''}
+                  <th>Các Lớp Đang Học</th>
+                  <th>Trạng Thái</th>
+                  ${isAdmin ? '<th style="text-align:right;">Quản Lý</th>' : ''}
+                </tr>
+              </thead>
+              <tbody>
+                ${members.map((m, idx) => {
+                  const online = isUserOnline(m);
+                  const isMe = currentUser && m.id === currentUser.id;
+                  const initial = (m.fullName || m.username || 'U').charAt(0).toUpperCase();
+                  const isPending = m.status === 'pending';
+                  const enrolledIds = getUserEnrolledClassIds(m);
+                  const showPass = !!revealedAccountIds[m.id];
+
+                  let classesCellHtml = '';
+                  if (m.role === 'admin') {
+                    classesCellHtml = `<span class="tag status-done" style="font-size:10.5px;">Ban Giảng Viên / Toàn hệ thống</span>`;
+                  } else if (!enrolledIds.length) {
+                    classesCellHtml = `<span style="font-size:11.5px; color:#94a3b8; font-style:italic;">Chưa xếp lớp</span>`;
+                  } else {
+                    classesCellHtml = `<div class="class-tag-list">` + enrolledIds.map(cid => {
+                      const cname = (classDatabase.find(c => String(c.id) === cid) || {}).name || cid;
+                      const removeBtn = isAdmin ? `<button type="button" onclick="removeUserFromClass(${m.id}, '${escapeHTML(cid)}')" title="Gỡ học viên khỏi lớp ${escapeHTML(cname)}">✕</button>` : '';
+                      return `<span class="class-tag-chip">🏫 ${escapeHTML(cname)} ${removeBtn}</span>`;
+                    }).join('') + `</div>`;
+                  }
+
+                  let masterPassCell = '';
+                  if (isMaster) {
+                    masterPassCell = `
+                      <td>
+                        <div class="cred-box">
+                          <span>${showPass ? escapeHTML(m.password || '') : '••••••••'}</span>
+                          <button type="button" onclick="toggleRevealPassword(${m.id})" title="${showPass ? 'Ẩn mật khẩu' : 'Xem mật khẩu'}">
+                            <i class="fa-solid ${showPass ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                          </button>
+                          <button type="button" onclick="copyAccountCredentials(${escapeHTML(JSON.stringify(String(m.username || '')))}, ${escapeHTML(JSON.stringify(String(m.password || '')))})" title="Sao chép TK & MK">
+                            <i class="fa-regular fa-copy"></i>
+                          </button>
+                        </div>
+                      </td>
+                    `;
+                  }
+
+                  let adminActionsCell = '';
+                  if (isAdmin) {
+                    let btns = '';
+                    if (isPending) {
+                      btns += `<button type="button" class="primary" style="padding:5px 9px; font-size:11px;" onclick="approveUser(${m.id}); renderClassMembersView('${escapeHTML(currentClassViewId)}');">Duyệt</button>`;
+                    }
+                    if (m.role !== 'admin') {
+                      if (targetClass && isUserInClass(m, targetClass.id)) {
+                        btns += `<button type="button" class="secondary" style="padding:5px 9px; font-size:11px; color:#b91c1c; border-color:#fecaca; background:#fff5f5;" onclick="removeUserFromClass(${m.id}, '${escapeHTML(targetClass.id)}')">Gỡ khỏi lớp</button>`;
+                      }
+                      const quickAddOptions = classDatabase.filter(c => !isUserInClass(m, c.id));
+                      if (quickAddOptions.length) {
+                        btns += `
+                          <select onchange="if(this.value){ quickAddUserToClass(${m.id}, this.value); this.value=''; }" style="padding:5px 8px; border-radius:8px; border:1px solid #d5e4da; font-size:11px; color:#1e6042; background:#f8fcf9; font-weight:650;">
+                            <option value="">+ Gán thêm lớp...</option>
+                            ${quickAddOptions.map(c => `<option value="${escapeHTML(c.id)}">${escapeHTML(c.name)}</option>`).join('')}
+                          </select>
+                        `;
+                      }
+                    }
+                    if (isMaster && String(m.username || '').toLowerCase() !== 'admin1') {
+                      btns += `<button type="button" onclick="deleteUserPermanently(${m.id})" class="super-del-btn" style="padding:5px 8px; font-size:11px;"><i class="fa-solid fa-trash-can"></i> Xóa TK</button>`;
+                    }
+                    adminActionsCell = `<td style="text-align:right; white-space:nowrap;"><div style="display:inline-flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">${btns}</div></td>`;
+                  }
+
+                  return `
+                    <tr>
+                      <td style="font-weight:800; color:#64748b;">#${idx + 1}</td>
+                      <td>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                          <div class="user-avatar-small" style="width:34px; height:34px; font-size:12px;">
+                            ${m.avatar ? `<img src="${m.avatar}">` : initial}
+                          </div>
+                          <div>
+                            <b style="font-size:13px; color:#173d2e;">${escapeHTML(m.fullName || m.username)} ${isMe ? '(Tôi)' : ''}</b>
+                            <span style="display:block; font-size:10.5px; color:#64748b;">${m.role === 'admin' ? 'Giảng viên' : 'Học viên'}${m.bio ? ' · ' + escapeHTML(m.bio) : ''}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span style="font-family:monospace; font-weight:800; color:#1e40af; background:#eff6ff; padding:3px 8px; border-radius:6px; font-size:12px;">
+                          @${escapeHTML(m.username)}
+                        </span>
+                      </td>
+                      ${masterPassCell}
+                      <td>${classesCellHtml}</td>
+                      <td>
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                          <span class="${online ? 'badge-online' : 'badge-offline'}">
+                            <span class="status-dot ${online ? 'status-online' : 'status-offline'}"></span>
+                            ${online ? 'Online' : 'Offline'}
+                          </span>
+                          ${isPending ? '<span class="tag" style="background:#fef3c7;color:#92400e;font-size:9.5px;">Chờ duyệt</span>' : ''}
+                        </div>
+                      </td>
+                      ${adminActionsCell}
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+        return;
+      }
+
+      // Chế độ 2: DẠNG THẺ (Grid)
+      container.className = 'grid-3';
       container.innerHTML = members.map(m => {
         const online = isUserOnline(m);
         const isMe = currentUser && m.id === currentUser.id;
         const initial = (m.fullName || m.username).charAt(0).toUpperCase();
-        const userClassName = m.classId === 'all' 
-          ? 'Toàn hệ thống' 
-          : (classMap[m.classId] || (m.role === 'admin' ? 'Ban Giảng Viên BioBling' : 'Chưa xếp lớp'));
+        const userClassName = getUserEnrolledClassNames(m);
         const isPending = m.status === 'pending';
+        const showPass = !!revealedAccountIds[m.id];
 
         let actionBtnHtml = '';
-        if (isAdmin && m.role !== 'admin' && m.classId) {
-          actionBtnHtml = `
-            <button onclick="removeUserFromClass(${m.id})" class="del-btn" style="color:#b91c1c; font-size:11px; padding:3px 6px; border:1px solid #fecaca; background:#fff5f5; border-radius:6px;" title="Gỡ khỏi lớp">
-              Gỡ lớp
-            </button>
-          `;
+        if (isAdmin && m.role !== 'admin') {
+          const rmClassId = targetClass ? targetClass.id : (getUserEnrolledClassIds(m)[0] || '');
+          if (rmClassId) {
+            actionBtnHtml = `
+              <button onclick="removeUserFromClass(${m.id}, '${escapeHTML(rmClassId)}')" class="del-btn" style="color:#b91c1c; font-size:11px; padding:3px 6px; border:1px solid #fecaca; background:#fff5f5; border-radius:6px;" title="Gỡ khỏi lớp">
+                Gỡ lớp
+              </button>
+            `;
+          }
         }
 
         let deleteAccountBtn = '';
@@ -4349,6 +5568,16 @@
             <button onclick="deleteUserPermanently(${m.id})" class="super-del-btn">
               <i class="fa-solid fa-trash-can"></i> Xóa
             </button>
+          `;
+        }
+
+        let masterCredHtml = '';
+        if (isMaster) {
+          masterCredHtml = `
+            <div style="margin-top:8px; padding:7px 10px; background:#fff8eb; border:1px solid #fde68a; border-radius:8px; font-size:11.5px; display:flex; justify-content:space-between; align-items:center;">
+              <span>🔑 TK: <strong>@${escapeHTML(m.username)}</strong> · MK: <code>${showPass ? escapeHTML(m.password || '') : '••••••••'}</code></span>
+              <button type="button" class="text-btn" style="font-size:11px; color:#b45309;" onclick="toggleRevealPassword(${m.id})">${showPass ? 'Ẩn' : 'Xem'}</button>
+            </div>
           `;
         }
 
@@ -4372,6 +5601,8 @@
                 ${isPending ? '<span class="tag" style="background:#fef3c7;color:#92400e;font-size:9.5px;">Chờ duyệt</span>' : ''}
               </div>
             </div>
+
+            ${masterCredHtml}
             
             <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
               <span style="font-size:11px; color:#23694b; background:#f0f8f2; padding:3px 8px; border-radius:6px; font-weight:600;">
@@ -4398,143 +5629,288 @@
       if (!targetClass) return;
 
       setElText('assignModalTitle', `➕ Thêm học viên vào "${targetClass.name}"`);
-      const candidates = userDatabase.filter(u => u.status === 'approved' && u.classId !== classId);
-      const listEl = document.getElementById('assignCandidateList');
+      const searchInp = document.getElementById('assignCandidateSearch');
+      if (searchInp) searchInp.value = '';
+      renderAssignCandidatesList();
+      document.getElementById('assignMemberModal').classList.add('open');
+    }
 
-      const classMap = {};
-      classDatabase.forEach(c => classMap[c.id] = c.name);
+    function renderAssignCandidatesList() {
+      const listEl = document.getElementById('assignCandidateList');
+      if (!listEl || !targetClassForAdd) return;
+      const q = (document.getElementById('assignCandidateSearch')?.value || '').trim().toLowerCase();
+
+      const candidates = userDatabase.filter(u =>
+        u && u.role !== 'admin' && u.status === 'approved' && !isUserInClass(u, targetClassForAdd) &&
+        (!q || String(u.fullName || '').toLowerCase().includes(q) || String(u.username || '').toLowerCase().includes(q))
+      );
 
       if (!candidates.length) {
-        listEl.innerHTML = `<div class="notice" style="text-align:center;">Không có thành viên nào khả dụng.</div>`;
-      } else {
-        listEl.innerHTML = candidates.map(u => {
-          const currentClassStr = u.classId ? `(Đang ở: ${classMap[u.classId] || 'Lớp khác'})` : `(Chưa có lớp)`;
-          return `
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fbf8; border:1px solid #dce8df; border-radius:12px; padding:10px 14px;">
-              <div>
-                <b style="font-size:13px; color:#173d2e;">${escapeHTML(u.fullName || u.username)}</b>
-                <span style="font-size:11px; color:#6b8275; margin-left:6px;">@${escapeHTML(u.username)}</span>
-                <div style="font-size:10.5px; color:#23694b; margin-top:2px;">${escapeHTML(currentClassStr)}</div>
-              </div>
-              <button class="primary" style="padding:6px 12px; font-size:11.5px;" onclick="addCandidateToClass(${u.id})">
-                Thêm vào lớp
-              </button>
-            </div>
-          `;
-        }).join('');
+        listEl.innerHTML = `<div class="notice" style="text-align:center;">Không có học viên nào khả dụng để thêm vào lớp này.</div>`;
+        return;
       }
-      document.getElementById('assignMemberModal').classList.add('open');
+
+      listEl.innerHTML = candidates.map(u => {
+        const currentClassStr = getUserEnrolledClassIds(u).length
+          ? `(Đang học: ${getUserEnrolledClassNames(u)})`
+          : `(Chưa có lớp)`;
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fbf8; border:1px solid #dce8df; border-radius:12px; padding:10px 14px; gap:10px;">
+            <div>
+              <b style="font-size:13px; color:#173d2e;">${escapeHTML(u.fullName || u.username)}</b>
+              <span style="font-size:11px; color:#1e40af; font-family:monospace; font-weight:700; margin-left:6px;">@${escapeHTML(u.username)}</span>
+              <div style="font-size:10.5px; color:#23694b; margin-top:2px;">${escapeHTML(currentClassStr)}</div>
+            </div>
+            <button type="button" class="primary" style="padding:6px 12px; font-size:11.5px; white-space:nowrap;" onclick="addCandidateToClass(${u.id})">
+              + Thêm vào lớp
+            </button>
+          </div>
+        `;
+      }).join('');
     }
 
     function closeAssignMemberModal() {
       document.getElementById('assignMemberModal').classList.remove('open');
     }
 
-    function addCandidateToClass(userId) {
-      const user = userDatabase.find(u => u.id === userId);
-      if (!user || !targetClassForAdd) return;
-
-      user.classId = targetClassForAdd;
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-      rtdb.ref('/users').set(userDatabase);
-
-      const targetClass = classDatabase.find(c => c.id === targetClassForAdd);
-      showToast(`Đã thêm @${user.username} vào lớp ${targetClass ? targetClass.name : ''}`);
-      openAssignMemberModal(targetClassForAdd);
-      renderClassMembersView(targetClassForAdd);
-    }
-
-    function removeUserFromClass(userId) {
-      const user = userDatabase.find(u => u.id === userId);
-      if (!user) return;
-
-      if (confirm(`Bạn có chắc muốn gỡ @${user.username} khỏi lớp hiện tại không?`)) {
-        user.classId = "";
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-        rtdb.ref('/users').set(userDatabase);
-        showToast(`Đã gỡ @${user.username} khỏi lớp.`);
+    function quickAddUserToClass(userId, classId) {
+      const user = userDatabase.find(u => u && u.id === userId);
+      if (!user || !classId) return;
+      const currentIds = getUserEnrolledClassIds(user);
+      if (!currentIds.includes(String(classId))) {
+        currentIds.push(String(classId));
+        setUserEnrolledClassIds(user, currentIds);
+        safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+        try { rtdb.ref('/users').set(userDatabase); } catch (e) {}
+        const targetClass = classDatabase.find(c => String(c.id) === String(classId));
+        showToast(`Đã thêm @${user.username} vào lớp ${targetClass ? targetClass.name : ''}`);
         renderClassMembersView(currentClassViewId);
       }
     }
 
-    // Theo lớp đang học: mỗi buổi chỉ chứa tài liệu được gán vào buổi đó trong lớp.
+    function addCandidateToClass(userId) {
+      const user = userDatabase.find(u => u && u.id === userId);
+      if (!user || !targetClassForAdd) return;
+
+      const currentIds = getUserEnrolledClassIds(user);
+      if (!currentIds.includes(String(targetClassForAdd))) {
+        currentIds.push(String(targetClassForAdd));
+        setUserEnrolledClassIds(user, currentIds);
+      }
+      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      try { rtdb.ref('/users').set(userDatabase); } catch (e) {}
+
+      const targetClass = classDatabase.find(c => c.id === targetClassForAdd);
+      showToast(`Đã thêm @${user.username} vào lớp ${targetClass ? targetClass.name : ''}`);
+      renderAssignCandidatesList();
+      renderClassMembersView(targetClassForAdd);
+    }
+
+    function removeUserFromClass(userId, classIdToRemove = null) {
+      const user = userDatabase.find(u => u && u.id === userId);
+      if (!user) return;
+      const targetCid = classIdToRemove || (currentClassViewId !== 'all_users' && currentClassViewId !== 'unassigned' ? currentClassViewId : '');
+      const clsObj = classDatabase.find(c => String(c.id) === String(targetCid));
+      const clsLabel = clsObj ? clsObj.name : 'lớp hiện tại';
+
+      if (safeConfirm(`Bạn có chắc muốn gỡ @${user.username} khỏi ${clsLabel} không?`)) {
+        if (targetCid) {
+          const nextIds = getUserEnrolledClassIds(user).filter(id => id !== String(targetCid));
+          setUserEnrolledClassIds(user, nextIds);
+        } else {
+          setUserEnrolledClassIds(user, []);
+        }
+        safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+        try { rtdb.ref('/users').set(userDatabase); } catch (e) {}
+        showToast(`Đã gỡ @${user.username} khỏi ${clsLabel}.`);
+        renderClassMembersView(currentClassViewId);
+      }
+    }
+
+    // V9: Chọn lớp trước -> chỉ hiện buổi học và video/tài liệu của đúng lớp đã chọn.
+    let currentVidClassFilter = '';
+    let currentDocClassFilter = '';
     let currentVidFilter = 'all';
     let currentDocFilter = 'all';
-    function availableMediaSessions(items) {
-      const isAdmin = currentUser?.role === 'admin';
-      const ids = new Set();
-      items.forEach(m=>{
-        if(isAdmin) {
-          const assigned = getAssignedClassIds(m);
-          const concrete = assigned.includes('all') ? classDatabase.map(c=>String(c.id)) : assigned;
-          concrete.forEach(cid=>{const sid=mediaClassSessionId(m,cid);if(sid) ids.add(sid);});
-        } else {
-          const sid=mediaClassSessionId(m,currentUser?.classId);if(sid) ids.add(sid);
-        }
-      });
-      return sessionDatabase.filter(s=>ids.has(s.id));
+
+    function countMediaForClass(classId, mediaType) {
+      if (!classId) return 0;
+      return mediaDatabase.filter(m => m.type === mediaType && isForClass(m, classId)).length;
     }
-    function mediaInSelectedSession(media, filter) {
-      if(filter==='all') return true;
-      if(currentUser?.role==='admin') {
-        const classes=getAssignedClassIds(media);
-        return (classes.includes('all')?classDatabase.map(c=>String(c.id)):classes).some(cid=>mediaClassSessionId(media,cid)===filter);
+
+    function renderMediaClassToolbar(toolbarId, selectedClassId, mediaType) {
+      const bar = document.getElementById(toolbarId);
+      if (!bar) return '';
+      const accessible = getUserAccessibleClasses();
+      if (selectedClassId && !accessible.some(c => String(c.id) === String(selectedClassId))) {
+        selectedClassId = '';
       }
-      return mediaClassSessionId(media,currentUser?.classId)===filter;
+      if (!selectedClassId && accessible.length === 1) {
+        selectedClassId = String(accessible[0].id);
+      }
+      if (mediaType === 'drive_video') currentVidClassFilter = selectedClassId;
+      else currentDocClassFilter = selectedClassId;
+
+      if (!accessible.length) {
+        bar.innerHTML = '<div class="notice" style="width:100%;">Chưa có lớp học nào.</div>';
+        return '';
+      }
+
+      const fnName = mediaType === 'drive_video' ? 'selectVideoClassFilter' : 'selectDocClassFilter';
+      const unitLabel = mediaType === 'drive_video' ? 'video' : 'tài liệu';
+
+      bar.innerHTML = accessible.map(c => {
+        const cid = String(c.id);
+        const active = cid === String(selectedClassId);
+        const cnt = countMediaForClass(cid, mediaType);
+        return `<button type="button" class="class-chip-btn ${active ? 'active' : ''}" onclick="${fnName}('${escapeHTML(cid)}')">
+          <span>🏫 ${escapeHTML(c.name)}</span>
+          <span class="chip-count">${cnt} ${unitLabel}</span>
+        </button>`;
+      }).join('');
+
+      return selectedClassId;
     }
-    function renderMediaSessionToolbar(elementId,items,chosen,type) {
-      const el=document.getElementById(elementId);
-      const sessions=availableMediaSessions(items);
-      if(!sessions.some(s=>s.id===chosen))chosen='all';
-      if(type==='video') currentVidFilter=chosen;else currentDocFilter=chosen;
-      const update=type==='video'?'initVideosView':'initDocumentsView';
-      const curr=type==='video'?'currentVidFilter':'currentDocFilter';
-      el.innerHTML = !sessions.length ? '' : `<button class="pill ${chosen==='all'?'active':''}" onclick="${curr}='all';${update}();">Tất cả buổi</button>` + sessions.map(s=>{
-        const name = currentUser?.role==='admin' && s.classId ? `${classDatabase.find(c=>String(c.id)===s.classId)?.name||'Lớp'} • ${s.title}` : s.title;
-        return `<button class="pill ${chosen===s.id?'active':''}" onclick="${curr}='${escapeHTML(s.id)}';${update}();">${escapeHTML(name)}</button>`;
+
+    function selectVideoClassFilter(classId) {
+      currentVidClassFilter = String(classId || '');
+      currentVidFilter = 'all';
+      initVideosView();
+    }
+
+    function selectDocClassFilter(classId) {
+      currentDocClassFilter = String(classId || '');
+      currentDocFilter = 'all';
+      initDocumentsView();
+    }
+
+    function availableMediaSessions(items, selectedClassId) {
+      if (!selectedClassId) return [];
+      const ids = new Set();
+      items.forEach(m => {
+        const sid = mediaClassSessionId(m, selectedClassId);
+        if (sid) ids.add(sid);
+      });
+      return sessionDatabase.filter(s => ids.has(s.id));
+    }
+
+    function mediaInSelectedSession(media, filter, selectedClassId) {
+      if (filter === 'all') return true;
+      return mediaClassSessionId(media, selectedClassId) === filter;
+    }
+
+    function renderMediaSessionToolbar(elementId, items, chosen, type, selectedClassId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      if (!selectedClassId) {
+        el.innerHTML = '';
+        return;
+      }
+      const sessions = availableMediaSessions(items, selectedClassId);
+      if (!sessions.some(s => s.id === chosen)) chosen = 'all';
+      if (type === 'video') currentVidFilter = chosen;
+      else currentDocFilter = chosen;
+      const update = type === 'video' ? 'initVideosView' : 'initDocumentsView';
+      const curr = type === 'video' ? 'currentVidFilter' : 'currentDocFilter';
+      el.innerHTML = !sessions.length ? '' : `<button class="pill ${chosen === 'all' ? 'active' : ''}" onclick="${curr}='all';${update}();">Tất cả buổi của lớp (${items.length})</button>` + sessions.map(s => {
+        return `<button class="pill ${chosen === s.id ? 'active' : ''}" onclick="${curr}='${escapeHTML(s.id)}';${update}();">${escapeHTML(s.title)}</button>`;
       }).join('');
     }
+
     function initVideosView() {
-      const vids=mediaDatabase.filter(m=>m.type==='drive_video' && canUserAccessMedia(m));
-      renderMediaSessionToolbar('videoSessionToolbar',vids,currentVidFilter,'video');
-      const filtered=vids.filter(v=>mediaInSelectedSession(v,currentVidFilter));
-      const playlist=document.getElementById('videoPlaylistContainer');
-      const player=document.getElementById('driveVideoContainer');
-      if (!currentUser?.classId && currentUser?.role !== 'admin') {
-        player.innerHTML='<div style="padding:40px 20px;color:#fff;text-align:center;">Bạn chưa được xếp vào lớp học để xem video.</div>';
-        playlist.innerHTML='';document.getElementById('btnOpenExternalVideo').style.display='none';return;
+      const playlist = document.getElementById('videoPlaylistContainer');
+      const player = document.getElementById('driveVideoContainer');
+      const emptyPrompt = document.getElementById('videoClassEmptyPrompt');
+      const playerLayout = document.getElementById('videoMainPlayerLayout');
+
+      const accessibleClasses = getUserAccessibleClasses();
+      if (!accessibleClasses.length && currentUser?.role !== 'admin') {
+        document.getElementById('videoClassToolbar').innerHTML = '<div class="notice" style="width:100%;">Bạn chưa được thêm vào lớp học nào.</div>';
+        document.getElementById('videoSessionToolbar').innerHTML = '';
+        if (emptyPrompt) emptyPrompt.style.display = 'none';
+        if (playerLayout) playerLayout.style.display = 'grid';
+        player.innerHTML = '<div style="padding:40px 20px;color:#fff;text-align:center;">Tài khoản của bạn chưa được thêm vào lớp học nào để xem video bài giảng.</div>';
+        playlist.innerHTML = '';
+        document.getElementById('btnOpenExternalVideo').style.display = 'none';
+        return;
       }
-      if(!filtered.length) {
-        player.innerHTML='<div style="padding:40px 20px;color:#fff;text-align:center;">Buổi này chưa có video bài giảng.</div>';
-        playlist.innerHTML='';document.getElementById('btnOpenExternalVideo').style.display='none';return;
+
+      const selectedClassId = renderMediaClassToolbar('videoClassToolbar', currentVidClassFilter, 'drive_video');
+      if (!selectedClassId) {
+        document.getElementById('videoSessionToolbar').innerHTML = '';
+        if (emptyPrompt) emptyPrompt.style.display = 'block';
+        if (playerLayout) playerLayout.style.display = 'none';
+        player.innerHTML = '';
+        return;
       }
-      const loadVid=(v)=>{
-        if(!v)return;
-        setElText('currentVideoTitle',v.title);
-        setElText('currentVideoNote',`${v.note||'Video bài giảng chính thức.'}${v.deadline?` • Hạn: ${formatDeadline(v.deadline)}`:''}`);
-        setElText('currentVideoSessionBadge',sessionTitleForMedia(v));
-        document.getElementById('btnOpenExternalVideo').href=v.url;
-        document.getElementById('btnOpenExternalVideo').style.display='inline-flex';
-        player.innerHTML=`<iframe src="${convertToDrivePreviewUrl(v.url)}" allowfullscreen></iframe>`;
+
+      if (emptyPrompt) emptyPrompt.style.display = 'none';
+      if (playerLayout) playerLayout.style.display = 'grid';
+
+      const vids = mediaDatabase.filter(m => m.type === 'drive_video' && canUserAccessMedia(m) && isForClass(m, selectedClassId));
+      renderMediaSessionToolbar('videoSessionToolbar', vids, currentVidFilter, 'video', selectedClassId);
+      const filtered = vids.filter(v => mediaInSelectedSession(v, currentVidFilter, selectedClassId));
+
+      if (!filtered.length) {
+        player.innerHTML = '<div style="padding:40px 20px;color:#fff;text-align:center;">Lớp / buổi học này hiện chưa có video bài giảng.</div>';
+        playlist.innerHTML = '<div class="notice">Chưa có video nào trong lớp này.</div>';
+        setElText('currentVideoTitle', 'Chưa có video');
+        setElText('currentVideoNote', '');
+        setElText('currentVideoSessionBadge', 'Chuyên đề');
+        document.getElementById('btnOpenExternalVideo').style.display = 'none';
+        return;
+      }
+
+      const loadVid = (v) => {
+        if (!v) return;
+        setElText('currentVideoTitle', v.title);
+        setElText('currentVideoNote', `${v.note || 'Video bài giảng chính thức.'}${v.deadline ? ` • Hạn: ${formatDeadline(v.deadline)}` : ''}`);
+        setElText('currentVideoSessionBadge', sessionTitleForMedia(v, selectedClassId));
+        document.getElementById('btnOpenExternalVideo').href = v.url;
+        document.getElementById('btnOpenExternalVideo').style.display = 'inline-flex';
+        player.innerHTML = `<iframe src="${convertToDrivePreviewUrl(v.url)}" allowfullscreen></iframe>`;
       };
       loadVid(filtered[0]);
-      playlist.innerHTML=filtered.map(v=>`<div class="playlist-item" style="padding:12px;border:1px solid #e7eee9;background:#fbfdfb;border-radius:12px;cursor:pointer;" onclick="loadDriveVideoPlayer('${escapeHTML(v.id)}')">
-        <div><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(sessionTitleForMedia(v))}</span></div>
+      playlist.innerHTML = filtered.map(v => `<div class="playlist-item" style="padding:12px;border:1px solid #e7eee9;background:#fbfdfb;border-radius:12px;cursor:pointer;" onclick="loadDriveVideoPlayer('${escapeHTML(v.id)}')">
+        <div><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(sessionTitleForMedia(v, selectedClassId))}</span></div>
         <b style="font-size:13px;display:block;margin-top:4px;color:#183d2e;">${escapeHTML(v.title)}</b>
-        ${v.deadline?`<div style="font-size:10px;color:#b45309;margin-top:5px;">⏰ ${escapeHTML(formatDeadline(v.deadline))}</div>`:''}</div>`).join('');
-      window.loadDriveVideoPlayer=(id)=>loadVid(filtered.find(v=>v.id===id));
+        ${v.deadline ? `<div style="font-size:10px;color:#b45309;margin-top:5px;">⏰ ${escapeHTML(formatDeadline(v.deadline))}</div>` : ''}</div>`).join('');
+      window.loadDriveVideoPlayer = (id) => loadVid(filtered.find(v => v.id === id));
     }
+
     function initDocumentsView() {
-      const docs=mediaDatabase.filter(m=>m.type==='drive_doc' && canUserAccessMedia(m));
-      renderMediaSessionToolbar('docSessionToolbar',docs,currentDocFilter,'doc');
-      const filtered=docs.filter(m=>mediaInSelectedSession(m,currentDocFilter));
-      const container=document.getElementById('docCardsContainer');
-      if (!currentUser?.classId && currentUser?.role!=='admin') {
-        container.innerHTML='<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Bạn chưa được xếp vào lớp học để xem tài liệu.</div>';return;
+      const container = document.getElementById('docCardsContainer');
+      const accessibleClasses = getUserAccessibleClasses();
+      if (!accessibleClasses.length && currentUser?.role !== 'admin') {
+        document.getElementById('docClassToolbar').innerHTML = '<div class="notice" style="width:100%;">Bạn chưa được thêm vào lớp học nào.</div>';
+        document.getElementById('docSessionToolbar').innerHTML = '';
+        container.innerHTML = '<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Tài khoản của bạn chưa được thêm vào lớp học nào để xem tài liệu.</div>';
+        return;
       }
-      if (!filtered.length) {container.innerHTML='<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Buổi này chưa có tài liệu.</div>';return;}
-      container.innerHTML=filtered.map(doc=>`<div class="card"><div class="card-top"><div class="file-icon">📄</div><span class="tag session-badge">${escapeHTML(sessionTitleForMedia(doc))}</span></div>
-        <h3>${escapeHTML(doc.title)}</h3><p>${escapeHTML(doc.note||'Tài liệu học tập chuẩn.')}</p>
+
+      const selectedClassId = renderMediaClassToolbar('docClassToolbar', currentDocClassFilter, 'drive_doc');
+      if (!selectedClassId) {
+        document.getElementById('docSessionToolbar').innerHTML = '';
+        container.innerHTML = `
+          <div class="empty-class-prompt" style="grid-column:1/-1;">
+            <i class="fa-solid fa-folder-tree"></i>
+            <h3>Vui lòng chọn một lớp học ở phía trên</h3>
+            <p>Tài liệu và đề cương sẽ chỉ hiển thị theo đúng lớp bạn chọn để danh sách luôn gọn gàng, không bị chồng chéo.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const docs = mediaDatabase.filter(m => m.type === 'drive_doc' && canUserAccessMedia(m) && isForClass(m, selectedClassId));
+      renderMediaSessionToolbar('docSessionToolbar', docs, currentDocFilter, 'doc', selectedClassId);
+      const filtered = docs.filter(m => mediaInSelectedSession(m, currentDocFilter, selectedClassId));
+
+      if (!filtered.length) {
+        container.innerHTML = '<div class="notice" style="grid-column:1/-1;text-align:center;padding:24px;">Lớp / buổi học này hiện chưa có tài liệu nào.</div>';
+        return;
+      }
+      container.innerHTML = filtered.map(doc => `<div class="card"><div class="card-top"><div class="file-icon">📄</div><span class="tag session-badge">${escapeHTML(sessionTitleForMedia(doc, selectedClassId))}</span></div>
+        <h3>${escapeHTML(doc.title)}</h3><p>${escapeHTML(doc.note || 'Tài liệu học tập chuẩn.')}</p>
         ${getDeadlineBadgeHTML(doc.deadline)}<div class="card-foot"><span class="tag status-class">Word / PPTX / PDF</span>
         <button class="primary" style="padding:6px 12px;font-size:11.5px;" onclick="openDocViewer('${escapeHTML(doc.url)}', '${escapeHTML(doc.title)}')">👁️ Xem tài liệu</button></div></div>`).join('');
     }
@@ -4620,7 +5996,7 @@
     }
     function validateSessionAllocation(pickerId, hostId) {
       const classIds = selectedConcreteClasses(pickerId);
-      if (!classIds.length) {alert('Bạn chưa có lớp để phân phối. Hãy tạo và chọn lớp trước.');return null;}
+      if (!classIds.length) {safeAlert('Bạn chưa có lớp để phân phối. Hãy tạo và chọn lớp trước.');return null;}
       const host = document.getElementById(hostId);
       let map = {};
       try {map = JSON.parse(host.dataset.sessionMap || '{}');}catch(_){}
@@ -4630,7 +6006,7 @@
         const ses = sessionDatabase.find(s=>s.id===sid);
         if (!ses || (ses.classId && String(ses.classId)!==cid)) {
           const name = classDatabase.find(c=>String(c.id)===cid)?.name || cid;
-          alert(`Vui lòng chọn buổi học hợp lệ cho lớp: ${name}`);
+          safeAlert(`Vui lòng chọn buổi học hợp lệ cho lớp: ${name}`);
           host.querySelector(`[data-session-class="${CSS.escape(cid)}"]`)?.focus();
           return null;
         }
@@ -4696,8 +6072,8 @@
       const sessionId = classSessionIds[classIds[0]];
       const title = document.getElementById('mediaTitle').value.trim();
       const url = document.getElementById('mediaUrl').value.trim();
-      if (!classIds.length) return alert('Chọn ít nhất một lớp cho học liệu.');
-      if (!title || !url) return alert('Vui lòng nhập tiêu đề và đường dẫn học liệu.');
+      if (!classIds.length) return safeAlert('Chọn ít nhất một lớp cho học liệu.');
+      if (!title || !url) return safeAlert('Vui lòng nhập tiêu đề và đường dẫn học liệu.');
       const sesObj = sessionDatabase.find(s => s.id === sessionId);
       const newMedia = {
         id: 'med_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
@@ -4725,7 +6101,7 @@
 
     function openEditMediaModal(id) {
       const item = mediaDatabase.find(m=>m.id===id);
-      if (!item) return alert('Học liệu không còn tồn tại.');
+      if (!item) return safeAlert('Học liệu không còn tồn tại.');
       document.getElementById('editMediaId').value = item.id;
       document.getElementById('editMediaTitle').value = item.title || '';
       document.getElementById('editMediaType').value = item.type || 'drive_doc';
@@ -4752,7 +6128,7 @@
       const classIds = Object.keys(classSessionIds);
       const sessionId = classSessionIds[classIds[0]];
       const ses = sessionDatabase.find(s=>s.id===sessionId);
-      if (!ses) return alert('Buổi học đã bị xóa, vui lòng chọn lại.');
+      if (!ses) return safeAlert('Buổi học đã bị xóa, vui lòng chọn lại.');
       const patch = {
         classId: classIds[0], classIds,
         sessionId, sessionName: ses.title, classSessionIds,
@@ -4763,7 +6139,7 @@
         deadline: document.getElementById('editMediaDeadline').value || '',
         updatedAt: new Date().toISOString()
       };
-      if (!patch.title || !patch.url) return alert('Tiêu đề và đường dẫn không thể để trống.');
+      if (!patch.title || !patch.url) return safeAlert('Tiêu đề và đường dẫn không thể để trống.');
       const btn = document.getElementById('btnSaveEditedMedia');
       btn.disabled = true;
       try {
@@ -4782,7 +6158,7 @@
     }
 
     async function handleDeleteMedia(id) {
-      if (!confirm('Xóa học liệu này khỏi tất cả các lớp?')) return;
+      if (!safeConfirm('Xóa học liệu này khỏi tất cả các lớp?')) return;
       try {
         await commitRtdbList('media', rows=>rows.filter(m=>m.id!==id));
         showToast('Đã xóa học liệu.');
@@ -4806,9 +6182,9 @@
       e.preventDefault();
       const title = document.getElementById('newSessionTitle').value.trim();
       const classId = document.getElementById('sessionManagerClassSelect').value;
-      if (!classDatabase.some(c=>String(c.id)===classId)) return alert('Hãy chọn một lớp trước khi tạo buổi học.');
+      if (!classDatabase.some(c=>String(c.id)===classId)) return safeAlert('Hãy chọn một lớp trước khi tạo buổi học.');
       if (!title) return;
-      if (classSessions(classId).some(s=>s.title.toLocaleLowerCase('vi') === title.toLocaleLowerCase('vi'))) return alert('Lớp này đã có buổi trùng tên.');
+      if (classSessions(classId).some(s=>s.title.toLocaleLowerCase('vi') === title.toLocaleLowerCase('vi'))) return safeAlert('Lớp này đã có buổi trùng tên.');
       const btn = e.target.querySelector('[type=submit]');
       btn.disabled = true;
       try {
@@ -4855,7 +6231,7 @@
     async function migrateLegacySessions() {
       const legacy = sessionDatabase.filter(s=>!s.classId);
       if (!legacy.length) return;
-      if (!classDatabase.length) return alert('Bạn cần tạo lớp trước khi chuyển buổi cũ.');
+      if (!classDatabase.length) return safeAlert('Bạn cần tạo lớp trước khi chuyển buổi cũ.');
       const scope = {};
       // Chỉ nhân bản những buổi cũ đang được học liệu sử dụng. Buổi chưa có tài liệu vẫn nằm trong nhóm dữ liệu cũ để gán sau.
       legacy.forEach(s=>{
@@ -4867,8 +6243,8 @@
         if (usedClasses.size) scope[s.id]=[...usedClasses];
       });
       const count = Object.values(scope).reduce((n,ids)=>n+ids.length,0);
-      if (!count) return alert('Những buổi cũ chưa được học liệu sử dụng. Bạn có thể tạo buổi mới cho từng lớp; không tự chuyển dữ liệu không xác định lớp.');
-      if (!confirm(`Chuyển ${Object.keys(scope).length} buổi cũ thành ${count} buổi độc lập theo các lớp đang sử dụng? Học liệu đã đăng sẽ được cập nhật phân phối tương ứng; buổi cũ được giữ lại làm bản dự phòng.`)) return;
+      if (!count) return safeAlert('Những buổi cũ chưa được học liệu sử dụng. Bạn có thể tạo buổi mới cho từng lớp; không tự chuyển dữ liệu không xác định lớp.');
+      if (!safeConfirm(`Chuyển ${Object.keys(scope).length} buổi cũ thành ${count} buổi độc lập theo các lớp đang sử dụng? Học liệu đã đăng sẽ được cập nhật phân phối tương ứng; buổi cũ được giữ lại làm bản dự phòng.`)) return;
       const lookup = {};
       const clones = [];
       for(const oldId of Object.keys(scope)) {
@@ -4911,7 +6287,7 @@
     function openEditCatalogModal(kind,id) {
       const data = kind==='class' ? classDatabase : sessionDatabase;
       const obj = data.find(x=>x.id===id);
-      if (!obj) return alert('Không tìm thấy mục này.');
+      if (!obj) return safeAlert('Không tìm thấy mục này.');
       document.getElementById('editCatalogKind').value = kind;
       document.getElementById('editCatalogId').value = id;
       document.getElementById('editCatalogHeading').textContent = kind==='class'?'✏️ Đổi tên lớp học':'✏️ Đổi tên buổi học';
@@ -4943,18 +6319,18 @@
     }
     async function handleDeleteSession(id) {
       const used = mediaDatabase.filter(m=>m.sessionId===id || Object.values(m.classSessionIds||{}).includes(id));
-      if (used.length) return alert(`Buổi học đang chứa ${used.length} học liệu. Hãy chuyển các học liệu sang buổi khác trước khi xóa.`);
-      if (!confirm('Xóa buổi học này?')) return;
+      if (used.length) return safeAlert(`Buổi học đang chứa ${used.length} học liệu. Hãy chuyển các học liệu sang buổi khác trước khi xóa.`);
+      if (!safeConfirm('Xóa buổi học này?')) return;
       try { await commitRtdbList('sessions',rows=>rows.filter(s=>s.id!==id)); openSessionManagerModal(lastSessionManagerClassId); renderAdminClassDashboard(); }
       catch(err){presentStorageError(err);}
     }
     async function handleDeleteClass(id) {
-      const members = userDatabase.filter(u=>u.classId===id);
+      const members = userDatabase.filter(u => u && u.role !== 'admin' && isUserInClass(u, id));
       const media = mediaDatabase.filter(m=>getAssignedClassIds(m).includes(id));
       const exams = examsList.filter(e=>getAssignedClassIds(e,true).includes(id));
       const sessions = classSessions(id);
-      if (members.length || media.length || exams.length || sessions.length) return alert(`Lớp vẫn đang được sử dụng (${members.length} học viên, ${media.length} học liệu, ${exams.length} đề thi, ${sessions.length} buổi học). Hãy chuyển hoặc xóa các mục liên quan trước khi xóa lớp.`);
-      if (!confirm('Xóa lớp này vĩnh viễn?')) return;
+      if (members.length || media.length || exams.length || sessions.length) return safeAlert(`Lớp vẫn đang được sử dụng (${members.length} học viên, ${media.length} học liệu, ${exams.length} đề thi, ${sessions.length} buổi học). Hãy chuyển hoặc xóa các mục liên quan trước khi xóa lớp.`);
+      if (!safeConfirm('Xóa lớp này vĩnh viễn?')) return;
       try { await commitRtdbList('classes',rows=>rows.filter(c=>c.id!==id)); openClassManagerModal(); renderAdminClassDashboard(); }
       catch(err){presentStorageError(err);}
     }
@@ -4984,7 +6360,7 @@
       const u = userDatabase.find(x => x.id === userId);
       if(u) {
         u.status = 'approved';
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+        safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
         rtdb.ref('/users').set(userDatabase);
         showToast(`Đã duyệt @${u.username}`);
         renderAdminClassDashboard();
@@ -5011,13 +6387,13 @@
 
     function addNewNote() {
       const val = document.getElementById('newNoteContent').value.trim();
-      if(!val) return alert("Vui lòng nhập nội dung ghi chú!");
+      if(!val) return safeAlert("Vui lòng nhập nội dung ghi chú!");
       notesDatabase.unshift({
         id: "note_" + Date.now(),
         content: val,
         time: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + " - " + new Date().toLocaleDateString('vi-VN')
       });
-      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesDatabase));
+      safeStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesDatabase));
       document.getElementById('newNoteContent').value = "";
       renderNotesView();
       showToast("Đã lưu ghi chú!");
@@ -5025,7 +6401,7 @@
 
     function deleteNote(id) {
       notesDatabase = notesDatabase.filter(n => n.id !== id);
-      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesDatabase));
+      safeStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesDatabase));
       renderNotesView();
     }
 
@@ -5052,29 +6428,29 @@
         userDatabase[idx].fullName = currentUser.fullName;
         userDatabase[idx].bio = currentUser.bio;
         userDatabase[idx].avatar = currentUser.avatar;
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+        safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
         rtdb.ref('/users').set(userDatabase);
       }
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+      safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
       updateUserUI(); 
       showToast("Đã lưu thông tin hồ sơ!");
     }
     
     function handleChangePassword(e) {
       e.preventDefault();
-      if(document.getElementById('pwdOld').value !== currentUser.password) return alert("Mật khẩu cũ không chính xác!");
-      if(document.getElementById('pwdNew').value !== document.getElementById('pwdConfirm').value) return alert("Mật khẩu mới không khớp!");
+      if(document.getElementById('pwdOld').value !== currentUser.password) return safeAlert("Mật khẩu cũ không chính xác!");
+      if(document.getElementById('pwdNew').value !== document.getElementById('pwdConfirm').value) return safeAlert("Mật khẩu mới không khớp!");
       currentUser.password = document.getElementById('pwdNew').value;
       userDatabase.find(u=>u.id===currentUser.id).password = currentUser.password;
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
+      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
       rtdb.ref('/users').set(userDatabase);
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+      safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
       e.target.reset(); 
       showToast("Đổi mật khẩu thành công!");
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
+      if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
       checkAuthSession();
     });
   </script>
