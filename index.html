@@ -2316,15 +2316,38 @@
     const _memoryStore = {};
     const safeStorage = {
       getItem(k) {
-        try { return window.safeStorage.getItem(k); } catch (e) { return Object.prototype.hasOwnProperty.call(_memoryStore, k) ? _memoryStore[k] : null; }
+        try {
+          const val = window.localStorage.getItem(k);
+          if (val !== null) return val;
+        } catch (e) {}
+        try {
+          const sVal = window.sessionStorage.getItem(k);
+          if (sVal !== null) return sVal;
+        } catch (e) {}
+        return Object.prototype.hasOwnProperty.call(_memoryStore, k) ? _memoryStore[k] : null;
       },
       setItem(k, v) {
-        try { window.safeStorage.setItem(k, String(v)); } catch (e) { _memoryStore[k] = String(v); }
+        const str = String(v);
+        _memoryStore[k] = str;
+        try { window.localStorage.setItem(k, str); } catch (e) {}
+        try { window.sessionStorage.setItem(k, str); } catch (e) {}
       },
       removeItem(k) {
-        try { window.safeStorage.removeItem(k); } catch (e) { delete _memoryStore[k]; }
+        delete _memoryStore[k];
+        try { window.localStorage.removeItem(k); } catch (e) {}
+        try { window.sessionStorage.removeItem(k); } catch (e) {}
       }
     };
+
+    function safeParseJSON(raw, fallback) {
+      if (!raw) return fallback;
+      try {
+        const parsed = JSON.parse(raw);
+        return parsed !== null && parsed !== undefined ? parsed : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
 
     function showAuthNotice(msg, isSuccess = false) {
       const box = document.getElementById('authNoticeBox');
@@ -2340,12 +2363,7 @@
 
     
     function safeConfirm(msg) {
-      try {
-        if (window.parent !== window) return true;
-        return window.safeConfirm(msg);
-      } catch (e) {
-        return true;
-      }
+      return true;
     }
 
     function safeAlert(msg) {
@@ -2395,17 +2413,18 @@
     let liveOnlineStatus = {};
 
     /* ================= STATE GỐC ================= */
-    let userDatabase = mergeDefaultAdmins(JSON.parse(safeStorage.getItem(AUTH_STORAGE_KEY) || "null"));
-    let classDatabase = JSON.parse(safeStorage.getItem(CLASSES_STORAGE_KEY)) || [{ id: "cls_a1", name: "Lớp Sinh Học Chuyên Sâu - BioBling 2B" }];
-    let sessionDatabase = JSON.parse(safeStorage.getItem(SESSIONS_STORAGE_KEY)) || [
+    const ACTIVE_PAGE_STORAGE_KEY = "atelier_active_page_v9";
+    let userDatabase = mergeDefaultAdmins(safeParseJSON(safeStorage.getItem(AUTH_STORAGE_KEY), null));
+    let classDatabase = safeParseJSON(safeStorage.getItem(CLASSES_STORAGE_KEY), [{ id: "cls_a1", name: "Lớp Sinh Học Chuyên Sâu - BioBling 2B" }]);
+    let sessionDatabase = safeParseJSON(safeStorage.getItem(SESSIONS_STORAGE_KEY), [
       { id: "ses_1", title: "Chuyên đề 01: Cơ sở vật chất & Cơ chế di truyền ADN" },
       { id: "ses_2", title: "Chuyên đề 02: Phiên mã, Dịch mã & Điều hòa hoạt động Gen" }
-    ];
-    let mediaDatabase = JSON.parse(safeStorage.getItem(MEDIA_STORAGE_KEY)) || [];
-    let currentUser = JSON.parse(safeStorage.getItem(SESSION_STORAGE_KEY)) || null;
-    let notesDatabase = JSON.parse(safeStorage.getItem(NOTES_STORAGE_KEY)) || [
+    ]);
+    let mediaDatabase = safeParseJSON(safeStorage.getItem(MEDIA_STORAGE_KEY), []);
+    let currentUser = safeParseJSON(safeStorage.getItem(SESSION_STORAGE_KEY), null);
+    let notesDatabase = safeParseJSON(safeStorage.getItem(NOTES_STORAGE_KEY), [
       { id: "note_1", content: "Nguyên tắc bổ sung trong phân tử ADN: A-T (2 liên kết hydro), G-X (3 liên kết hydro).", time: "10:15 - 01/10/2026" }
-    ];
+    ]);
 
     /* ================= STATE PHÒNG KHẢO THÍ ================= */
     let examsList = [];
@@ -2491,7 +2510,10 @@
         safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
         
         if (currentUser) {
-          const fresh = userDatabase.find(u => u.id === currentUser.id);
+          const fresh = userDatabase.find(u => u && (
+            String(u.id) === String(currentUser.id) ||
+            String(u.username || '').toLowerCase() === String(currentUser.username || '').toLowerCase()
+          ));
           if (fresh) {
             currentUser = fresh;
             safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
@@ -2501,14 +2523,17 @@
       } else if (userDatabase && userDatabase.length > 0) {
         rtdb.ref('/users').set(userDatabase);
       }
+      const activePageId = document.querySelector('.page.active')?.id;
+      if (activePageId === 'my_class') renderClassMembersView(currentClassViewId);
+      if (activePageId === 'create_admin') renderSuperAdminView();
+      if (activePageId === 'class_admin') renderAdminClassDashboard();
     });
 
     rtdb.ref('/status').on('value', (snapshot) => {
       liveOnlineStatus = snapshot.val() || {};
       const activePage = document.querySelector('.page.active');
       if (activePage && activePage.id === 'my_class') {
-        const sel = document.getElementById('adminSelectClassView');
-        renderClassMembersView(sel ? sel.value : (currentUser ? currentUser.classId : 'all_users'));
+        renderClassMembersView(currentClassViewId);
       }
     });
 
@@ -2858,6 +2883,10 @@
 
     function navigateTo(pageId) {
       closeClassPicker();
+      if (!document.getElementById(pageId)) pageId = 'dashboard';
+      if (pageId === 'class_admin' && (!currentUser || currentUser.role !== 'admin')) pageId = 'dashboard';
+      if (pageId === 'create_admin' && !isSuperAdmin()) pageId = 'dashboard';
+      safeStorage.setItem(ACTIVE_PAGE_STORAGE_KEY, pageId);
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       const targetPage = document.getElementById(pageId);
       if (targetPage) targetPage.classList.add('active');
@@ -4691,13 +4720,20 @@
     }
 
     function checkAuthSession() {
+      if (!currentUser) {
+        const savedSession = safeParseJSON(safeStorage.getItem(SESSION_STORAGE_KEY), null);
+        if (savedSession && savedSession.username) {
+          currentUser = savedSession;
+        }
+      }
       if (!currentUser) { 
         document.getElementById('authOverlay').style.display = 'grid'; 
       } else { 
         document.getElementById('authOverlay').style.display = 'none'; 
         setupLivePresence(currentUser);
         updateUserUI(); 
-        navigateTo('dashboard'); 
+        const lastPage = safeStorage.getItem(ACTIVE_PAGE_STORAGE_KEY) || 'dashboard';
+        navigateTo(lastPage); 
       }
     }
 
@@ -4817,7 +4853,10 @@
     function updateUserUI() {
       if (!currentUser) return;
 
-      const freshUser = userDatabase.find(u => u.id === currentUser.id);
+      const freshUser = userDatabase.find(u => u && (
+        String(u.id) === String(currentUser.id) ||
+        String(u.username || '').toLowerCase() === String(currentUser.username || '').toLowerCase()
+      ));
       if (freshUser) {
         currentUser = freshUser;
         safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
