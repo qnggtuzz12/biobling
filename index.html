@@ -709,6 +709,7 @@
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(4px);
       padding: 0;
+      z-index: 100020 !important;
     }
     .doc-viewer-box {
       width: 95vw;
@@ -2117,6 +2118,286 @@
       letter-spacing: 0.04em;
     }
 
+    
+    /* V15 • Ký hiệu câu bỏ trống khi chấm, Sửa đáp án trực tiếp khi xem bài, Giám sát Live 1:1 & Tự động Toàn màn hình */
+    .unanswered-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px dashed #fdba74;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .correct-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .wrong-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .admin-key-edit-banner {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 1.5px solid #f59e0b;
+      color: #92400e;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      line-height: 1.45;
+    }
+
+    /* Floating Live Mentor Chat Box inside Exam Room */
+    .live-mentor-chat-widget {
+      border-top: 1px solid #cbd5e1;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      max-height: 215px;
+      transition: max-height .2s ease;
+    }
+    .live-mentor-chat-widget.minimized {
+      max-height: 38px;
+      overflow: hidden;
+    }
+    .live-mentor-chat-head {
+      background: #1e3a8a;
+      color: #fff;
+      padding: 7px 12px;
+      font-size: 11.5px;
+      font-weight: 750;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .live-mentor-chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 95px;
+      max-height: 125px;
+      background: #fff;
+    }
+    .live-chat-bubble {
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 11.5px;
+      line-height: 1.4;
+      max-width: 92%;
+      word-break: break-word;
+    }
+    .live-chat-bubble.from-mentor {
+      align-self: flex-start;
+      background: #eff6ff;
+      color: #1e3a8a;
+      border: 1px solid #bfdbfe;
+    }
+    .live-chat-bubble.from-student {
+      align-self: flex-end;
+      background: #dcfce7;
+      color: #14532d;
+      border: 1px solid #bbf7d0;
+    }
+
+    /* Live 1:1 Proctoring Modal Grid */
+    .proctor-layout {
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      gap: 16px;
+      min-height: 470px;
+      max-height: 74vh;
+    }
+    .proctor-student-list {
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: #f8fafc;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .proctor-student-item {
+      background: #fff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 11px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .proctor-student-item:hover {
+      border-color: #60a5fa;
+    }
+    .proctor-student-item.active {
+      background: #eff6ff;
+      border-color: #2563eb;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, .12);
+    }
+    .proctor-detail-pane {
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    /* V16 • Tín hiệu chạy ngang (Signal Ticker), Thả Emote bay lên, Xem Live 1:1 (cả Đề + Phiếu) & Giám sát Đa Tài Khoản (Multi-Account Wall) */
+    @keyframes slideInSignalBanner {
+      0% { opacity: 0; transform: translate(-50%, -24px) scale(0.92); }
+      12% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      85% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -18px) scale(0.95); }
+    }
+    @keyframes floatUpEmote {
+      0% { opacity: 0; transform: translateY(20px) scale(0.6); }
+      18% { opacity: 1; transform: translateY(0) scale(1.18); }
+      100% { opacity: 0; transform: translateY(-220px) scale(0.95) rotate(12deg); }
+    }
+    .mentor-signal-banner-stream {
+      position: fixed;
+      top: 64px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100005;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: min(92vw, 620px);
+    }
+    .mentor-signal-toast {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(30, 58, 138, 0.94) 100%);
+      color: #fff;
+      border: 1.5px solid #60a5fa;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.35);
+      border-radius: 99px;
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 750;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideInSignalBanner 5.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      backdrop-filter: blur(8px);
+    }
+    .mentor-emote-burst-item {
+      position: fixed;
+      bottom: 42px;
+      z-index: 100006;
+      font-size: 38px;
+      pointer-events: none;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.22));
+      animation: floatUpEmote 2.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Thanh điều khiển gửi Tín hiệu & Emote khi Admin đang Xem Live 1:1 trực tiếp trong phòng thi */
+    .admin-spectator-control-bar {
+      background: linear-gradient(90deg, #0f172a 0%, #1e3a8a 100%);
+      color: #fff;
+      padding: 8px 16px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #3b82f6;
+      z-index: 19;
+    }
+    .emote-quick-btn {
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border-radius: 99px;
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: all .15s ease;
+    }
+    .emote-quick-btn:hover {
+      background: rgba(255,255,255,0.24);
+      transform: translateY(-1px) scale(1.06);
+    }
+
+    /* Lưới Giám Sát Nhiều Tài Khoản Cùng Lúc (Multi-Account Live Exam Wall) */
+    .proctor-multi-wall-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+      gap: 14px;
+      max-height: 68vh;
+      overflow-y: auto;
+      padding: 4px;
+    }
+    .proctor-wall-card {
+      background: #fff;
+      border: 1.5px solid #dbe4f0;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .proctor-wall-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.12);
+      border-color: #93c5fd;
+    }
+    .wall-mini-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 8px;
+      max-height: 112px;
+      overflow-y: auto;
+    }
+    .wall-mini-cell {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+    .wall-mini-cell.c-blank { background: #fff7ed; color: #c2410c; border: 1px dashed #fdba74; }
+    .wall-mini-cell.c-ok    { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .wall-mini-cell.c-err   { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+    @media(max-width: 820px) {
+      .proctor-layout { grid-template-columns: 1fr; }
+    }
+
     /* V8 • Lịch sử lượt làm và phân tích câu hỏi */
     .exam-v8-switch { display:flex;flex-wrap:wrap;gap:7px;margin:12px 0; }
     .exam-v8-switch button { border:1px solid #d7e8df;background:white;color:#476653;border-radius:10px;padding:9px 12px;font-size:12px;font-weight:750; }
@@ -2589,14 +2870,19 @@
               <h1>Phòng Khảo Thí & Đề Thi Sinh Học Chuẩn Hóa</h1>
               <p>Hệ thống thi thử, đề cương và luyện trắc nghiệm (chuẩn Bộ GD&ĐT: Trắc nghiệm 4 lựa chọn, Đúng/Sai, Trả lời ngắn).</p>
             </div>
-            <div id="adminExamBtnContainer" style="display:none;">
-              <div style="display:flex; gap:8px;">
-                <button onclick="openAdminScoreboardModal()" class="secondary" style="color:#1e40af; border-color:#bfdbfe; background:#eff6ff;">
-                  <i class="fa-solid fa-chart-simple"></i> Bảng Điểm Học Viên
-                </button>
-                <button onclick="openCreateExamModal()" class="primary">
-                  <i class="fa-solid fa-circle-plus"></i> Thêm Đề Thi Mới
-                </button>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <div id="adminExamBtnContainer" style="display:none;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <button type="button" onclick="openLiveProctorModal()" class="secondary" style="color:#be123c; border-color:#fecdd3; background:#fff1f2;">
+                    <span class="status-dot status-online" style="background:#e11d48;"></span> Phòng Giám Sát Thi Live (<span id="liveProctorActiveCount">0</span> đang thi)
+                  </button>
+                  <button onclick="openAdminScoreboardModal()" class="secondary" style="color:#1e40af; border-color:#bfdbfe; background:#eff6ff;">
+                    <i class="fa-solid fa-chart-simple"></i> Bảng Điểm Học Viên
+                  </button>
+                  <button onclick="openCreateExamModal()" class="primary">
+                    <i class="fa-solid fa-circle-plus"></i> Thêm Đề Thi Mới
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -3267,6 +3553,53 @@
     </div>
   </div>
 
+  <!-- ================= MODAL GIÁM SÁT PHÒNG THI ĐA TÀI KHOẢN & VÀO XEM LIVE 1:1 (ADMIN) ================= -->
+  <div id="liveProctorModal" class="modal-wrap">
+    <div class="modal-box" style="width:min(100%, 1120px); max-height:92vh; padding:22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:12px; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:40px; height:40px; border-radius:12px; background:#fff1f2; color:#e11d48; display:grid; place-items:center; font-size:19px;">
+            <i class="fa-solid fa-tower-broadcast"></i>
+          </div>
+          <div>
+            <h2 style="margin:0; font-size:18px; color:#183d2e;">Trung Tâm Giám Sát Phòng Thi Live (Đa Tài Khoản & 1:1)</h2>
+            <p style="margin:0; font-size:11.5px; color:#64748b;">Quan sát nhiều tài khoản làm bài cùng lúc, thả Emote / phát tín hiệu chạy ngang màn hình hoặc bấm vào xem trực tiếp Đề + Phiếu làm bài của từng học viên.</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <select id="proctorExamFilterSelect" onchange="renderLiveProctorModalContent()" style="padding:7px 11px; border-radius:9px; border:1px solid #cbd5e1; font-size:12px; font-weight:650; color:#1e293b;">
+            <option value="all">📑 Tất cả đề đang thi</option>
+          </select>
+          <button type="button" class="secondary" onclick="clearFinishedLiveSessions()" style="font-size:11.5px; padding:7px 11px;" title="Dọn các phiên đã nộp xong khỏi màn hình giám sát">
+            🧹 Dọn phiên đã nộp
+          </button>
+          <button type="button" class="secondary" onclick="closeLiveProctorModal()">Đóng ✕</button>
+        </div>
+      </div>
+
+      <!-- Thanh Phát Tín Hiệu / Thả Emote Đồng Loạt Cho Toàn Phòng Thi -->
+      <div style="background:linear-gradient(90deg, #eff6ff 0%, #f0fdf4 100%); border:1px solid #bfdbfe; border-radius:13px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <strong style="font-size:12px; color:#1e3a8a;"><i class="fa-solid fa-bullhorn"></i> Phát tín hiệu toàn phòng thi:</strong>
+          <button type="button" class="pill" style="padding:4px 9px; font-size:11.5px;" onclick="broadcastSignalToAllActive('🔥', 'emote')">🔥 Thả lửa</button>
+          <button type="button" class="pill" style="padding:4px 9px; font-size:11.5px;" onclick="broadcastSignalToAllActive('👏', 'emote')">👏 Vỗ tay</button>
+          <button type="button" class="pill" style="padding:4px 9px; font-size:11.5px;" onclick="broadcastSignalToAllActive('❤️', 'emote')">❤️ Thả tim</button>
+          <button type="button" class="pill" style="padding:4px 9px; font-size:11.5px;" onclick="broadcastSignalToAllActive('⚡ Tăng tốc lên các em ơi!', 'banner')">⚡ Nhắc tăng tốc</button>
+          <button type="button" class="pill" style="padding:4px 9px; font-size:11.5px;" onclick="broadcastSignalToAllActive('👀 Đọc kỹ đề và kiểm tra lại các câu bỏ trống trước khi nộp nhé!', 'banner')">👀 Nhắc rà soát bài</button>
+        </div>
+        <form onsubmit="handleBroadcastCustomSignal(event)" style="display:flex; gap:6px; flex:1; min-width:240px; max-width:380px;">
+          <input type="text" id="inpBroadcastSignalAll" placeholder="Nhập thông báo nhỏ chạy ngang màn hình tất cả HV..." style="flex:1; padding:6px 11px; border:1px solid #93c5fd; border-radius:99px; font-size:12px; background:#fff;">
+          <button type="submit" class="primary" style="padding:6px 13px; border-radius:99px; font-size:11.5px; background:#2563eb; border-color:#2563eb; white-space:nowrap;">
+            Phát tất cả
+          </button>
+        </form>
+      </div>
+
+      <!-- Lưới Giám Sát Nhiều Tài Khoản Cùng Lúc -->
+      <div id="proctorMultiWallContainer" class="proctor-multi-wall-grid"></div>
+    </div>
+  </div>
+
   <!-- ================= MODAL BẢNG THEO DÕI ĐIỂM SỐ (DÀNH RIÊNG CHO ADMIN) ================= -->
   <div id="adminScoreboardModal" class="modal-wrap">
     <div class="modal-box" style="width:min(100%, 820px); max-height:88vh;">
@@ -3338,8 +3671,11 @@
       <h3 style="margin:0 0 10px; font-size:18px; color:#183d2e;">Cảnh Báo Trước Khi Bắt Đầu!</h3>
       <div id="examWarningText" style="font-size:13px; color:#475569; line-height:1.6; margin-bottom:20px; text-align:left;">
       </div>
-      <div style="display:flex; justify-content:center; gap:12px;">
+      <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
         <button type="button" class="secondary" onclick="closeExamWarningModal()">Để sau</button>
+        <button type="button" id="btnResetDraftAndStartNew" class="secondary" style="display:none; color:#b45309; border-color:#fde68a; background:#fffbeb;">
+          🔄 Làm lại từ đầu (Xóa nháp cũ)
+        </button>
         <button type="button" id="btnProceedExam" class="primary" style="background:#2563eb; border-color:#2563eb;">
           🚀 Bắt đầu làm bài ngay
         </button>
@@ -3361,7 +3697,16 @@
         </div>
       </div>
 
-      <div style="display:flex; align-items:center; gap:14px;">
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <button type="button" id="btnAdminInlineKeyEdit" onclick="toggleAdminInlineKeyEditMode()" class="secondary" style="display:none; font-size:11.5px; padding:6px 12px; color:#b45309; border-color:#fde68a; background:#fffbeb;">
+          <i class="fa-solid fa-key"></i> Sửa đáp án toàn đề
+        </button>
+        <button type="button" id="btnSaveInlineKeyChanges" onclick="saveInlineEditedKeysToMasterExam()" class="primary" style="display:none; font-size:11.5px; padding:6px 12px; background:#d97706; border-color:#d97706;">
+          <i class="fa-solid fa-floppy-disk"></i> Lưu đáp án mới & Chấm lại
+        </button>
+        <button type="button" id="btnExamFullscreenNow" onclick="toggleBrowserFullscreenForExam()" class="secondary" style="font-size:11.5px; padding:6px 11px;" title="Bật / Tắt toàn màn hình máy tính">
+          <i class="fa-solid fa-expand"></i> Toàn màn hình
+        </button>
         <a id="btnExamDirectDocs" href="#" target="_blank" class="secondary" style="font-size:11.5px; padding:6px 12px; display:inline-flex; align-items:center; gap:6px;">
           Mở tab mới ↗
         </a>
@@ -3371,6 +3716,40 @@
         <button onclick="confirmExitExam()" class="secondary" style="padding:6px 12px; font-size:11.5px; border-color:#cbd5e1;">
           ✕ Thoát phòng thi
         </button>
+      </div>
+    </div>
+
+    <!-- Luồng hiển thị Tín Hiệu & Emote bay qua màn hình khi Mentor gửi -->
+    <div id="mentorSignalBannerStream" class="mentor-signal-banner-stream" aria-live="polite"></div>
+
+    <!-- Thanh Điều Khiển Giám Sát Trực Tiếp 1:1 (Chỉ hiện khi Mentor đang vào xem Live bài làm của học viên) -->
+    <div id="adminSpectatorControlBar" class="admin-spectator-control-bar">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="background:#e11d48;color:#fff;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:99px;letter-spacing:0.04em;">
+          🔴 ĐANG XEM LIVE 1:1
+        </span>
+        <strong id="spectatorStudentNameLabel" style="font-size:13px;">Học viên: ---</strong>
+        <span id="spectatorLiveScoreLabel" style="font-size:12px;color:#93c5fd;font-weight:700;">Tiến độ: 0/0</span>
+        <button type="button" class="emote-quick-btn" style="font-size:11px;background:rgba(255,255,255,0.16);" onclick="returnToMultiProctorWallFromSpectator()">
+          ⇄ Đổi học viên / Xem nhiều máy
+        </button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:#cbd5e1;font-weight:700;">Thả Emote:</span>
+        <button type="button" class="emote-quick-btn" onclick="sendMentorSignalToTarget(spectatingSessionKey, '🔥', 'emote')" title="Thả lửa khích lệ">🔥</button>
+        <button type="button" class="emote-quick-btn" onclick="sendMentorSignalToTarget(spectatingSessionKey, '👏', 'emote')" title="Vỗ tay khen ngợi">👏</button>
+        <button type="button" class="emote-quick-btn" onclick="sendMentorSignalToTarget(spectatingSessionKey, '❤️', 'emote')" title="Thả tim">❤️</button>
+        <button type="button" class="emote-quick-btn" onclick="sendMentorSignalToTarget(spectatingSessionKey, '⚡', 'emote')" title="Tăng tốc">⚡</button>
+        <button type="button" class="emote-quick-btn" onclick="sendMentorSignalToTarget(spectatingSessionKey, '🎯', 'emote')" title="Chính xác">🎯</button>
+        <button type="button" class="emote-quick-btn" onclick="sendMentorSignalToTarget(spectatingSessionKey, '👀', 'emote')" title="Chú ý kỹ câu này">👀</button>
+
+        <form onsubmit="handleSpectatorSignalSubmit(event)" style="display:inline-flex;gap:5px;margin-left:6px;">
+          <input type="text" id="inpSpectatorSignalText" placeholder="Gửi tín hiệu nhỏ chạy qua màn hình HV..." style="padding:5px 10px;border-radius:99px;border:1px solid #60a5fa;background:rgba(255,255,255,0.95);color:#0f172a;font-size:11.5px;width:230px;">
+          <button type="submit" class="primary" style="padding:5px 12px;border-radius:99px;font-size:11px;background:#2563eb;border-color:#60a5fa;">
+            📡 Phát tín hiệu
+          </button>
+        </form>
       </div>
     </div>
 
@@ -3425,8 +3804,11 @@
           </div>
         </div>
 
-        <div id="examDraftSaveStatus" class="draft-status" role="status" aria-live="polite">🔒 Bài làm được tự động lưu trên thiết bị</div>
+        <div id="examDraftSaveStatus" class="draft-status" role="status" aria-live="polite">🔒 Bài làm được tự động lưu & đồng bộ Live</div>
+        <div id="liveReviewStatsBanner" style="display:none; margin:6px 14px 0; padding:8px 10px; border-radius:9px; background:#f8fafc; border:1px solid #e2e8f0; font-size:11px; color:#334155;"></div>
         <div id="liveAnswerSheetList" style="flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:14px;" class="custom-scrollbar"></div>
+
+
 
         <div style="padding:14px; border-top:1px solid #e2e8f0; background:#f8fafc;">
           <button id="btnLiveSubmitExam" onclick="confirmLiveSubmit()" class="primary" style="width:100%; justify-content:center; padding:12px; font-size:13px; background:#2563eb; border-color:#2563eb;">
@@ -4635,24 +5017,68 @@
           </tbody></table>`;
     }
 
+    function findExamByCodeSafe(examCode) {
+      const clean = String(examCode || '').trim().toLowerCase();
+      return examsList.find(x => x && String(x.code || '').trim().toLowerCase() === clean) || null;
+    }
+
     function openReviewExamDirectly(examCode, targetUserId = null, submissionId = null) {
-      const exam = examsList.find(x => String(x.code) === String(examCode));
-      if (!exam || !currentUser) return safeAlert('Không tìm thấy đề thi hoặc phiên đăng nhập đã hết hạn!');
-      const uid=targetUserId===null ? currentUser.id : targetUserId;
-      // Khi có ID lượt nộp thì dùng CHÍNH XÁC lượt đó, không dùng .find() khiến xem sai lượt.
-      let submission = submissionId ? studentSubmissions.find(s=>String(s.id)===String(submissionId) && String(s.examCode)===String(examCode)) : null;
-      if(!submission && !submissionId) submission = examSubmissionsFor(examCode,uid).slice(-1)[0];
-      if(!submission) return safeAlert('Không tìm thấy bài làm đã nộp!');
-      if(currentUser.role!=='admin' && String(submission.userId)!==String(currentUser.id)) return safeAlert('Bạn không có quyền xem lượt thi của học viên khác.');
-      currentResultSubmissionId=String(submission.id);
-      studentLiveAnswers = JSON.parse(JSON.stringify(submission.answers || {mcq:{},tf:{},sa:{}}));
-      const reviewExam = submission.gradingKeys ? {...exam,
-        mcqKeys: submission.gradingKeys.mcq || {}, tfKeys: submission.gradingKeys.tf || {}, saKeys: submission.gradingKeys.sa || {},
-        rawDocsUrl:submission.rawDocsUrl || exam.rawDocsUrl, embedUrl:submission.embedUrl || exam.embedUrl
-      } : {...exam};
+      if (!currentUser) return safeAlert('Phiên đăng nhập đã hết hạn!');
+      let exam = findExamByCodeSafe(examCode);
+      const uid = targetUserId === null ? currentUser.id : targetUserId;
+
+      // Khi có ID lượt nộp thì dùng CHÍNH XÁC lượt đó
+      let submission = submissionId
+        ? studentSubmissions.find(s => String(s.id) === String(submissionId))
+        : null;
+      if (!submission && !submissionId) {
+        submission = examSubmissionsFor(examCode, uid).slice(-1)[0];
+      }
+      // Nếu là Admin bấm xem đề mà chưa chỉ định học viên, có thể mở ngay chế độ Xem & Sửa đáp án của đề đó
+      if (!submission && currentUser.role === 'admin' && exam) {
+        currentResultSubmissionId = null;
+        isLiveSpectatorMode = false;
+        spectatingSessionKey = '';
+        studentLiveAnswers = { mcq: {}, tf: {}, sa: {} };
+        startExamRoom({ ...exam }, true);
+        return;
+      }
+      if (!submission) return safeAlert('Không tìm thấy bài làm đã nộp!');
+      if (currentUser.role !== 'admin' && String(submission.userId) !== String(currentUser.id)) {
+        return safeAlert('Bạn không có quyền xem lượt thi của học viên khác.');
+      }
+
+      if (!exam) {
+        exam = {
+          code: submission.examCode || examCode,
+          title: submission.examTitle || ('Đề thi ' + examCode),
+          rawDocsUrl: submission.rawDocsUrl || '',
+          embedUrl: submission.embedUrl || '',
+          mcqKeys: (submission.gradingKeys && submission.gradingKeys.mcq) || {},
+          tfKeys: (submission.gradingKeys && submission.gradingKeys.tf) || {},
+          saKeys: (submission.gradingKeys && submission.gradingKeys.sa) || {}
+        };
+      }
+
+      isLiveSpectatorMode = false;
+      spectatingSessionKey = '';
+      currentResultSubmissionId = String(submission.id);
+      studentLiveAnswers = JSON.parse(JSON.stringify(submission.answers || { mcq: {}, tf: {}, sa: {} }));
+
+      // Ưu tiên lấy đáp án mới nhất của đề gốc nếu Admin đã sửa đáp án toàn đề, nếu đề gốc bị xóa mới lấy gradingKeys cũ
+      const masterMcq = Object.keys(exam.mcqKeys || exam.keys || {}).length ? (exam.mcqKeys || exam.keys) : ((submission.gradingKeys && submission.gradingKeys.mcq) || {});
+      const masterTf  = Object.keys(exam.tfKeys || {}).length ? exam.tfKeys : ((submission.gradingKeys && submission.gradingKeys.tf) || {});
+      const masterSa  = Object.keys(exam.saKeys || {}).length ? exam.saKeys : ((submission.gradingKeys && submission.gradingKeys.sa) || {});
+
+      const reviewExam = {
+        ...exam,
+        mcqKeys: JSON.parse(JSON.stringify(masterMcq)),
+        tfKeys: JSON.parse(JSON.stringify(masterTf)),
+        saKeys: JSON.parse(JSON.stringify(masterSa)),
+        rawDocsUrl: exam.rawDocsUrl || submission.rawDocsUrl || '',
+        embedUrl: exam.embedUrl || submission.embedUrl || ''
+      };
       startExamRoom(reviewExam, true);
-      if(!submission.gradingKeys && (!submission.examUpdatedAt || exam.updatedAt!==submission.examUpdatedAt))
-        showToast('Lượt thi cũ chưa lưu đáp án gốc: cần đối chiếu nếu đề đã chỉnh sửa.');
     }
 
     // V9: Lọc đề thi theo từng lớp (chọn lớp nào mới hiện đề của lớp đó; đề gán cho cả 2 lớp sẽ hiện ở cả 2 lớp)
@@ -4719,8 +5145,8 @@
     }
 
     function previewExamDocQuickly(examCode) {
-      const exam = examsList.find(x => String(x.code) === String(examCode));
-      if (!exam) return;
+      const exam = findExamByCodeSafe(examCode);
+      if (!exam) return showToast('Không tìm thấy đề thi này.');
       const rawUrl = exam.rawDocsUrl || exam.embedUrl || '';
       if (!rawUrl) return showToast('Đề thi này chưa có đường dẫn tài liệu.');
       openDocViewer(rawUrl, `Xem đề: ${exam.title} (${exam.code})`);
@@ -4767,7 +5193,399 @@
       }).join('');
     }
 
+    
+    /* ================= HỆ THỐNG GIÁM SÁT ĐA TÀI KHOẢN, XEM LIVE 1:1 (ĐỀ + PHIẾU) & PHÁT TÍN HIỆU / EMOTE ================= */
+    let liveExamsDataMap = {};
+    let spectatingSessionKey = '';
+    let isLiveSpectatorMode = false;
+    let _studentSignalRef = null;
+    let _seenSignalIds = new Set();
+
+    function getLiveExamSessionKey(userId = null, examCode = null) {
+      const uid = userId || (currentUser ? currentUser.id : '');
+      const code = examCode || (activeExam ? activeExam.code : '');
+      if (!uid || !code) return '';
+      return `${String(uid).replace(/[^a-zA-Z0-9_-]/g, '_')}_${String(code).replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+    }
+
+    function syncStudentLiveExamStateToRtdb() {
+      if (!activeExam || isLiveReviewMode || isLiveSpectatorMode || !currentUser) return;
+      const sessionKey = getLiveExamSessionKey();
+      if (!sessionKey) return;
+
+      const mcqKeys = activeExam.mcqKeys || {};
+      const tfKeys = activeExam.tfKeys || {};
+      const saKeys = activeExam.saKeys || {};
+      const totalItems = Object.keys(mcqKeys).length + Object.keys(tfKeys).length + Object.keys(saKeys).length;
+
+      const mcqDone = Object.values(studentLiveAnswers.mcq || {}).filter(Boolean).length;
+      let tfDone = 0;
+      Object.keys(studentLiveAnswers.tf || {}).forEach(k => {
+        if (Object.values(studentLiveAnswers.tf[k] || {}).filter(Boolean).length === 4) tfDone++;
+      });
+      const saDone = Object.values(studentLiveAnswers.sa || {}).filter(v => v && String(v).trim().length > 0).length;
+
+      try {
+        rtdb.ref('/live_exams/' + sessionKey).update({
+          sessionKey,
+          userId: currentUser.id,
+          username: currentUser.username,
+          fullName: currentUser.fullName || currentUser.username,
+          classNames: getUserEnrolledClassNames(currentUser),
+          examCode: activeExam.code,
+          examTitle: activeExam.title,
+          status: 'active',
+          startedAt: activeDraftStartedAt || Date.now(),
+          expiresAt: activeExam.isUnlimited ? null : activeDraftExpiresAt,
+          timeRemainingSec: activeExam.isUnlimited ? null : examTimeRemaining,
+          answeredCount: mcqDone + tfDone + saDone,
+          totalCount: totalItems,
+          answers: JSON.parse(JSON.stringify(studentLiveAnswers)),
+          updatedAt: Date.now()
+        });
+      } catch (e) {}
+    }
+
+    function markStudentLiveExamStatus(newStatus) {
+      if (isLiveSpectatorMode) return;
+      const sessionKey = getLiveExamSessionKey();
+      if (!sessionKey) return;
+      try {
+        rtdb.ref('/live_exams/' + sessionKey).update({
+          status: newStatus,
+          updatedAt: Date.now()
+        });
+      } catch (e) {}
+    }
+
+    // Hiển thị Tín hiệu nhỏ chạy ngang màn hình hoặc Emote bay lên khi Mentor gửi
+    function displayIncomingMentorSignal(sig) {
+      if (!sig) return;
+      if (sig.kind === 'emote') {
+        for (let i = 0; i < 6; i++) {
+          const el = document.createElement('div');
+          el.className = 'mentor-emote-burst-item';
+          el.textContent = sig.content || '🔥';
+          el.style.left = `${22 + Math.random() * 56}vw`;
+          el.style.animationDelay = `${i * 0.11}s`;
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), 2900);
+        }
+      } else {
+        const stream = document.getElementById('mentorSignalBannerStream');
+        if (!stream) return;
+        const item = document.createElement('div');
+        item.className = 'mentor-signal-toast';
+        item.innerHTML = `
+          <span style="background:#2563eb;padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:800;">📡 Tín hiệu từ Mentor ${escapeHTML(sig.senderName || '')}</span>
+          <span>${escapeHTML(sig.content || '')}</span>
+        `;
+        stream.appendChild(item);
+        setTimeout(() => item.remove(), 5300);
+      }
+    }
+
+    function attachStudentLiveMentorChatListener() {
+      detachStudentLiveMentorChatListener();
+      if (isLiveSpectatorMode) return;
+      const sessionKey = getLiveExamSessionKey();
+      if (!sessionKey) return;
+      _seenSignalIds = new Set();
+      let initialLoadDone = false;
+
+      _studentSignalRef = rtdb.ref('/live_exams/' + sessionKey + '/signals');
+      _studentSignalRef.on('value', (snap) => {
+        const raw = snap.val() || {};
+        const entries = Object.entries(raw);
+        if (!initialLoadDone) {
+          entries.forEach(([id]) => _seenSignalIds.add(id));
+          initialLoadDone = true;
+          return;
+        }
+        entries.forEach(([id, sig]) => {
+          if (!_seenSignalIds.has(id)) {
+            _seenSignalIds.add(id);
+            displayIncomingMentorSignal(sig);
+          }
+        });
+      });
+    }
+
+    function detachStudentLiveMentorChatListener() {
+      if (_studentSignalRef) {
+        try { _studentSignalRef.off(); } catch (e) {}
+        _studentSignalRef = null;
+      }
+    }
+
+    // Mentor gửi Tín hiệu hoặc Emote tới 1 học viên
+    function sendMentorSignalToTarget(sessionKey, content, kind = 'banner') {
+      if (!sessionKey || !content || !currentUser) return;
+      try {
+        rtdb.ref('/live_exams/' + sessionKey + '/signals').push({
+          senderName: currentUser.fullName || currentUser.username,
+          kind,
+          content: String(content).trim(),
+          time: Date.now()
+        });
+        showToast(kind === 'emote'
+          ? `Đã thả biểu tượng ${content} tới màn hình học viên!`
+          : `📡 Đã phát tín hiệu chạy qua màn hình học viên!`);
+      } catch (e) {}
+    }
+
+    function sendCustomCardSignal(event, sessionKey) {
+      event.preventDefault();
+      const inp = document.getElementById('inpCardSignal_' + sessionKey);
+      const text = (inp?.value || '').trim();
+      if (!text) return;
+      sendMentorSignalToTarget(sessionKey, text, 'banner');
+      if (inp) inp.value = '';
+    }
+
+    function handleSpectatorSignalSubmit(e) {
+      e.preventDefault();
+      if (!spectatingSessionKey) return;
+      const inp = document.getElementById('inpSpectatorSignalText');
+      const text = (inp?.value || '').trim();
+      if (!text) return;
+      sendMentorSignalToTarget(spectatingSessionKey, text, 'banner');
+      if (inp) inp.value = '';
+    }
+
+    // Phát tín hiệu hoặc thả Emote đồng loạt tới tất cả học viên đang làm bài
+    function broadcastSignalToAllActive(content, kind = 'banner') {
+      const filterExam = document.getElementById('proctorExamFilterSelect')?.value || 'all';
+      const targets = Object.values(liveExamsDataMap).filter(s =>
+        s && s.status === 'active' && (filterExam === 'all' || String(s.examCode) === String(filterExam))
+      );
+      if (!targets.length) return safeAlert('Hiện không có học viên nào đang làm bài để nhận tín hiệu.');
+      targets.forEach(s => {
+        try {
+          rtdb.ref('/live_exams/' + s.sessionKey + '/signals').push({
+            senderName: currentUser?.fullName || currentUser?.username || 'Mentor',
+            kind,
+            content: String(content).trim(),
+            time: Date.now()
+          });
+        } catch (e) {}
+      });
+      showToast(`📡 Đã phát ${kind === 'emote' ? 'Emote ' + content : 'tín hiệu'} tới ${targets.length} học viên đang làm bài!`);
+    }
+
+    function handleBroadcastCustomSignal(e) {
+      e.preventDefault();
+      const inp = document.getElementById('inpBroadcastSignalAll');
+      const text = (inp?.value || '').trim();
+      if (!text) return;
+      broadcastSignalToAllActive(text, 'banner');
+      if (inp) inp.value = '';
+    }
+
+    async function clearFinishedLiveSessions() {
+      const all = Object.values(liveExamsDataMap);
+      const finished = all.filter(s => s && s.status !== 'active');
+      if (!finished.length) return showToast('Không có phiên đã kết thúc nào cần dọn.');
+      for (const s of finished) {
+        try { await rtdb.ref('/live_exams/' + s.sessionKey).remove(); } catch (e) {}
+      }
+      showToast(`🧹 Đã dọn ${finished.length} phiên đã nộp khỏi màn hình giám sát.`);
+    }
+
+    // Mentor bấm "👁️ Vào xem Live (Đề + Phiếu)" -> Mở trực tiếp giao diện Phòng Thi với Đề thi bên trái + Phiếu trả lời của học viên tự nhảy trực tiếp bên phải
+    function openLiveSpectatorRoom(sessionKey) {
+      const sData = liveExamsDataMap[sessionKey];
+      if (!sData) return safeAlert('Không tìm thấy phiên làm bài này!');
+      const exam = examsList.find(e => String(e.code) === String(sData.examCode));
+      if (!exam) return safeAlert('Không tìm thấy đề thi tương ứng!');
+
+      closeLiveProctorModal();
+      spectatingSessionKey = sessionKey;
+      isLiveSpectatorMode = true;
+      studentLiveAnswers = JSON.parse(JSON.stringify(sData.answers || { mcq: {}, tf: {}, sa: {} }));
+
+      startExamRoom(exam, true);
+
+      const bar = document.getElementById('adminSpectatorControlBar');
+      if (bar) bar.style.display = 'flex';
+      updateSpectatorRoomFromRealtime(sData);
+    }
+
+    function updateSpectatorRoomFromRealtime(sData) {
+      if (!isLiveSpectatorMode || !activeExam || !sData) return;
+      studentLiveAnswers = JSON.parse(JSON.stringify(sData.answers || { mcq: {}, tf: {}, sa: {} }));
+      renderLiveExamAnswerSheet();
+
+      const mcqKeys = activeExam.mcqKeys || {};
+      const tfKeys = activeExam.tfKeys || {};
+      const saKeys = activeExam.saKeys || {};
+      const calc = computeScoreForAnswersAndKeys(studentLiveAnswers, mcqKeys, tfKeys, saKeys, !!activeExam.practiceOnly);
+
+      setElText('spectatorStudentNameLabel', `👤 ${sData.fullName || sData.username} (@${sData.username})`);
+      setElText('spectatorLiveScoreLabel', `Đã làm: ${sData.answeredCount || 0}/${sData.totalCount || 0} · Điểm tạm tính: ${calc.finalScore !== null ? calc.finalScore + ' đ' : 'Luyện tập'} (${sData.status === 'active' ? 'Đang làm bài' : 'Đã nộp / Tạm dừng'})`);
+      showExamDraftStatus(`📡 Đang đồng bộ trực tiếp 1:1 với màn hình của ${sData.fullName || sData.username} (Cập nhật: ${sData.updatedAt ? formatDraftClock(sData.updatedAt) : 'vừa xong'})`);
+    }
+
+    function returnToMultiProctorWallFromSpectator() {
+      exitExamToHome();
+      openLiveProctorModal();
+    }
+
+    // Lắng nghe toàn bộ phòng thi Live cho Giảng viên / Admin
+    rtdb.ref('/live_exams').on('value', (snap) => {
+      liveExamsDataMap = snap.val() || {};
+      const now = Date.now();
+      const activeList = Object.values(liveExamsDataMap).filter(item =>
+        item && item.status === 'active' && (now - (item.updatedAt || 0) < 3 * 60 * 60 * 1000)
+      );
+      setElText('liveProctorActiveCount', activeList.length);
+
+      if (document.getElementById('liveProctorModal')?.classList.contains('open')) {
+        renderLiveProctorModalContent();
+      }
+      if (isLiveSpectatorMode && spectatingSessionKey && liveExamsDataMap[spectatingSessionKey]) {
+        updateSpectatorRoomFromRealtime(liveExamsDataMap[spectatingSessionKey]);
+      }
+    });
+
+    function openLiveProctorModal() {
+      renderLiveProctorModalContent();
+      document.getElementById('liveProctorModal')?.classList.add('open');
+    }
+
+    function closeLiveProctorModal() {
+      document.getElementById('liveProctorModal')?.classList.remove('open');
+    }
+
+    function renderLiveProctorModalContent() {
+      const wallEl = document.getElementById('proctorMultiWallContainer');
+      const filterSel = document.getElementById('proctorExamFilterSelect');
+      if (!wallEl) return;
+
+      const allSessions = Object.values(liveExamsDataMap)
+        .filter(item => item && item.sessionKey)
+        .sort((a, b) => {
+          if (a.status === 'active' && b.status !== 'active') return -1;
+          if (a.status !== 'active' && b.status === 'active') return 1;
+          return (b.updatedAt || 0) - (a.updatedAt || 0);
+        });
+
+      if (filterSel) {
+        const prev = filterSel.value || 'all';
+        const uniqueCodes = [...new Set(allSessions.map(s => String(s.examCode)).filter(Boolean))];
+        filterSel.innerHTML = `<option value="all">📑 Tất cả đề đang thi (${allSessions.length} máy)</option>` +
+          uniqueCodes.map(code => {
+            const title = (examsList.find(e => String(e.code) === code) || {}).title || code;
+            const cnt = allSessions.filter(s => String(s.examCode) === code).length;
+            return `<option value="${escapeHTML(code)}">${escapeHTML(title)} (${cnt} máy)</option>`;
+          }).join('');
+        filterSel.value = [...filterSel.options].some(o => o.value === prev) ? prev : 'all';
+      }
+
+      const chosenExam = filterSel ? filterSel.value : 'all';
+      const filtered = allSessions.filter(s => chosenExam === 'all' || String(s.examCode) === String(chosenExam));
+
+      if (!filtered.length) {
+        wallEl.innerHTML = `
+          <div class="notice" style="grid-column:1/-1; text-align:center; padding:42px 20px;">
+            <i class="fa-solid fa-desktop" style="font-size:32px; color:#64748b; margin-bottom:10px; display:block;"></i>
+            <strong>Hiện chưa có tài khoản nào đang làm bài trong phòng thi.</strong>
+            <div style="margin-top:4px; font-size:12px; color:#64748b;">Khi bạn tổ chức thi, tất cả các máy đang làm bài sẽ tự động hiện lên thành lưới đa màn hình tại đây.</div>
+          </div>
+        `;
+        return;
+      }
+
+      wallEl.innerHTML = filtered.map(s => {
+        const isActive = s.status === 'active';
+        const pct = s.totalCount ? Math.round(((s.answeredCount || 0) / s.totalCount) * 100) : 0;
+        const examObj = examsList.find(e => String(e.code) === String(s.examCode)) || {};
+        const mcqKeys = examObj.mcqKeys || examObj.keys || {};
+        const tfKeys = examObj.tfKeys || {};
+        const saKeys = examObj.saKeys || {};
+        const ans = s.answers || { mcq: {}, tf: {}, sa: {} };
+        const calc = computeScoreForAnswersAndKeys(ans, mcqKeys, tfKeys, saKeys, !!examObj.practiceOnly);
+
+        const miniCells = [];
+        Object.keys(mcqKeys).sort((a,b)=>Number(a)-Number(b)).forEach(q => {
+          const pick = ans.mcq && ans.mcq[q];
+          if (!pick) miniCells.push(`<span class="wall-mini-cell c-blank" title="Câu ${q}: Chưa làm">${q}:⚪</span>`);
+          else if (pick === mcqKeys[q]) miniCells.push(`<span class="wall-mini-cell c-ok" title="Câu ${q}: Đúng (${pick})">${q}:${escapeHTML(pick)}</span>`);
+          else miniCells.push(`<span class="wall-mini-cell c-err" title="Câu ${q}: Chọn ${pick} (Đ/A: ${mcqKeys[q]})">${q}:${escapeHTML(pick)}</span>`);
+        });
+        Object.keys(tfKeys).sort((a,b)=>Number(a)-Number(b)).forEach(q => {
+          const subMap = (ans.tf && ans.tf[q]) || {};
+          const doneSubs = ['a','b','c','d'].filter(k => !!subMap[k]).length;
+          if (doneSubs === 0) miniCells.push(`<span class="wall-mini-cell c-blank">ĐS${q}:⚪</span>`);
+          else miniCells.push(`<span class="wall-mini-cell ${doneSubs===4?'c-ok':'c-blank'}">ĐS${q}:${doneSubs}/4</span>`);
+        });
+        Object.keys(saKeys).sort((a,b)=>Number(a)-Number(b)).forEach(q => {
+          const val = ans.sa && ans.sa[q];
+          if (!val || String(val).trim() === '') miniCells.push(`<span class="wall-mini-cell c-blank">TL${q}:⚪</span>`);
+          else {
+            const ok = normalizeShortExamAnswer(val) === normalizeShortExamAnswer(saKeys[q]);
+            miniCells.push(`<span class="wall-mini-cell ${ok?'c-ok':'c-err'}">TL${q}:${escapeHTML(String(val).slice(0,5))}</span>`);
+          }
+        });
+
+        const statusBadge = isActive
+          ? `<span class="badge-online"><span class="status-dot status-online"></span>Đang thi Live</span>`
+          : `<span class="badge-offline">${s.status === 'submitted' ? 'Đã nộp bài' : 'Tạm rời'}</span>`;
+
+        return `
+          <div class="proctor-wall-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+              <div style="min-width:0;">
+                <strong style="font-size:14px; color:#173d2e; display:block;">👤 ${escapeHTML(s.fullName || s.username)}</strong>
+                <span style="font-size:11px; color:#64748b; font-family:monospace;">@${escapeHTML(s.username || '')} · ${escapeHTML(s.classNames || '')}</span>
+              </div>
+              ${statusBadge}
+            </div>
+
+            <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:9px; padding:6px 10px; font-size:11.5px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; color:#1e40af; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:62%;">${escapeHTML(s.examTitle || s.examCode)}</span>
+              <strong style="color:#1d4ed8;">${calc.finalScore !== null ? calc.finalScore + ' đ' : 'Luyện tập'}</strong>
+            </div>
+
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:11px; color:#475569; margin-bottom:4px;">
+                <span>Tiến độ: <strong>${s.answeredCount || 0}/${s.totalCount || 0}</strong> câu (${pct}%)</span>
+                <span>⏱️ ${s.updatedAt ? formatDraftClock(s.updatedAt) : ''}</span>
+              </div>
+              <div style="width:100%; height:6px; background:#e2e8f0; border-radius:99px; overflow:hidden;">
+                <div style="width:${pct}%; height:100%; background:${isActive ? '#2563eb' : '#94a3b8'}; transition:width .25s;"></div>
+              </div>
+            </div>
+
+            <div class="wall-mini-grid custom-scrollbar">
+              ${miniCells.join('') || '<span class="subtle">Chưa có câu hỏi</span>'}
+            </div>
+
+            <!-- Thả Emote & Gửi tín hiệu nhanh cho riêng máy này -->
+            <div style="display:flex; gap:4px; align-items:center; justify-content:space-between; border-top:1px dashed #e2e8f0; padding-top:8px;">
+              <div style="display:flex; gap:3px;">
+                <button type="button" class="pill" style="padding:3px 7px; font-size:12px;" onclick="sendMentorSignalToTarget('${escapeHTML(s.sessionKey)}', '🔥', 'emote')" title="Thả lửa">🔥</button>
+                <button type="button" class="pill" style="padding:3px 7px; font-size:12px;" onclick="sendMentorSignalToTarget('${escapeHTML(s.sessionKey)}', '👏', 'emote')" title="Vỗ tay">👏</button>
+                <button type="button" class="pill" style="padding:3px 7px; font-size:12px;" onclick="sendMentorSignalToTarget('${escapeHTML(s.sessionKey)}', '❤️', 'emote')" title="Thả tim">❤️</button>
+                <button type="button" class="pill" style="padding:3px 7px; font-size:12px;" onclick="sendMentorSignalToTarget('${escapeHTML(s.sessionKey)}', '⚡', 'emote')" title="Tăng tốc">⚡</button>
+                <button type="button" class="pill" style="padding:3px 7px; font-size:12px;" onclick="sendMentorSignalToTarget('${escapeHTML(s.sessionKey)}', '👀', 'emote')" title="Chú ý">👀</button>
+              </div>
+              <button type="button" class="primary" style="padding:5px 10px; font-size:11px; background:#1e40af; border-color:#1e40af;" onclick="openLiveSpectatorRoom('${escapeHTML(s.sessionKey)}')" title="Vào xem trực tiếp cả Đề thi và Phiếu trả lời của học viên này">
+                👁️ Xem Đề + Phiếu Live
+              </button>
+            </div>
+
+            <form onsubmit="sendCustomCardSignal(event, '${escapeHTML(s.sessionKey)}')" style="display:flex; gap:5px;">
+              <input type="text" id="inpCardSignal_${escapeHTML(s.sessionKey)}" placeholder="Gửi tín hiệu chạy qua màn hình..." style="flex:1; padding:5px 9px; border:1px solid #cbd5e1; border-radius:8px; font-size:11px;">
+              <button type="submit" class="secondary" style="padding:5px 9px; font-size:11px;">📡 Gửi</button>
+            </form>
+          </div>
+        `;
+      }).join('');
+    }
+
     function initExamsView() {
+
       const isAdmin = currentUser && currentUser.role === 'admin';
       const adminBtnWrap = document.getElementById('adminExamBtnContainer');
       const filterWrap = document.getElementById('examClassFilterWrap');
@@ -4921,6 +5739,9 @@
 
                   if (isAdmin) {
                     actionButtons += `
+                      <button type="button" onclick="openReviewExamDirectly(${escapeHTML(JSON.stringify(String(e.code)))})" class="secondary" style="padding:6px 10px; font-size:11.5px; color:#b45309; border-color:#fde68a; background:#fffbeb;" title="Mở phòng đề để đối chiếu hoặc sửa đáp án trực tiếp">
+                        🔑 Xem & Sửa Đ/A
+                      </button>
                       <button type="button" onclick="promptStartExam(${escapeHTML(JSON.stringify(String(e.code)))})" class="primary" style="padding:6px 10px; font-size:11.5px; background:#10b981; border-color:#10b981;">
                         Làm thử
                       </button>
@@ -5146,7 +5967,8 @@
       };
       try {
         safeStorage.setItem(key, JSON.stringify(snapshot));
-        showExamDraftStatus(`✅ Đã tự động lưu lúc ${formatDraftClock(snapshot.savedAt)} · Có thể trở lại làm tiếp trên trình duyệt này`);
+        syncStudentLiveExamStateToRtdb();
+        showExamDraftStatus(`✅ Đã tự động lưu & đồng bộ Live lúc ${formatDraftClock(snapshot.savedAt)}`);
         return true;
       } catch(err) {
         showExamDraftStatus('⚠️ Không lưu được bài làm trên thiết bị. Hãy kiểm tra dung lượng/quyền lưu của trình duyệt.',true);
@@ -5167,8 +5989,8 @@
       if (document.visibilityState==='hidden') persistExamDraft();
     });
 
-    function promptStartExam(examCode) {
-      const exam = examsList.find(x => String(x.code).trim() === String(examCode).trim());
+    function promptStartExam(examCode, forceFresh = false) {
+      const exam = findExamByCodeSafe(examCode);
       if (!exam) {
         safeAlert("Không tìm thấy dữ liệu đề thi này!");
         return;
@@ -5189,31 +6011,53 @@
         }
       }
 
+      if (forceFresh) {
+        clearExamDraft(exam);
+      }
+
+      let draft = readExamDraft(exam);
+      // Nếu bản nháp cũ đã hết giờ từ trước thì tự động xóa để lượt làm mới có đủ thời gian từ đầu
+      if (draft && !exam.isUnlimited && typeof draft.expiresAt === 'number' && draft.expiresAt <= Date.now() + 2000) {
+        clearExamDraft(exam);
+        draft = null;
+      }
+
       const isUnlimited = !!exam.isUnlimited;
+      const btnProceed = document.getElementById('btnProceedExam');
+      const btnResetNew = document.getElementById('btnResetDraftAndStartNew');
 
       document.getElementById('examWarningText').innerHTML = `
         <div style="margin-bottom:8px;">Bài thi: <strong style="color:#1e3a8a; font-size:14px;">${escapeHTML(exam.title)}</strong></div>
         <div style="margin-bottom:8px;">Mã đề: <span style="font-family:monospace; font-weight:bold; color:#2563eb;">${escapeHTML(exam.code)}</span></div>
         <div style="margin-bottom:8px;">${isUnlimited ? '📌 <strong>Chế độ:</strong> Đề cương thời gian vô hạn.' : `⏱️ <strong>Thời gian làm bài:</strong> ${exam.timeLimit || 50} phút.`}</div>
         ${exam.deadline ? `<div style="margin-bottom:8px;color:#c2410c;">📅 <strong>Hạn làm bài:</strong> ${escapeHTML(formatDeadline(exam.deadline))}</div>` : ''}
+        ${draft ? `<div style="margin-bottom:8px;padding:8px 10px;border-radius:8px;background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46;font-size:12px;font-weight:700;">💾 Đã tìm thấy bài đang làm dở (lưu lúc ${draft.savedAt ? formatDraftClock(draft.savedAt) : 'vừa xong'}). Bạn có thể làm tiếp hoặc bấm Làm lại từ đầu.</div>` : ''}
         <div style="color:#b91c1c; font-size:12px; font-weight:600; background:#fef2f2; border:1px solid #fee2e2; border-radius:8px; padding:8px 10px;">
-          💾 Mỗi lần nộp sẽ tạo một lượt riêng, không ghi đè điểm cũ. Hệ thống lưu nháp trên trình duyệt để tiếp tục khi bị thoát. Đồng hồ vẫn chạy theo mốc bắt đầu.
+          🖥️ Hệ thống sẽ mở chế độ Phòng thi Toàn màn hình. Mỗi lần nộp bài sẽ lưu thành một lượt riêng trong lịch sử.
         </div>
       `;
 
-      document.getElementById('btnProceedExam').onclick = () => {
-        document.getElementById('examWarningModal').classList.remove('open');
-        const draft = readExamDraft(exam);
-        if (draft) {
-          const savedAt = draft.savedAt ? formatDraftClock(draft.savedAt) : 'trước đó';
-          if (safeConfirm(`Đã tìm thấy bài làm lưu lúc ${savedAt}.\nBấm OK để TIẾP TỤC bài cũ (không đặt lại đồng hồ).\nBấm Hủy để bắt đầu lại từ đầu và xóa bản lưu cũ.`)) {
-            startExamRoom(exam, false, draft);
-          } else {
+      if (draft) {
+        if (btnProceed) btnProceed.innerHTML = '▶️ Tiếp tục bài đang làm';
+        if (btnResetNew) {
+          btnResetNew.style.display = 'inline-flex';
+          btnResetNew.onclick = () => {
+            document.getElementById('examWarningModal').classList.remove('open');
             clearExamDraft(exam);
-            startExamRoom(exam, false);
-          }
-        } else startExamRoom(exam, false);
-      };
+            startExamRoom({ ...exam }, false, null);
+          };
+        }
+      } else {
+        if (btnProceed) btnProceed.innerHTML = '🚀 Bắt đầu làm bài ngay';
+        if (btnResetNew) btnResetNew.style.display = 'none';
+      }
+
+      if (btnProceed) {
+        btnProceed.onclick = () => {
+          document.getElementById('examWarningModal').classList.remove('open');
+          startExamRoom({ ...exam }, false, draft);
+        };
+      }
 
       document.getElementById('examWarningModal').classList.add('open');
     }
@@ -5221,6 +6065,47 @@
     function closeExamWarningModal() {
       document.getElementById('examWarningModal').classList.remove('open');
     }
+
+        let autoFullscreenExamEnabled = true; // Luôn tự động mở Toàn màn hình cho tất cả các bài làm
+
+    function enterExamFullscreenIfNeeded() {
+      if (!autoFullscreenExamEnabled) return;
+      const el = document.documentElement;
+      try {
+        if (!document.fullscreenElement && el.requestFullscreen) {
+          el.requestFullscreen().catch(() => {});
+        }
+      } catch (e) {}
+    }
+
+    function exitExamFullscreenIfActive() {
+      try {
+        if (document.fullscreenElement && document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      } catch (e) {}
+    }
+
+    function toggleBrowserFullscreenForExam() {
+      try {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {
+            showToast("Trình duyệt nhúng hiện tại giới hạn Fullscreen phần cứng; phòng thi đã phủ kín 100% khung nhìn.");
+          });
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      } catch (e) {}
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const btn = document.getElementById('btnExamFullscreenNow');
+      if (btn) {
+        btn.innerHTML = document.fullscreenElement
+          ? '<i class="fa-solid fa-compress"></i> Thoát Fullscreen'
+          : '<i class="fa-solid fa-expand"></i> Toàn màn hình';
+      }
+    });
 
     function startExamRoom(exam, reviewOnly = false, restoredDraft = null) {
       if (!exam) {
@@ -5230,7 +6115,43 @@
 
       activeExam = exam;
       isLiveReviewMode = reviewOnly;
+      isAdminEditingExamKeys = false;
       examDraftCompleted = !!reviewOnly;
+
+      const isAdmin = currentUser && currentUser.role === 'admin';
+      const btnKeyEdit = document.getElementById('btnAdminInlineKeyEdit');
+      const btnKeySave = document.getElementById('btnSaveInlineKeyChanges');
+      if (btnKeyEdit) {
+        btnKeyEdit.style.display = isAdmin ? 'inline-flex' : 'none';
+        btnKeyEdit.innerHTML = '<i class="fa-solid fa-key"></i> Sửa đáp án toàn đề';
+        btnKeyEdit.style.background = '#fffbeb';
+        btnKeyEdit.style.color = '#b45309';
+      }
+      if (btnKeySave) btnKeySave.style.display = 'none';
+
+      // Tự động kích hoạt Toàn màn hình (Fullscreen) nếu chế độ phòng thi đang BẬT
+      enterExamFullscreenIfNeeded();
+
+      examSubmitting = false;
+      clearInterval(examCountdownTimer);
+      stopExamDraftHeartbeat();
+
+      // Khôi phục lại cột Phiếu trả lời và mức thu phóng 100% nếu lần trước người dùng đã thu gọn hoặc phóng to
+      const rightPanel = document.getElementById('liveExamRightPanel');
+      if (rightPanel) rightPanel.classList.remove('collapsed');
+      const btnWide = document.getElementById('btnToggleWideDoc');
+      if (btnWide) {
+        btnWide.innerHTML = '<i class="fa-solid fa-arrows-left-right-to-line"></i> Mở rộng đề';
+        btnWide.style.background = '';
+        btnWide.style.color = '';
+      }
+      examZoomVal = 1.0;
+      const zoomWrap = document.getElementById('examZoomWrapper');
+      if (zoomWrap) zoomWrap.style.transform = 'scale(1)';
+      setElText('examZoomLevelTxt', '100%');
+      examCurrentTool = null;
+      document.getElementById('liveExamCanvas')?.classList.remove('drawing-active');
+      clearExamCanvas();
 
       if (!activeExam.mcqKeys) activeExam.mcqKeys = activeExam.keys || {};
       if (!activeExam.tfKeys) activeExam.tfKeys = {};
@@ -5240,10 +6161,19 @@
       document.getElementById('liveExamCode').innerText = activeExam.code || "---";
 
       const rawUrl = activeExam.rawDocsUrl || activeExam.embedUrl || "";
-      const embedUrl = activeExam.embedUrl || convertDocsToPreview(rawUrl);
+      const embedUrl = convertDocsToPreview(rawUrl) || activeExam.embedUrl || "";
       
       const docIframe = document.getElementById('liveExamIframe');
-      docIframe.src = embedUrl;
+      if (docIframe) {
+        // Luôn làm mới lại iframe để tránh lỗi Google Docs/Drive bị treo trắng ở lần mở thứ 2 trở đi
+        if (docIframe.getAttribute('data-loaded-url') !== embedUrl || !docIframe.src || docIframe.src === 'about:blank') {
+          docIframe.src = 'about:blank';
+          docIframe.setAttribute('data-loaded-url', embedUrl);
+          setTimeout(() => {
+            docIframe.src = embedUrl;
+          }, 35);
+        }
+      }
 
       const directBtn = document.getElementById('btnExamDirectDocs');
       if (directBtn) {
@@ -5300,6 +6230,14 @@
         }
       }
 
+      const specBar = document.getElementById('adminSpectatorControlBar');
+      if (specBar && !isLiveSpectatorMode) specBar.style.display = 'none';
+      if (!reviewOnly && !isLiveSpectatorMode && currentUser) {
+        attachStudentLiveMentorChatListener();
+      } else {
+        detachStudentLiveMentorChatListener();
+      }
+
       const examModal = document.getElementById('liveExamModal');
       examModal.classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -5309,8 +6247,165 @@
       }, 150);
     }
 
+    let isAdminEditingExamKeys = false;
+
+    function toggleAdminInlineKeyEditMode() {
+      if (!currentUser || currentUser.role !== 'admin' || !activeExam) return;
+      isAdminEditingExamKeys = !isAdminEditingExamKeys;
+      const btnEdit = document.getElementById('btnAdminInlineKeyEdit');
+      const btnSave = document.getElementById('btnSaveInlineKeyChanges');
+      if (btnEdit) {
+        btnEdit.innerHTML = isAdminEditingExamKeys
+          ? '<i class="fa-solid fa-xmark"></i> Thoát sửa đáp án'
+          : '<i class="fa-solid fa-key"></i> Sửa đáp án toàn đề';
+        btnEdit.style.background = isAdminEditingExamKeys ? '#fee2e2' : '#fffbeb';
+        btnEdit.style.color = isAdminEditingExamKeys ? '#b91c1c' : '#b45309';
+      }
+      if (btnSave) {
+        btnSave.style.display = isAdminEditingExamKeys ? 'inline-flex' : 'none';
+      }
+      renderLiveExamAnswerSheet();
+      if (isAdminEditingExamKeys) {
+        showToast("🔑 Đang bật chế độ Sửa Đáp Án: Bấm trực tiếp vào đáp án đúng mới trên phiếu rồi nhấn 'Lưu đáp án mới & Chấm lại'!");
+      }
+    }
+
+    function adminPickMasterMcqKey(q, opt) {
+      if (!isAdminEditingExamKeys || !activeExam) return;
+      if (!activeExam.mcqKeys) activeExam.mcqKeys = {};
+      activeExam.mcqKeys[q] = opt;
+      renderLiveExamAnswerSheet();
+    }
+
+    function adminPickMasterTfKey(q, sub, val) {
+      if (!isAdminEditingExamKeys || !activeExam) return;
+      if (!activeExam.tfKeys) activeExam.tfKeys = {};
+      if (!activeExam.tfKeys[q]) activeExam.tfKeys[q] = { a: 'Đ', b: 'Đ', c: 'Đ', d: 'Đ' };
+      activeExam.tfKeys[q][sub] = val;
+      renderLiveExamAnswerSheet();
+    }
+
+    function adminPickMasterSaKey(q, val) {
+      if (!isAdminEditingExamKeys || !activeExam) return;
+      if (!activeExam.saKeys) activeExam.saKeys = {};
+      activeExam.saKeys[q] = val;
+    }
+
+    function computeScoreForAnswersAndKeys(answers, mcqKeys, tfKeys, saKeys, practiceOnly) {
+      const totalMcq = Object.keys(mcqKeys || {}).length;
+      const totalTf = Object.keys(tfKeys || {}).length;
+      const totalSa = Object.keys(saKeys || {}).length;
+      let mcqCorrect = 0, tfCorrectSubCount = 0, saCorrect = 0, tfTotalScore = 0, saTotalScore = 0;
+
+      for (let q in mcqKeys) {
+        if (answers.mcq && answers.mcq[q] === mcqKeys[q]) mcqCorrect++;
+      }
+      for (let q in tfKeys) {
+        let subCorrect = 0;
+        ['a', 'b', 'c', 'd'].forEach(sub => {
+          if (answers.tf && answers.tf[q] && answers.tf[q][sub] === tfKeys[q][sub]) {
+            subCorrect++;
+            tfCorrectSubCount++;
+          }
+        });
+        if (subCorrect === 1) tfTotalScore += 0.1;
+        else if (subCorrect === 2) tfTotalScore += 0.25;
+        else if (subCorrect === 3) tfTotalScore += 0.5;
+        else if (subCorrect === 4) tfTotalScore += 1.0;
+      }
+      for (let q in saKeys) {
+        const uAns = normalizeShortExamAnswer(answers.sa && answers.sa[q]);
+        const kAns = normalizeShortExamAnswer(saKeys[q]);
+        if (uAns === kAns && uAns !== "") {
+          saCorrect++;
+          saTotalScore += 1.0;
+        }
+      }
+
+      let finalScore = null;
+      if (!practiceOnly) {
+        if (totalMcq === 18 && totalTf === 4 && totalSa === 6) {
+          finalScore = parseFloat((mcqCorrect * 0.25 + tfTotalScore + saCorrect * 0.25).toFixed(2));
+        } else {
+          finalScore = parseFloat((mcqCorrect * 0.25 + tfTotalScore + saTotalScore).toFixed(2));
+        }
+      }
+      return { mcqCorrect, tfCorrectSubCount, saCorrect, totalMcq, totalTf, totalSa, finalScore };
+    }
+
+    async function saveInlineEditedKeysToMasterExam() {
+      if (!currentUser || currentUser.role !== 'admin' || !activeExam) return;
+      const btnSave = document.getElementById('btnSaveInlineKeyChanges');
+      if (btnSave) {
+        btnSave.disabled = true;
+        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang cập nhật toàn đề...';
+      }
+
+      try {
+        const examCode = activeExam.code;
+        const mcqKeys = JSON.parse(JSON.stringify(activeExam.mcqKeys || {}));
+        const tfKeys = JSON.parse(JSON.stringify(activeExam.tfKeys || {}));
+        const saKeys = JSON.parse(JSON.stringify(activeExam.saKeys || {}));
+
+        const rawMcq = Object.entries(mcqKeys).sort((a,b)=>Number(a[0])-Number(b[0])).map(([q,a])=>`${q}.${a}`).join(' ');
+        const rawTf = Object.entries(tfKeys).sort((a,b)=>Number(a[0])-Number(b[0])).map(([q,a])=>`${q}: ${['a','b','c','d'].map(k=>a[k]).join(' ')}`).join('\n');
+        const rawSa = Object.entries(saKeys).sort((a,b)=>Number(a[0])-Number(b[0])).map(([q,a])=>`${q}: ${a}`).join('\n');
+        const newUpdatedAt = new Date().toISOString();
+
+        // 1. Cập nhật đáp án gốc của toàn đề trên Firestore
+        await db.collection("exams").doc(examCode).set({
+          mcqKeys,
+          tfKeys,
+          saKeys,
+          keys: mcqKeys,
+          rawMcq,
+          rawTf,
+          rawSa,
+          updatedAt: newUpdatedAt
+        }, { merge: true });
+
+        // 2. Chấm lại toàn bộ các bài nộp đã có của đề này để đồng bộ điểm chuẩn xác
+        const subsOfExam = studentSubmissions.filter(s => String(s.examCode) === String(examCode));
+        for (const sub of subsOfExam) {
+          const ans = sub.answers || { mcq: {}, tf: {}, sa: {} };
+          const res = computeScoreForAnswersAndKeys(ans, mcqKeys, tfKeys, saKeys, !!sub.practiceOnly);
+          await db.collection("submissions").doc(sub.id).set({
+            mcqCorrect: res.mcqCorrect,
+            tfCorrectSubCount: res.tfCorrectSubCount,
+            saCorrect: res.saCorrect,
+            mcqTotal: res.totalMcq,
+            tfTotalSubCount: res.totalTf * 4,
+            saTotal: res.totalSa,
+            score: res.finalScore,
+            examUpdatedAt: newUpdatedAt,
+            gradingKeys: { mcq: mcqKeys, tf: tfKeys, sa: saKeys }
+          }, { merge: true });
+        }
+
+        isAdminEditingExamKeys = false;
+        const btnEdit = document.getElementById('btnAdminInlineKeyEdit');
+        if (btnEdit) {
+          btnEdit.innerHTML = '<i class="fa-solid fa-key"></i> Sửa đáp án toàn đề';
+          btnEdit.style.background = '#fffbeb';
+          btnEdit.style.color = '#b45309';
+        }
+        if (btnSave) btnSave.style.display = 'none';
+        renderLiveExamAnswerSheet();
+        showToast(`✅ Đã lưu đáp án mới cho toàn đề [${examCode}] và tự động chấm lại ${subsOfExam.length} lượt bài nộp!`);
+      } catch (err) {
+        safeAlert("Lỗi khi cập nhật đáp án: " + err.message);
+      } finally {
+        if (btnSave) {
+          btnSave.disabled = false;
+          btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu đáp án mới & Chấm lại';
+        }
+      }
+    }
+
     function renderLiveExamAnswerSheet() {
       const container = document.getElementById('liveAnswerSheetList');
+      const statsBanner = document.getElementById('liveReviewStatsBanner');
+      if (!container || !activeExam) return;
       container.innerHTML = '';
 
       const mcqKeys = activeExam.mcqKeys || {};
@@ -5319,6 +6414,18 @@
 
       const totalItems = Object.keys(mcqKeys).length + Object.keys(tfKeys).length + Object.keys(saKeys).length;
       document.getElementById('liveTotalCount').innerText = totalItems;
+
+      // Hiển thị banner hướng dẫn khi Admin đang bật chế độ sửa đáp án trực tiếp
+      if (isAdminEditingExamKeys) {
+        const editNote = document.createElement('div');
+        editNote.className = 'admin-key-edit-banner';
+        editNote.innerHTML = `🔑 <strong>CHẾ ĐỘ SỬA ĐÁP ÁN TOÀN ĐỀ:</strong> Bấm trực tiếp vào đáp án đúng mới (A/B/C/D, Đúng/Sai hoặc nhập ô Trả lời ngắn), sau đó bấm nút <strong>"Lưu đáp án mới & Chấm lại"</strong> ở thanh trên cùng.`;
+        container.appendChild(editNote);
+      }
+
+      let reviewCorrectCount = 0;
+      let reviewWrongCount = 0;
+      let reviewBlankCount = 0;
 
       // 1. MCQ
       if (Object.keys(mcqKeys).length > 0) {
@@ -5329,17 +6436,42 @@
         list1.style.gap = "6px";
 
         Object.keys(mcqKeys).sort((a,b)=>Number(a)-Number(b)).forEach(q => {
+          const userPick = studentLiveAnswers.mcq[q] || null;
+          const isUnanswered = !userPick;
+          const isQuestionCorrect = userPick === mcqKeys[q];
+
+          if (isLiveReviewMode) {
+            if (isUnanswered) reviewBlankCount++;
+            else if (isQuestionCorrect) reviewCorrectCount++;
+            else reviewWrongCount++;
+          }
+
           const row = document.createElement('div');
-          row.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:6px 10px; font-size:12px;";
+          const rowBorder = isLiveReviewMode
+            ? (isUnanswered ? '#fdba74' : (isQuestionCorrect ? '#bbf7d0' : '#fecaca'))
+            : '#e2e8f0';
+          const rowBg = isLiveReviewMode && isUnanswered ? '#fffaf5' : '#f8fafc';
+          row.style.cssText = `display:flex; justify-content:space-between; align-items:center; background:${rowBg}; border:1px solid ${rowBorder}; border-radius:8px; padding:6px 10px; font-size:12px; gap:6px; flex-wrap:wrap;`;
           
+          let statusBadge = '';
+          if (isLiveReviewMode) {
+            if (isUnanswered) {
+              statusBadge = `<span class="unanswered-pill" title="Câu này học sinh bỏ trống chưa chọn đáp án">⚪ Chưa làm</span>`;
+            } else if (isQuestionCorrect) {
+              statusBadge = `<span class="correct-pill">✓ Đúng</span>`;
+            } else {
+              statusBadge = `<span class="wrong-pill">✕ Sai (Chọn ${escapeHTML(userPick)})</span>`;
+            }
+          }
+
           let btns = '';
           ['A', 'B', 'C', 'D'].forEach(opt => {
-            const isSelected = studentLiveAnswers.mcq[q] === opt;
+            const isSelected = userPick === opt;
             const isCorrect = mcqKeys[q] === opt;
 
             let st = "width:28px; height:28px; border-radius:50%; font-weight:700; border:1px solid #cbd5e1; display:inline-flex; align-items:center; justify-content:center; font-size:12px; margin-left:3px; transition:0.15s; cursor:pointer;";
-            if (isLiveReviewMode) {
-              if (isCorrect) st += "background:#16a34a; color:#fff; border-color:#16a34a;";
+            if (isLiveReviewMode || isAdminEditingExamKeys) {
+              if (isCorrect) st += "background:#16a34a; color:#fff; border-color:#16a34a; box-shadow:0 0 0 2px rgba(22,163,74,.25);";
               else if (isSelected && !isCorrect) st += "background:#dc2626; color:#fff; border-color:#dc2626;";
               else st += "color:#94a3b8; background:#fff;";
             } else {
@@ -5347,10 +6479,15 @@
               else st += "background:#fff; color:#475569;";
             }
 
-            btns += `<button type="button" onclick="pickLiveOption('${q}', '${opt}')" ${isLiveReviewMode ? 'disabled' : ''} style="${st}">${opt}</button>`;
+            const clickHandler = isAdminEditingExamKeys
+              ? `adminPickMasterMcqKey('${q}', '${opt}')`
+              : `pickLiveOption('${q}', '${opt}')`;
+            const disabledAttr = (isLiveReviewMode && !isAdminEditingExamKeys) ? 'disabled' : '';
+
+            btns += `<button type="button" onclick="${clickHandler}" ${disabledAttr} style="${st}" title="${isAdminEditingExamKeys ? 'Đặt ' + opt + ' làm đáp án đúng của Câu ' + q : ''}">${opt}</button>`;
           });
 
-          row.innerHTML = `<span style="font-weight:700; color:#334155;">Câu ${q}:</span><div>${btns}</div>`;
+          row.innerHTML = `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-weight:700; color:#334155;">Câu ${q}:</span>${statusBadge}</div><div>${btns}</div>`;
           list1.appendChild(row);
         });
         wrap1.appendChild(list1);
@@ -5369,33 +6506,60 @@
           const card = document.createElement('div');
           card.style.cssText = "background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px; font-size:12px;";
           
+          let blankSubsInQ = 0;
           let subRows = '';
           ['a', 'b', 'c', 'd'].forEach(sub => {
             const userPick = (studentLiveAnswers.tf[q] && studentLiveAnswers.tf[q][sub]) || null;
             const correctPick = tfKeys[q] ? tfKeys[q][sub] : null;
+            const isSubBlank = !userPick;
+            const isSubCorrect = userPick === correctPick;
+
+            if (isLiveReviewMode) {
+              if (isSubBlank) { reviewBlankCount++; blankSubsInQ++; }
+              else if (isSubCorrect) reviewCorrectCount++;
+              else reviewWrongCount++;
+            }
+
+            let subBadge = '';
+            if (isLiveReviewMode) {
+              if (isSubBlank) subBadge = `<span class="unanswered-pill" style="font-size:9.5px;padding:1px 6px;">⚪ Chưa làm</span>`;
+              else if (isSubCorrect) subBadge = `<span class="correct-pill" style="font-size:9.5px;padding:1px 6px;">✓ Đúng</span>`;
+              else subBadge = `<span class="wrong-pill" style="font-size:9.5px;padding:1px 6px;">✕ Sai</span>`;
+            }
 
             const getStyle = (val) => {
               const sel = userPick === val;
-              if (isLiveReviewMode) {
+              if (isLiveReviewMode || isAdminEditingExamKeys) {
                 if (correctPick === val) return "background:#16a34a; color:#fff; border-color:#16a34a; font-weight:700;";
                 if (sel && correctPick !== val) return "background:#dc2626; color:#fff; border-color:#dc2626; font-weight:700;";
-                return "color:#94a3b8; border-color:#e2e8f0;";
+                return "color:#94a3b8; border-color:#e2e8f0; background:#fff;";
               }
               return sel ? "background:#16a34a; color:#fff; font-weight:700; border:1px solid #16a34a;" : "background:#fff; color:#334155; border:1px solid #cbd5e1;";
             };
 
+            const clickD = isAdminEditingExamKeys ? `adminPickMasterTfKey('${q}', '${sub}', 'Đ')` : `pickLiveTfOption('${q}', '${sub}', 'Đ')`;
+            const clickS = isAdminEditingExamKeys ? `adminPickMasterTfKey('${q}', '${sub}', 'S')` : `pickLiveTfOption('${q}', '${sub}', 'S')`;
+            const disabledAttr = (isLiveReviewMode && !isAdminEditingExamKeys) ? 'disabled' : '';
+
             subRows += `
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-                <span style="font-weight:600; color:#475569;">(${sub})</span>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px; padding:3px 6px; border-radius:6px; background:${isLiveReviewMode && isSubBlank ? '#fff7ed' : 'transparent'};">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-weight:700; color:#475569;">Ý (${sub})</span>
+                  ${subBadge}
+                </div>
                 <div style="display:flex; gap:4px;">
-                  <button type="button" onclick="pickLiveTfOption('${q}', '${sub}', 'Đ')" ${isLiveReviewMode ? 'disabled' : ''} style="padding:2px 8px; font-size:11px; border-radius:6px; cursor:pointer; ${getStyle('Đ')}">Đúng</button>
-                  <button type="button" onclick="pickLiveTfOption('${q}', '${sub}', 'S')" ${isLiveReviewMode ? 'disabled' : ''} style="padding:2px 8px; font-size:11px; border-radius:6px; cursor:pointer; ${getStyle('S')}">Sai</button>
+                  <button type="button" onclick="${clickD}" ${disabledAttr} style="padding:2px 8px; font-size:11px; border-radius:6px; cursor:pointer; ${getStyle('Đ')}">Đúng</button>
+                  <button type="button" onclick="${clickS}" ${disabledAttr} style="padding:2px 8px; font-size:11px; border-radius:6px; cursor:pointer; ${getStyle('S')}">Sai</button>
                 </div>
               </div>
             `;
           });
 
-          card.innerHTML = `<strong style="color:#1e293b; display:block; border-bottom:1px solid #e2e8f0; padding-bottom:3px;">Câu ${q} (Đ/S):</strong>${subRows}`;
+          const qHeaderBadge = (isLiveReviewMode && blankSubsInQ === 4)
+            ? `<span class="unanswered-pill">⚪ Bỏ trống cả câu</span>`
+            : '';
+
+          card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2e8f0;padding-bottom:4px;"><strong style="color:#1e293b;">Câu ${q} (Đ/S):</strong>${qHeaderBadge}</div>${subRows}`;
           list2.appendChild(card);
         });
         wrap2.appendChild(list2);
@@ -5411,29 +6575,84 @@
         list3.style.gap = "6px";
 
         Object.keys(saKeys).sort((a,b)=>Number(a)-Number(b)).forEach(q => {
-          const card = document.createElement('div');
-          card.style.cssText = "background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:6px 10px; font-size:12px; display:flex; justify-content:space-between; align-items:center;";
-          
           const val = studentLiveAnswers.sa[q] || "";
+          const isBlank = String(val).trim() === "";
           const correctVal = saKeys[q];
-          const isCorrect = isLiveReviewMode && (normalizeShortExamAnswer(val) === normalizeShortExamAnswer(correctVal) && String(val).trim() !== '');
+          const isCorrect = !isBlank && (normalizeShortExamAnswer(val) === normalizeShortExamAnswer(correctVal));
 
-          let inputSt = "border:1px solid #cbd5e1; border-radius:6px; padding:4px 8px; font-size:12px; font-family:monospace; width:110px; outline:none; ";
           if (isLiveReviewMode) {
-            inputSt += isCorrect ? "background:#dcfce7; border-color:#22c55e; color:#15803d; font-weight:700;" : "background:#fee2e2; border-color:#ef4444; color:#991b1b; text-decoration:line-through;";
+            if (isBlank) reviewBlankCount++;
+            else if (isCorrect) reviewCorrectCount++;
+            else reviewWrongCount++;
+          }
+
+          const card = document.createElement('div');
+          const borderCol = isLiveReviewMode
+            ? (isBlank ? '#fdba74' : (isCorrect ? '#bbf7d0' : '#fecaca'))
+            : '#e2e8f0';
+          const bgCol = isLiveReviewMode && isBlank ? '#fffaf5' : '#f8fafc';
+          card.style.cssText = `background:${bgCol}; border:1px solid ${borderCol}; border-radius:8px; padding:7px 10px; font-size:12px; display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap;`;
+
+          let statusBadge = '';
+          if (isLiveReviewMode) {
+            if (isBlank) statusBadge = `<span class="unanswered-pill">⚪ Chưa làm</span>`;
+            else if (isCorrect) statusBadge = `<span class="correct-pill">✓ Đúng</span>`;
+            else statusBadge = `<span class="wrong-pill">✕ Sai</span>`;
+          }
+
+          let inputSt = "border:1px solid #cbd5e1; border-radius:6px; padding:4px 8px; font-size:12px; font-family:monospace; width:105px; outline:none; ";
+          if (isLiveReviewMode) {
+            if (isBlank) inputSt += "background:#fff7ed; border-color:#fdba74; color:#c2410c; font-style:italic;";
+            else if (isCorrect) inputSt += "background:#dcfce7; border-color:#22c55e; color:#15803d; font-weight:700;";
+            else inputSt += "background:#fee2e2; border-color:#ef4444; color:#991b1b; text-decoration:line-through;";
+          }
+
+          const displayVal = (isLiveReviewMode && isBlank) ? "Bỏ trống" : val;
+
+          let rightControlHtml = '';
+          if (isAdminEditingExamKeys) {
+            rightControlHtml = `
+              <div style="display:flex; align-items:center; gap:5px;">
+                <span style="font-size:10.5px;color:#b45309;font-weight:700;">Đ/A mới:</span>
+                <input type="text" value="${escapeHTML(correctVal)}" oninput="adminPickMasterSaKey('${q}', this.value)" style="border:1.5px solid #f59e0b; background:#fffbeb; color:#92400e; font-weight:800; border-radius:6px; padding:4px 8px; font-size:12px; font-family:monospace; width:95px;" placeholder="Đáp án đúng...">
+              </div>
+            `;
+          } else {
+            rightControlHtml = `
+              <div style="display:flex; align-items:center; gap:6px;">
+                <input type="text" value="${escapeHTML(displayVal)}" ${isLiveReviewMode ? 'disabled' : ''} oninput="pickLiveSaAnswer('${q}', this.value)" style="${inputSt}" placeholder="Đáp án...">
+                ${isLiveReviewMode ? `<span style="font-size:11px; font-weight:800; color:#15803d; font-family:monospace; background:#dcfce7; padding:2px 6px; border-radius:5px;">Đ/A: ${escapeHTML(correctVal)}</span>` : ''}
+              </div>
+            `;
           }
 
           card.innerHTML = `
-            <span style="font-weight:700; color:#334155;">Câu ${q}:</span>
-            <div style="display:flex; align-items:center; gap:6px;">
-              <input type="text" value="${escapeHTML(val)}" ${isLiveReviewMode ? 'disabled' : ''} oninput="pickLiveSaAnswer('${q}', this.value)" style="${inputSt}" placeholder="Đáp án...">
-              ${isLiveReviewMode ? `<span style="font-size:11px; font-weight:700; color:#16a34a; font-family:monospace;">Đ/A: ${correctVal}</span>` : ''}
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span style="font-weight:700; color:#334155;">Câu ${q}:</span>
+              ${statusBadge}
             </div>
+            ${rightControlHtml}
           `;
           list3.appendChild(card);
         });
         wrap3.appendChild(list3);
         container.appendChild(wrap3);
+      }
+
+      if (statsBanner) {
+        if (isLiveReviewMode) {
+          statsBanner.style.display = 'flex';
+          statsBanner.style.justifyContent = 'space-between';
+          statsBanner.style.flexWrap = 'wrap';
+          statsBanner.style.gap = '6px';
+          statsBanner.innerHTML = `
+            <span style="color:#15803d;font-weight:800;">✓ Đúng: ${reviewCorrectCount}</span>
+            <span style="color:#b91c1c;font-weight:800;">✕ Sai: ${reviewWrongCount}</span>
+            <span style="color:#c2410c;font-weight:800;">⚪ Chưa làm (Bỏ trống): ${reviewBlankCount}</span>
+          `;
+        } else {
+          statsBanner.style.display = 'none';
+        }
       }
 
       updateLiveProgress();
@@ -5510,8 +6729,13 @@
       }
       if (safeConfirm('Bài làm đã được tự động lưu trên thiết bị. Bạn có muốn rời phòng thi và quay lại làm tiếp sau không?\nLưu ý: đồng hồ của đề có giới hạn thời gian vẫn tiếp tục chạy.')) {
         persistExamDraft();
+        markStudentLiveExamStatus('paused');
+        detachStudentLiveMentorChatListener();
         stopExamDraftHeartbeat();
         clearInterval(examCountdownTimer);
+        exitExamFullscreenIfActive();
+        const docIframe = document.getElementById('liveExamIframe');
+        if (docIframe) { docIframe.src = 'about:blank'; docIframe.removeAttribute('data-loaded-url'); }
         document.getElementById('liveExamModal').classList.remove('open');
         document.body.style.overflow = '';
         activeExam = null;
@@ -5682,12 +6906,22 @@
         // Chế độ dùng thử không đăng nhập: không có kết quả trên đám mây.
         clearExamDraft();
       }
+      markStudentLiveExamStatus('submitted');
       examSubmitting = false;
       examDraftCompleted = true;
       document.getElementById('examResultScoreModal').classList.add('open');
     }
 
     function exitExamToHome() {
+      detachStudentLiveMentorChatListener();
+      exitExamFullscreenIfActive();
+      isAdminEditingExamKeys = false;
+      isLiveSpectatorMode = false;
+      spectatingSessionKey = '';
+      const specBar = document.getElementById('adminSpectatorControlBar');
+      if (specBar) specBar.style.display = 'none';
+      const docIframe = document.getElementById('liveExamIframe');
+      if (docIframe) { docIframe.src = 'about:blank'; docIframe.removeAttribute('data-loaded-url'); }
       document.getElementById('examResultScoreModal').classList.remove('open');
       document.getElementById('liveExamModal').classList.remove('open');
       document.body.style.overflow = '';
@@ -6026,20 +7260,32 @@
     }
 
     function openDocViewer(rawUrl, title) {
+      if (!rawUrl) return showToast("Chưa có đường dẫn tài liệu để hiển thị.");
       const modal = document.getElementById('docViewerModal');
       const iframe = document.getElementById('docViewerIframe');
       setElText('docViewerTitle', title || "Xem Tài Liệu");
-      document.getElementById('btnDocViewerNewTab').href = rawUrl;
-      iframe.src = convertToDrivePreviewUrl(rawUrl);
+      const newTabBtn = document.getElementById('btnDocViewerNewTab');
+      if (newTabBtn) newTabBtn.href = rawUrl;
+
+      const previewUrl = convertToDrivePreviewUrl(rawUrl);
       modal.classList.add('open');
-      document.body.style.overflow = 'hidden'; 
+      document.body.style.overflow = 'hidden';
+
+      // Reset về about:blank trước 1 nhịp ngắn để trình duyệt luôn tải lại mới dù mở cùng 1 đề nhiều lần liên tiếp
+      iframe.src = "about:blank";
+      setTimeout(() => {
+        iframe.src = previewUrl;
+      }, 30);
     }
 
     function closeDocViewer() {
       const modal = document.getElementById('docViewerModal');
-      document.getElementById('docViewerIframe').src = ""; 
-      modal.classList.remove('open');
-      document.body.style.overflow = '';
+      const iframe = document.getElementById('docViewerIframe');
+      if (iframe) iframe.src = "about:blank";
+      if (modal) modal.classList.remove('open');
+      if (!document.getElementById('liveExamModal')?.classList.contains('open')) {
+        document.body.style.overflow = '';
+      }
     }
 
     let cropImgObj = new Image();
