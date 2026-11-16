@@ -9,6 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   
   <meta charset="utf-8">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>BioBling - 2B | LMS</title>
@@ -3085,7 +3086,7 @@
               <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:14px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                   <span class="tag session-badge" id="currentVideoSessionBadge">Chuyên đề</span>
-                  <a id="btnOpenExternalVideo" href="#" target="_blank" class="text-btn" style="display:inline-flex;align-items:center;gap:4px;">
+                  <a id="btnOpenExternalVideo" href="#" target="_blank" rel="noopener noreferrer" class="text-btn" style="display:inline-flex;align-items:center;gap:4px;">
                     Mở toàn màn hình trên Drive ↗
                   </a>
                 </div>
@@ -3727,7 +3728,7 @@
         <button type="button" id="btnExamFullscreenNow" onclick="toggleBrowserFullscreenForExam()" class="secondary" style="font-size:11.5px; padding:6px 11px;" title="Bật / Tắt toàn màn hình máy tính">
           <i class="fa-solid fa-expand"></i> Toàn màn hình
         </button>
-        <a id="btnExamDirectDocs" href="#" target="_blank" class="secondary" style="font-size:11.5px; padding:6px 12px; display:inline-flex; align-items:center; gap:6px;">
+        <a id="btnExamDirectDocs" href="#" target="_blank" rel="noopener noreferrer" class="secondary" style="font-size:11.5px; padding:6px 12px; display:inline-flex; align-items:center; gap:6px;">
           Mở tab mới ↗
         </a>
         <div id="liveExamTimerBox" style="background:#fff1f2; color:#e11d48; border:1px solid #fecdd3; padding:6px 14px; border-radius:8px; font-weight:700; font-family:monospace; font-size:14px; display:flex; align-items:center; gap:6px;">
@@ -3988,7 +3989,7 @@
       <div class="doc-viewer-header">
         <h3 id="docViewerTitle">Đang tải tài liệu...</h3>
         <div style="display:flex;gap:10px;align-items:center;">
-          <a id="btnDocViewerNewTab" href="#" target="_blank" class="secondary" style="font-size:11px;padding:6px 12px;border-radius:8px;">
+          <a id="btnDocViewerNewTab" href="#" target="_blank" rel="noopener noreferrer" class="secondary" style="font-size:11px;padding:6px 12px;border-radius:8px;">
             Mở cửa sổ mới ↗
           </a>
           <button style="border:0;background:#f1f2ed;color:#557463;width:32px;height:32px;border-radius:8px;font-size:16px;font-weight:700;" onclick="closeDocViewer()">✕</button>
@@ -4134,6 +4135,10 @@
         return Object.prototype.hasOwnProperty.call(_memoryStore, k) ? _memoryStore[k] : null;
       },
       setItem(k, v) {
+        if (k === 'atelier_auth_users_v9') { this.removeItem(k); return; }
+        if (k === 'atelier_current_session_v9') {
+          try { const u=JSON.parse(v); v=JSON.stringify({id:u.id,username:u.username}); } catch (_) { return; }
+        }
         const str = String(v);
         _memoryStore[k] = str;
         try { window.localStorage.setItem(k, str); } catch (e) {}
@@ -4170,27 +4175,17 @@
 
     
     function safeConfirm(msg) {
-      return true;
+      try { return window.confirm(String(msg || 'Xác nhận thao tác?')); }
+      catch (err) { showToast('Không thể mở xác nhận. Thao tác đã được hủy.'); return false; }
     }
 
     function safeAlert(msg) {
       showAuthNotice(String(msg || ''), false);
     }
 
-    const DEFAULT_ADMIN_ACCOUNTS = [
-      { id: 1, username: "admin1", fullName: "Casta Nguyễn", password: "Meocon@123", role: "admin", status: "approved", classId: "all", avatar: "", bio: "BioBling - 2B", createdAt: "2026-10-01" },
-      { id: 2, username: "tranducanh", fullName: "Trần Đức Anh", password: "12345678", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Giảng viên Sinh học BioBling - 2B", createdAt: "2026-10-01" },
-      { id: 3, username: "admin2", fullName: "Admin BioBling", password: "05012009", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Trợ giảng chuyên đề BioBling - 2B", createdAt: "2026-10-01" }
-    ];
-
+    // Legacy account normalization only. Never bootstrap credentials from public code.
     function mergeDefaultAdmins(list) {
-      const arr = Array.isArray(list) ? list.filter(Boolean) : (list && typeof list === 'object' ? Object.values(list).filter(Boolean) : []);
-      DEFAULT_ADMIN_ACCOUNTS.forEach(def => {
-        if (!arr.some(u => u && String(u.username || '').toLowerCase() === def.username.toLowerCase())) {
-          arr.push({ ...def });
-        }
-      });
-      return arr;
+      return Array.isArray(list) ? list.filter(Boolean) : (list && typeof list === 'object' ? Object.values(list).filter(Boolean) : []);
     }
 
     /* ================= STORAGE KEYS ================= */
@@ -4222,7 +4217,9 @@
 
     /* ================= STATE GỐC ================= */
     const ACTIVE_PAGE_STORAGE_KEY = "atelier_active_page_v9";
-    let userDatabase = mergeDefaultAdmins(safeParseJSON(safeStorage.getItem(AUTH_STORAGE_KEY), null));
+    let userDatabase = [];
+    let usersReady = false;
+    safeStorage.removeItem(AUTH_STORAGE_KEY);
     let classDatabase = safeParseJSON(safeStorage.getItem(CLASSES_STORAGE_KEY), [{ id: "cls_a1", name: "Lớp Sinh Học Chuyên Sâu - BioBling 2B" }]);
     let sessionDatabase = safeParseJSON(safeStorage.getItem(SESSIONS_STORAGE_KEY), [
       { id: "ses_1", title: "Chuyên đề 01: Cơ sở vật chất & Cơ chế di truyền ADN" },
@@ -4257,9 +4254,24 @@
     let scoreboardV8Tab = 'students';
 
     function isSuperAdmin() {
-      return currentUser && 
-             currentUser.username.toLowerCase() === 'admin1' && 
-             currentUser.password === 'Meocon@123';
+      return !!(currentUser && currentUser.role === 'admin' && currentUser.status === 'approved' && String(currentUser.username).toLowerCase() === 'admin1');
+    }
+    // UI checks are defense in depth, not a replacement for Firebase Rules.
+    function requireAdmin() {
+      if (currentUser && currentUser.role === 'admin' && currentUser.status === 'approved') return true;
+      safeAlert('Bạn không có quyền thực hiện thao tác này.'); return false;
+    }
+    function safeWebUrl(value) {
+      try { const url = new URL(String(value || '').trim()); return url.protocol === 'https:' && !url.username && !url.password ? url.href : ''; }
+      catch (_) { return ''; }
+    }
+    function safeAvatarUrl(value) {
+      const s=String(value || '');
+      return /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(s) ? s : safeWebUrl(s);
+    }
+    function hasValidLegacySession(user, session) {
+      return !!(user && session && String(user.id)===String(session.id) && user.status==='approved' &&
+        Array.isArray(user.activeSessions) && user.activeSessions.some(s=>s && s.deviceId===getOrCreateDeviceId()));
     }
 
     /* ================= REALTIME & FIRESTORE LISTENERS ================= */
@@ -4312,24 +4324,28 @@
     });
 
     rtdb.ref('/users').on('value', (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        userDatabase = mergeDefaultAdmins(data);
-        safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-        
-        if (currentUser) {
-          const fresh = userDatabase.find(u => u && (
-            String(u.id) === String(currentUser.id) ||
-            String(u.username || '').toLowerCase() === String(currentUser.username || '').toLowerCase()
-          ));
-          if (fresh) {
-            currentUser = fresh;
-            safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
-            updateUserUI();
-          }
+      const wasReady = usersReady;
+      usersReady = true;
+      userDatabase = mergeDefaultAdmins(snapshot.val());
+      const session = currentUser || safeParseJSON(safeStorage.getItem(SESSION_STORAGE_KEY), null);
+      const fresh = session && userDatabase.find(u=>String(u.id)===String(session.id));
+      if (hasValidLegacySession(fresh, session)) {
+        currentUser = fresh;
+        if (!wasReady) checkAuthSession(); else updateUserUI();
+      } else {
+        const hadSession = !!session;
+        if (currentUser && document.getElementById('liveExamModal')?.classList.contains('open')) {
+          persistExamDraft();
+          clearInterval(examCountdownTimer);
+          stopExamDraftHeartbeat();
+          detachStudentLiveMentorChatListener();
+          document.getElementById('examQuestionDialog').close();
+          document.getElementById('liveExamModal').classList.remove('open');
+          document.body.style.overflow = '';
         }
-      } else if (userDatabase && userDatabase.length > 0) {
-        rtdb.ref('/users').set(userDatabase);
+        currentUser = null;
+        safeStorage.removeItem(SESSION_STORAGE_KEY);
+        if (hadSession || !wasReady) checkAuthSession();
       }
       const activePageId = document.querySelector('.page.active')?.id;
       if (activePageId === 'my_class') renderClassMembersView(currentClassViewId);
@@ -4667,6 +4683,7 @@
     }
     // Transaction tránh việc nhiều quản trị viên ghi đè dữ liệu của nhau.
     async function commitRtdbList(path, modifier) {
+      if (!requireAdmin()) throw new Error('Không đủ quyền quản trị.');
       const result = await rtdb.ref('/'+path).transaction(value => {
         const list = Array.isArray(value) ? value.filter(Boolean) : (value && typeof value==='object' ? Object.values(value) : []);
         return modifier(list);
@@ -6182,7 +6199,7 @@
       document.getElementById('liveExamTitle').innerText = activeExam.title || "Bài Thi Sinh Học";
       document.getElementById('liveExamCode').innerText = activeExam.code || "---";
 
-      const rawUrl = activeExam.rawDocsUrl || activeExam.embedUrl || "";
+      const rawUrl = safeWebUrl(activeExam.rawDocsUrl || activeExam.embedUrl);
       const embedUrl = convertDocsToPreview(rawUrl) || activeExam.embedUrl || "";
       
       const docIframe = document.getElementById('liveExamIframe');
@@ -6356,6 +6373,7 @@
     }
 
     async function saveInlineEditedKeysToMasterExam() {
+      if (!requireAdmin()) return;
       if (!currentUser || currentUser.role !== 'admin' || !activeExam) return;
       const btnSave = document.getElementById('btnSaveInlineKeyChanges');
       if (btnSave) {
@@ -7085,6 +7103,7 @@
     }
 
     function convertDocsToPreview(url) {
+      url = safeWebUrl(url);
       if (!url) return "";
       url = url.trim();
       const docsMatch = url.match(/\/document\/d\/([a-zA-Z0-9-_]+)/);
@@ -7197,6 +7216,7 @@
     });
 
     async function saveAdminExamToFirestore() {
+      if (!requireAdmin()) return;
       const code = document.getElementById('inpAdminExamCode').value.trim();
       const title = document.getElementById('inpAdminExamTitle').value.trim();
       const timeLimit = parseInt(document.getElementById('inpAdminExamTime').value) || 50;
@@ -7206,7 +7226,8 @@
       const isUnlimited = document.getElementById('chkAdminIsUnlimited').checked;
       const practiceOnly = document.getElementById('chkAdminPracticeOnly').checked;
       const deadline = document.getElementById('inpAdminExamDeadline').value || '';
-      const rawDocsUrl = document.getElementById('inpAdminDocsUrl').value.trim();
+      const rawDocsUrl = safeWebUrl(document.getElementById('inpAdminDocsUrl').value);
+      if (!rawDocsUrl) return safeAlert('Đường dẫn đề thi phải là HTTPS hợp lệ.');
 
       const rawMcq = document.getElementById('inpAdminMcqKeys').value.trim();
       const rawTf = document.getElementById('inpAdminTfKeys').value.trim();
@@ -7306,6 +7327,7 @@
     }
 
     async function deleteAdminExam(code) {
+      if (!requireAdmin()) return;
       if (safeConfirm(`Bạn có chắc chắn muốn xóa đề thi [${code}] vĩnh viễn không?`)) {
         try {
           await db.collection("exams").doc(code).delete();
@@ -7318,6 +7340,7 @@
 
     /* ================= CÁC HÀM GỐC CỦA HỆ THỐNG LMS ================= */
     function convertToDrivePreviewUrl(rawUrl) {
+      rawUrl = safeWebUrl(rawUrl);
       if (!rawUrl) return '';
       let url = rawUrl.trim();
       const matchFileId = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
@@ -7333,6 +7356,7 @@
     }
 
     function openDocViewer(rawUrl, title) {
+      rawUrl = safeWebUrl(rawUrl);
       if (!rawUrl) return showToast("Chưa có đường dẫn tài liệu để hiển thị.");
       const modal = document.getElementById('docViewerModal');
       const iframe = document.getElementById('docViewerIframe');
@@ -7679,16 +7703,10 @@
     }
 
     function checkAuthSession() {
-      if (!currentUser) {
-        const savedSession = safeParseJSON(safeStorage.getItem(SESSION_STORAGE_KEY), null);
-        if (savedSession && savedSession.username) {
-          // Đối chiếu xem phiên thiết bị còn hợp lệ không
-          const dbUser = userDatabase.find(u => u && (
-            String(u.id) === String(savedSession.id) ||
-            String(u.username || '').toLowerCase() === String(savedSession.username || '').toLowerCase()
-          ));
-          currentUser = dbUser || savedSession;
-        }
+      if (!usersReady) {
+        currentUser = null;
+        document.getElementById('authOverlay').style.display = 'block';
+        return;
       }
       if (!currentUser) { 
         document.getElementById('authOverlay').style.display = 'block';
@@ -7715,6 +7733,7 @@
 
     function handleLogin(e) {
       e.preventDefault();
+      if (!usersReady) return showAuthNotice('Đang kết nối máy chủ tài khoản. Vui lòng thử lại sau.', false);
       userDatabase = mergeDefaultAdmins(userDatabase);
       const enteredUsername = document.getElementById('loginUsername').value.trim().toLowerCase();
       const enteredPassword = document.getElementById('loginPassword').value.trim();
@@ -7726,7 +7745,7 @@
       }
       
       const user = userDatabase[userIdx];
-      if (user.status === "pending") {
+      if (user.status !== "approved") {
         showAuthNotice("Tài khoản đang chờ duyệt từ Quản trị viên BioBling!", false);
         return;
       }
@@ -7764,6 +7783,7 @@
 
     function handleRegister(e) {
       e.preventDefault();
+      if (!usersReady) return showAuthNotice('Đang kết nối máy chủ tài khoản. Vui lòng thử lại sau.', false);
       const un = document.getElementById('regUsername').value.trim().toLowerCase();
       if(userDatabase.some(u=>u && String(u.username || '').toLowerCase()===un)) {
         showAuthNotice("Tên đăng nhập đã tồn tại!", false);
@@ -7889,7 +7909,7 @@
       const drawAvatar = (elId) => {
         const el = document.getElementById(elId);
         if (el) {
-          if (currentUser.avatar) el.innerHTML = `<img src="${currentUser.avatar}">`;
+          if (currentUser.avatar) el.innerHTML = `<img src="${escapeHTML(safeAvatarUrl(currentUser.avatar))}">`;
           else el.textContent = initChar;
         }
       };
@@ -7981,7 +8001,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #dce8df; padding:12px 14px; border-radius:12px; gap:10px; flex-wrap:wrap;">
             <div style="display:flex; align-items:center; gap:10px;">
               <div class="user-avatar-small" style="background:${isMasterSelf ? '#b91c1c' : '#287c54'}; font-size:12px;">
-                ${admin.avatar ? `<img src="${admin.avatar}">` : admin.username.charAt(0).toUpperCase()}
+                ${admin.avatar ? `<img src="${escapeHTML(safeAvatarUrl(admin.avatar))}">` : admin.username.charAt(0).toUpperCase()}
               </div>
               <div>
                 <b style="font-size:13.5px; color:#173d2e;">${escapeHTML(admin.fullName || admin.username)}</b>
@@ -8598,7 +8618,7 @@
                       <td>
                         <div style="display:flex; align-items:center; gap:10px;">
                           <div class="user-avatar-small" style="width:34px; height:34px; font-size:12px;">
-                            ${m.avatar ? `<img src="${m.avatar}">` : initial}
+                            ${m.avatar ? `<img src="${escapeHTML(safeAvatarUrl(m.avatar))}">` : initial}
                           </div>
                           <div>
                             <b style="font-size:13px; color:#173d2e;">${escapeHTML(m.fullName || m.username)} ${isMe ? '(Tôi)' : ''}</b>
@@ -8679,7 +8699,7 @@
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <div style="display:flex; align-items:center; gap:10px;">
                 <div class="user-avatar-small" style="width:40px; height:40px; font-size:14px;">
-                  ${m.avatar ? `<img src="${m.avatar}">` : initial}
+                  ${m.avatar ? `<img src="${escapeHTML(safeAvatarUrl(m.avatar))}">` : initial}
                 </div>
                 <div>
                   <b style="font-size:13.5px; color:#173d2e;">${escapeHTML(m.fullName || m.username)} ${isMe ? '(Tôi)' : ''}</b>
@@ -8767,6 +8787,7 @@
     }
 
     function quickAddUserToClass(userId, classId) {
+      if (!requireAdmin()) return;
       const user = userDatabase.find(u => u && u.id === userId);
       if (!user || !classId) return;
       const currentIds = getUserEnrolledClassIds(user);
@@ -8782,6 +8803,7 @@
     }
 
     function addCandidateToClass(userId) {
+      if (!requireAdmin()) return;
       const user = userDatabase.find(u => u && u.id === userId);
       if (!user || !targetClassForAdd) return;
 
@@ -8800,6 +8822,7 @@
     }
 
     function removeUserFromClass(userId, classIdToRemove = null) {
+      if (!requireAdmin()) return;
       const user = userDatabase.find(u => u && u.id === userId);
       if (!user) return;
       const targetCid = classIdToRemove || (currentClassViewId !== 'all_users' && currentClassViewId !== 'unassigned' ? currentClassViewId : '');
@@ -9497,7 +9520,8 @@
       const classIds = Object.keys(classSessionIds);
       const sessionId = classSessionIds[classIds[0]];
       const title = document.getElementById('mediaTitle').value.trim();
-      const url = document.getElementById('mediaUrl').value.trim();
+      const url = safeWebUrl(document.getElementById('mediaUrl').value);
+      if (!url) return safeAlert('Đường dẫn học liệu phải là HTTPS hợp lệ.');
       if (!classIds.length) return safeAlert('Chọn ít nhất một lớp cho học liệu.');
       if (!title || !url) return safeAlert('Vui lòng nhập tiêu đề và đường dẫn học liệu.');
       const sesObj = sessionDatabase.find(s => s.id === sessionId);
@@ -9560,7 +9584,7 @@
         sessionId, sessionName: ses.title, classSessionIds,
         type: document.getElementById('editMediaType').value,
         title: document.getElementById('editMediaTitle').value.trim(),
-        url: document.getElementById('editMediaUrl').value.trim(),
+        url: safeWebUrl(document.getElementById('editMediaUrl').value),
         note: document.getElementById('editMediaNote').value.trim(),
         deadline: document.getElementById('editMediaDeadline').value || '',
         updatedAt: new Date().toISOString()
@@ -9783,6 +9807,7 @@
     }
 
     function approveUser(userId) {
+      if (!requireAdmin()) return;
       const u = userDatabase.find(x => x.id === userId);
       if(u) {
         u.status = 'approved';
@@ -9860,7 +9885,7 @@
 
       const idAvatar = document.getElementById('idCardAvatarBox');
       if (idAvatar) {
-        if (currentUser.avatar) idAvatar.innerHTML = `<img src="${currentUser.avatar}">`;
+        if (currentUser.avatar) idAvatar.innerHTML = `<img src="${escapeHTML(safeAvatarUrl(currentUser.avatar))}">`;
         else idAvatar.textContent = nameVal.charAt(0).toUpperCase();
       }
     }
@@ -9988,7 +10013,7 @@
       document.getElementById('settingBio').value = currentUser.bio || "";
       const prevBox = document.getElementById('settingAvatarPreview');
       prevBox.removeAttribute('data-temp-avatar'); 
-      if(currentUser.avatar) prevBox.innerHTML = `<img src="${currentUser.avatar}">`;
+      if(currentUser.avatar) prevBox.innerHTML = `<img src="${escapeHTML(safeAvatarUrl(currentUser.avatar))}">`;
       else prevBox.textContent = (currentUser.fullName||currentUser.username).charAt(0).toUpperCase();
 
       updateLiveStudentIdCard();
@@ -10040,3 +10065,4 @@
   </script>
 </body>
 </html>
+
