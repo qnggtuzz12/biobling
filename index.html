@@ -2421,6 +2421,18 @@
     .exam-v8-actions {display:flex;flex-wrap:wrap;gap:7px;margin-top:9px;}
     .exam-v8-actions button {flex:1;justify-content:center;font-size:11px;}
     @media(max-width:650px) {.exam-v8-controls{align-items:stretch;flex-direction:column}.exam-v8-controls select{width:100%}}
+
+    #examQuestionDialog { width:min(620px,calc(100% - 24px)); max-height:85dvh; padding:20px; border:1px solid #dbe8de; border-radius:18px; color:#19342c; box-shadow:0 20px 70px #0004; }
+    #examQuestionDialog::backdrop { background:#0f172a88; }
+    .question-map-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(82px,1fr)); gap:8px; }
+    .question-map-item { min-height:52px; border:1px solid #cbd5e1; border-radius:10px; background:#f8fafc; color:#475569; padding:7px; }
+    .question-map-item small { display:block; font-size:10px; margin-top:3px; }
+    .question-map-item.done { background:#dcfce7; border-color:#86efac; color:#166534; }
+    .question-map-item.partial { background:#fff7ed; border-color:#fdba74; color:#9a3412; }
+    .question-map-target { outline:3px solid #2563eb; outline-offset:2px; scroll-margin:12px; }
+    #liveExamModal > div:first-of-type { flex-wrap:wrap; gap:8px; }
+    #liveAnswerSheetList { min-height:0; }
+    @media(max-width:600px) { #liveExamRightPanel { width:min(340px,100vw); min-width:min(290px,100vw); } #examQuestionDialog { padding:14px; } }
   </style>
 </head>
 <body>
@@ -3685,6 +3697,13 @@
 
   <!-- ================= GIAO DIỆN PHÒNG THI TOÀN MÀN HÌNH ================= -->
   <div id="liveExamModal">
+    <dialog id="examQuestionDialog" aria-labelledby="examQuestionTitle">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h2 id="examQuestionTitle" style="font-size:18px;margin:0">Danh sách câu hỏi</h2><button type="button" class="secondary" onclick="document.getElementById('examQuestionDialog').close()" autofocus>Đóng ✕</button></div>
+      <p style="font-size:12px;color:#64748b">Bấm số câu để tới ô trả lời. Câu Đúng/Sai chỉ hoàn tất khi đã chọn đủ 4 ý.</p>
+      <p id="examQuestionSummary" role="status" style="font-size:13px;font-weight:700"></p>
+      <label style="display:block;margin:12px 0;font-size:13px"><input id="examQuestionIncomplete" type="checkbox" onchange="renderExamQuestionMap()"> Chỉ hiện câu chưa hoàn tất</label>
+      <div id="examQuestionGroups"></div>
+    </dialog>
     <!-- Header Phòng Thi -->
     <div style="background:#fff; border-bottom:1px solid #e2e8f0; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; z-index:20;">
       <div style="display:flex; align-items:center; gap:12px;">
@@ -3704,6 +3723,7 @@
         <button type="button" id="btnSaveInlineKeyChanges" onclick="saveInlineEditedKeysToMasterExam()" class="primary" style="display:none; font-size:11.5px; padding:6px 12px; background:#d97706; border-color:#d97706;">
           <i class="fa-solid fa-floppy-disk"></i> Lưu đáp án mới & Chấm lại
         </button>
+        <button type="button" id="btnExamQuestionMap" onclick="openExamQuestionMap()" class="secondary" aria-haspopup="dialog" aria-controls="examQuestionDialog">☷ Danh sách câu hỏi <span id="examQuestionRemaining"></span></button>
         <button type="button" id="btnExamFullscreenNow" onclick="toggleBrowserFullscreenForExam()" class="secondary" style="font-size:11.5px; padding:6px 11px;" title="Bật / Tắt toàn màn hình máy tính">
           <i class="fa-solid fa-expand"></i> Toàn màn hình
         </button>
@@ -6113,6 +6133,8 @@
         return;
       }
 
+      document.getElementById('examQuestionDialog').close();
+      document.getElementById('examQuestionIncomplete').checked = false;
       activeExam = exam;
       isLiveReviewMode = reviewOnly;
       isAdminEditingExamKeys = false;
@@ -6488,6 +6510,8 @@
           });
 
           row.innerHTML = `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-weight:700; color:#334155;">Câu ${q}:</span>${statusBadge}</div><div>${btns}</div>`;
+          row.id = examQuestionTargetId('mcq', q);
+          row.tabIndex = -1;
           list1.appendChild(row);
         });
         wrap1.appendChild(list1);
@@ -6560,6 +6584,8 @@
             : '';
 
           card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2e8f0;padding-bottom:4px;"><strong style="color:#1e293b;">Câu ${q} (Đ/S):</strong>${qHeaderBadge}</div>${subRows}`;
+          card.id = examQuestionTargetId('tf', q);
+          card.tabIndex = -1;
           list2.appendChild(card);
         });
         wrap2.appendChild(list2);
@@ -6633,6 +6659,8 @@
             </div>
             ${rightControlHtml}
           `;
+          card.id = examQuestionTargetId('sa', q);
+          card.tabIndex = -1;
           list3.appendChild(card);
         });
         wrap3.appendChild(list3);
@@ -6680,19 +6708,64 @@
       updateLiveProgress();
     }
 
+
+    function examQuestionTargetId(type, q) { return 'exam-question-' + type + '-' + encodeURIComponent(q); }
+    function examQuestionItems() {
+      if (!activeExam) return [];
+      return ['mcq','tf','sa'].flatMap(type => Object.keys(activeExam[type+'Keys'] || {}).sort((a,b)=>Number(a)-Number(b)).map(q => {
+        const answer = (studentLiveAnswers[type] || {})[q];
+        const count = type === 'tf' ? ['a','b','c','d'].filter(s => answer && (answer[s] === 'Đ' || answer[s] === 'S')).length
+          : (String(answer ?? '').trim() ? 1 : 0);
+        return {type, q, count, status:count === (type === 'tf' ? 4 : 1) ? 'done' : count ? 'partial' : 'blank'};
+      }));
+    }
+    function openExamQuestionMap() {
+      renderExamQuestionMap();
+      document.getElementById('examQuestionDialog').showModal();
+    }
+    function renderExamQuestionMap() {
+      const items = examQuestionItems();
+      const done = items.filter(x=>x.status==='done').length;
+      const partial = items.filter(x=>x.status==='partial').length;
+      setElText('examQuestionSummary', '✓ Đã làm: '+done+' · ◐ Làm dở: '+partial+' · ○ Chưa làm: '+(items.length-done-partial));
+      const host = document.getElementById('examQuestionGroups');
+      host.replaceChildren();
+      const incomplete = document.getElementById('examQuestionIncomplete').checked;
+      const labels = {mcq:'Phần I · Trắc nghiệm',tf:'Phần II · Đúng / Sai',sa:'Phần III · Trả lời ngắn'};
+      for (const type of ['mcq','tf','sa']) {
+        const visible = items.filter(x=>x.type===type && (!incomplete || x.status!=='done'));
+        if (!visible.length) continue;
+        const heading = document.createElement('h3'); heading.style.fontSize='13px'; heading.textContent=labels[type]; host.appendChild(heading);
+        const grid = document.createElement('div'); grid.className='question-map-grid'; host.appendChild(grid);
+        visible.forEach(item=>{
+          const button=document.createElement('button'); button.type='button'; button.className='question-map-item '+item.status;
+          const state=item.status==='done'?'✓ Đã làm':item.status==='partial'?'◐ '+item.count+'/4 ý':'○ Chưa làm';
+          button.textContent='Câu '+item.q;
+          const small=document.createElement('small'); small.textContent=state; button.appendChild(small);
+          button.setAttribute('aria-label',labels[type]+', câu '+item.q+', '+state);
+          button.onclick=()=>jumpToExamQuestion(item.type,item.q); grid.appendChild(button);
+        });
+      }
+      if (!host.children.length) host.textContent=items.length?'Bạn đã hoàn tất tất cả câu hỏi.':'Đề chưa có câu hỏi.';
+    }
+    function jumpToExamQuestion(type,q) {
+      document.getElementById('examQuestionDialog').close();
+      if (document.getElementById('liveExamRightPanel').classList.contains('collapsed')) toggleExamWideDocMode();
+      const target=document.getElementById(examQuestionTargetId(type,q));
+      if (!target) return;
+      document.querySelectorAll('.question-map-target').forEach(el=>el.classList.remove('question-map-target'));
+      target.classList.add('question-map-target');
+      target.scrollIntoView({block:'center',behavior:'instant'});
+      target.focus({preventScroll:true});
+      setTimeout(()=>target.classList.remove('question-map-target'),2500);
+    }
     function updateLiveProgress() {
-      const mcqDone = Object.values(studentLiveAnswers.mcq).filter(Boolean).length;
-      let tfDone = 0;
-      Object.keys(studentLiveAnswers.tf).forEach(k => {
-        if (Object.values(studentLiveAnswers.tf[k] || {}).filter(Boolean).length === 4) tfDone++;
-      });
-      const saDone = Object.values(studentLiveAnswers.sa).filter(v => v && v.trim().length > 0).length;
-
-      const totalItems = Object.keys(activeExam.mcqKeys || {}).length + Object.keys(activeExam.tfKeys || {}).length + Object.keys(activeExam.saKeys || {}).length;
-      const totalDone = mcqDone + tfDone + saDone;
-
-      document.getElementById('liveAnsweredCount').innerText = totalDone;
-      document.getElementById('liveProgressBar').style.width = `${totalItems ? (totalDone / totalItems) * 100 : 0}%`;
+      const items=examQuestionItems();
+      const done=items.filter(x=>x.status==='done').length;
+      setElText('liveAnsweredCount',done);
+      setElText('examQuestionRemaining',items.length-done ? '('+(items.length-done)+' chưa xong)' : '(✓)');
+      document.getElementById('liveProgressBar').style.width=(items.length?done/items.length*100:0)+'%';
+      if (document.getElementById('examQuestionDialog').open) renderExamQuestionMap();
     }
 
     function startExamTimer(expiresAt) {
