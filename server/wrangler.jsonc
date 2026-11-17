@@ -19,10 +19,11 @@
     "FIREBASE_PROJECT": "biobling",
     "FIREBASE_DATABASE": "https://biobling-default-rtdb.firebaseio.com",
     "ALLOWED_ORIGINS": "https://biobling.vercel.app",
-    "RELEASE_ENABLED": "false",
+    "RELEASE_ENABLED": "true",
     "OWNER_UID": "owner_6ac95f4f2fa54226b02be4b668262daa"
   },
   "observability": {
     "enabled": false
   }
 }
+
