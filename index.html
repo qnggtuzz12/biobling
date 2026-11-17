@@ -1229,6 +1229,83 @@
       .landing-brand-text span { display: none; }
     }
 
+    /* Account surfaces share BioBling's typography, mint palette and controls. */
+    #authPopupModal .auth-card { width:min(100%,460px); max-height:calc(100dvh - 36px); overflow-y:auto; border:1px solid #e0ebe3; }
+    .auth-intro { text-align:center; margin:22px 0 18px; }
+    .auth-intro h3 { margin:0 0 7px; font-size:17px; font-weight:750; color:var(--green-dark); }
+    .auth-intro p { margin:0; font-size:12.5px; line-height:1.75; color:var(--muted); }
+    .auth-google-button.primary { width:100%; min-height:48px; justify-content:center; gap:11px; font-size:13px; border-radius:12px; box-shadow:0 5px 14px #266f511c; }
+    .auth-google-mark { width:25px; height:25px; border-radius:7px; background:#fff; color:#266f51; display:grid; place-items:center; font-size:15px; }
+    .auth-help { display:flex; gap:11px; align-items:flex-start; padding:14px; margin-top:18px; background:var(--mint-2); border:1px solid var(--line); border-radius:13px; }
+    .auth-help > i { color:var(--green); margin-top:3px; font-size:15px; }
+    .auth-help strong { display:block; font-size:12px; font-weight:750; color:var(--green-dark); margin-bottom:4px; }
+    .auth-help p { font-size:11.5px; color:#61796c; line-height:1.75; margin:0; }
+    .auth-footnote { display:flex; justify-content:center; align-items:center; gap:6px; margin:15px 0 0; font-size:10.5px; color:var(--muted); }
+    .account-section-title { display:flex; align-items:center; gap:9px; color:var(--green-dark); }
+    .account-description { font-size:12px; line-height:1.7; color:var(--muted); margin:5px 0 16px; }
+    .account-access-form { display:grid; gap:12px; margin-top:14px; }
+    .account-access-form label, .account-link-field label { font-size:12px; font-weight:700; color:var(--ink); }
+    .account-access-form select, .account-link-field select { width:100%; min-width:0; border:1px solid #d8e8dd; background:#f8fbf9; color:var(--ink); border-radius:10px; padding:11px 12px; font:inherit; font-size:12px; }
+    .account-access-form .primary { justify-content:center; min-height:42px; }
+    .account-person { display:flex; align-items:center; gap:11px; min-width:0; }
+    .account-avatar { width:37px; height:37px; flex:0 0 37px; border:1px solid #d6e8db; border-radius:12px; background:linear-gradient(145deg,#edf7ef,#dceee2); color:var(--green); display:grid; place-items:center; font-size:13px; font-weight:800; }
+    .account-person-copy { min-width:0; }
+    .account-person-copy strong { display:block; font-size:12.5px; font-weight:700; line-height:1.5; overflow-wrap:anywhere; }
+    .account-person-copy small { display:block; color:var(--muted); font-size:10.5px; margin-top:2px; overflow-wrap:anywhere; }
+    .account-badge { display:inline-flex; align-items:center; gap:5px; padding:5px 9px; border-radius:8px; background:#f0f5f2; color:#597064; font-size:10.5px; font-weight:700; line-height:1.4; white-space:nowrap; }
+    .account-badge.is-approved { background:#e8f5ec; color:#216b43; }
+    .account-badge.is-pending { background:#fff5dc; color:#906316; }
+    .account-badge.is-suspended { background:#fceceb; color:#a04c46; }
+    .account-badge.is-teacher { background:#eaf0fc; color:#4c6394; }
+    .account-badge.is-owner { background:#edf2e5; color:#5b7032; }
+    .account-google { font-size:11.5px; overflow-wrap:anywhere; }
+    .account-google small { display:flex; align-items:center; gap:5px; font-size:10.5px; color:var(--muted); margin-top:4px; }
+    .account-action.secondary { min-height:34px; font-size:11px; padding:7px 10px; white-space:nowrap; }
+    .account-action.is-caution { color:#a06435; border-color:#eddfce; background:#fffbf5; }
+    .account-action.is-caution:hover { background:#fff1df; }
+    .account-action:disabled { cursor:default; opacity:.65; }
+    .account-owner-label { display:inline-flex; align-items:center; gap:6px; color:#617642; font-size:11px; font-weight:650; }
+    .account-admin-card { display:flex; align-items:center; justify-content:space-between; gap:12px; border:1px solid var(--line); background:#fbfdfb; border-radius:13px; padding:13px; }
+    .account-summary { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:0 0 15px; }
+    .account-summary > span { display:inline-flex; align-items:center; gap:6px; background:var(--mint-2); border:1px solid var(--line); padding:6px 10px; border-radius:9px; color:var(--muted); font-size:11px; }
+    .account-summary b { color:var(--green-dark); font-size:12px; }
+    .account-table.member-compact-table { min-width:0; table-layout:fixed; }
+    .account-table th:nth-child(1) { width:23%; }
+    .account-table th:nth-child(2) { width:29%; }
+    .account-table th:nth-child(3), .account-table th:nth-child(4), .account-table th:nth-child(5) { width:16%; }
+    .account-table tbody tr:last-child td { border-bottom:0; }
+    .account-empty { padding:28px 18px; text-align:center; color:var(--muted); font-size:12px; }
+    .account-empty > i { display:block; font-size:25px; color:#89aa94; margin-bottom:12px; }
+    .account-empty strong { display:block; color:var(--green-dark); font-size:13px; margin-bottom:5px; }
+    .account-approval-card { padding:18px; border:1px solid var(--line); border-radius:16px; background:#fff; margin-bottom:12px; }
+    .account-approval-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:15px; }
+    .account-link-field { border-top:1px solid var(--line); margin-top:16px; padding-top:14px; display:grid; gap:9px; }
+    .account-link-controls { display:flex; gap:8px; }
+    .account-link-controls select { flex:1; }
+    .account-link-controls button { flex-shrink:0; }
+    @media(max-width:1100px) {
+      .account-table.member-compact-table { table-layout:auto; }
+      .account-table th, .account-table td { padding:12px 10px; }
+      .account-table .account-avatar { display:none; }
+    }
+    @media(max-width:700px) {
+      #authPopupModal .auth-card { padding:25px 20px 22px; }
+      #superStudentAccountsTableWrap { background:transparent; box-shadow:none; border:0; overflow:visible; }
+      .account-table, .account-table tbody { display:block; width:100%; }
+      .account-table thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+      .account-table tbody tr { display:block; background:#fff; border:1px solid var(--line); border-radius:15px; padding:6px 14px; margin-bottom:12px; }
+      .account-table tbody td { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 0; text-align:right; }
+      .account-table td::before { content:attr(data-label); font-size:11px; font-weight:650; color:var(--muted); flex-shrink:0; }
+      .account-table td:first-child { text-align:left; justify-content:flex-start; padding:13px 0; }
+      .account-table td:first-child::before { display:none; }
+      .account-table .account-avatar { display:grid; }
+      .account-google { min-width:0; }
+      .account-google small { justify-content:flex-end; }
+      .account-link-controls { flex-direction:column; }
+      .account-link-controls button { justify-content:center; }
+      .account-admin-card { flex-wrap:wrap; }
+    }
+
     .auth-tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -2719,10 +2796,20 @@
 
         <div id="authNoticeBox" style="display:none; padding:10px 12px; border-radius:10px; font-size:12px; font-weight:650; margin-bottom:14px; line-height:1.45;"></div>
         <!-- Form Đăng Nhập -->
-        <form id="formLogin" onsubmit="handleLogin(event)"><p>Đăng nhập bằng Google. Học viên mới cần giảng viên duyệt; hồ sơ và bài làm cũ sẽ được liên kết sau khi xác nhận.</p><button type="submit" class="primary" style="width:100%">Tiếp tục với Google</button></form>
+        <form id="formLogin" onsubmit="handleLogin(event)">
+          <div class="auth-intro"><h3>Chào mừng bạn trở lại</h3><p>Tiếp tục hành trình học Sinh học cùng BioBling.</p></div>
+          <button type="submit" class="primary auth-google-button"><span class="auth-google-mark" aria-hidden="true"><i class="fa-brands fa-google"></i></span>Tiếp tục với Google<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+          <div class="auth-help"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i><div><strong>Bạn đã học tại BioBling?</strong><p>Đăng nhập Google, sau đó giảng viên sẽ xác nhận và liên kết hồ sơ cũ để giữ nguyên lớp học và bài làm của bạn.</p></div></div>
+          <p class="auth-footnote"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>BioBling không lưu mật khẩu Google của bạn.</p>
+        </form>
 
         <!-- Form Đăng Ký -->
-        <form id="formRegister" onsubmit="handleRegister(event)" style="display:none"><p>Dùng tài khoản Google của bạn để đăng ký BioBling.</p><button type="submit" class="primary">Đăng ký bằng Google</button></form>
+        <form id="formRegister" onsubmit="handleRegister(event)" style="display:none">
+          <div class="auth-intro"><h3>Bắt đầu cùng BioBling</h3><p>Dùng tài khoản Google của bạn để tạo hồ sơ học tập.</p></div>
+          <button type="submit" class="primary auth-google-button"><span class="auth-google-mark" aria-hidden="true"><i class="fa-brands fa-google"></i></span>Đăng ký bằng Google<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+          <div class="auth-help"><i class="fa-solid fa-user-check" aria-hidden="true"></i><div><strong>Một bước nữa để vào lớp</strong><p>Sau khi đăng ký, giảng viên sẽ duyệt tài khoản và xếp lớp cho bạn. Học viên cũ sẽ được liên kết với hồ sơ đã có.</p></div></div>
+          <p class="auth-footnote"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>BioBling không lưu mật khẩu Google của bạn.</p>
+        </form>
       </div>
     </div>
 
@@ -2799,7 +2886,7 @@
               <line x1="20" y1="8" x2="20" y2="14"/>
               <line x1="23" y1="11" x2="17" y2="11"/>
             </svg>
-            Tạo Nick Admin (Master)
+            Quản lý tài khoản
           </button>
 
           <button id="navBtnSettings" data-page="account_settings" onclick="navigateTo('account_settings')">
@@ -3304,38 +3391,40 @@
         <section id="create_admin" class="page">
           <div class="page-header">
             <div>
-              <h1 style="color:#b91c1c;">🔑 Đặc Quyền Master: Cấp & Quản Trị Nick Admin</h1>
-              <p>Khu vực bảo mật cao cấp dành riêng cho <strong>admin1</strong>. Cấp quyền Quản trị viên/Giảng viên mới.</p>
+              <h1>Quản Lý Tài Khoản & Phân Quyền</h1>
+              <p>Quản lý học viên, liên kết Google và cấp quyền giảng viên trong một không gian.</p>
             </div>
           </div>
 
           <div class="two-col" style="margin-top:0;">
-            <div class="panel" style="border: 1.5px solid #fecaca; background: #fffbfb;">
-              <h3 style="color:#991b1b; display:flex; align-items:center; gap:8px;">
-                <i class="fa-solid fa-shield-halved"></i> Tạo Tài Khoản Admin Mới
+            <div class="panel">
+              <h3 class="account-section-title">
+                <i class="fa-solid fa-shield-halved"></i> Cấp quyền giảng viên
               </h3>
-              <form onsubmit="handleCreateAdmin(event)"><p>Người được cấp quyền cần đăng nhập Google vào BioBling trước.</p><select id="newAdminUser" required></select><button type="submit" class="primary">Cấp quyền giảng viên</button></form>
+              <p class="account-description">Giảng viên có thể quản lý học liệu và xem bài làm. Chọn người đã đăng nhập Google vào BioBling.</p>
+              <form class="account-access-form" onsubmit="handleCreateAdmin(event)"><label for="newAdminUser">Tài khoản nhận quyền</label><select id="newAdminUser" required></select><button type="submit" class="primary"><i class="fa-solid fa-user-shield" aria-hidden="true"></i>Cấp quyền giảng viên</button></form>
             </div>
 
             <div class="panel">
-              <h3>Danh Sách Quản Trị Viên Hiện Tại</h3>
+              <h3 class="account-section-title"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i>Đội ngũ quản lý</h3>
               <div id="adminListSuperView" style="display:grid; gap:10px; max-height:480px; overflow-y:auto; margin-top:10px;"></div>
             </div>
           </div>
 
-          <div class="panel" style="margin-top:18px; border:1.5px solid #fde68a; background:#fffdf7;">
+          <div class="panel" style="margin-top:18px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
               <div>
-                <h3 style="margin:0; color:#92400e; display:flex; align-items:center; gap:8px;">
-                  <i class="fa-solid fa-user-lock"></i> Quản lý tài khoản học viên
+                <h3 class="account-section-title" style="margin:0;">
+                  <i class="fa-solid fa-users"></i> Danh sách tài khoản
                 </h3>
-                <p style="margin:4px 0 0; font-size:12px; color:#78716c;">Quản lý trạng thái tài khoản và liên kết Google. BioBling không lưu mật khẩu.</p>
+                <p class="account-description" style="margin:4px 0 0;">Theo dõi trạng thái truy cập và liên kết Google của từng thành viên.</p>
               </div>
               <div class="exam-search-box" style="max-width:300px;">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="search" id="superStudentAccountSearch" placeholder="Tìm tên hoặc @username học viên..." oninput="renderSuperAdminView()">
+                <input type="search" id="superStudentAccountSearch" aria-label="Tìm tài khoản" placeholder="Tìm tên, email hoặc tên đăng nhập..." oninput="renderSuperAdminView()">
               </div>
             </div>
+            <div id="accountSummary" class="account-summary"></div>
             <div id="superStudentAccountsTableWrap" class="member-compact-table-wrap"></div>
           </div>
         </section>
@@ -7460,10 +7549,17 @@
 
     function renderSuperAdminView() {
       if(!isSuperAdmin())return;
-      const select=document.getElementById('newAdminUser');if(select)select.innerHTML='<option value="">Chọn người đã đăng nhập Google</option>'+userDatabase.filter(u=>u.uid&&u.role!=='admin').map(u=>'<option value="'+u.id+'">'+escapeHTML(u.fullName+' · '+u.email)+'</option>').join('');
-      const rows=userDatabase.map(u=>'<tr><td>'+escapeHTML(u.fullName||u.username)+'</td><td>'+escapeHTML(u.email||'Chưa liên kết Google')+'</td><td>'+escapeHTML(u.role)+'</td><td>'+escapeHTML(u.status)+'</td><td>'+(u.uid!==window.BIOBLING_OWNER_UID?'<button onclick="deleteUserPermanently('+u.id+')">Tạm khóa</button>':'Chủ hệ thống')+'</td></tr>').join('');
-      document.getElementById('adminListSuperView').innerHTML='<p>Giảng viên đăng nhập bằng tài khoản Google của chính mình.</p>';
-      document.getElementById('superStudentAccountsTableWrap').innerHTML='<table style="width:100%"><thead><tr><th>Họ tên</th><th>Google</th><th>Vai trò</th><th>Trạng thái</th><th>Quản lý</th></tr></thead><tbody>'+rows+'</tbody></table>';
+      const select=document.getElementById('newAdminUser');
+      if(select){const selected=select.value;select.innerHTML='<option value="">Chọn tài khoản Google</option>'+userDatabase.filter(u=>u.uid&&u.role!=='admin').map(u=>'<option value="'+Number(u.id)+'">'+escapeHTML(u.fullName+' · '+u.email)+'</option>').join('');select.value=selected;}
+      const person=u=>'<div class="account-person"><span class="account-avatar" aria-hidden="true">'+escapeHTML((u.fullName||u.username||'?').trim().split(/\s+/).slice(-2).map(w=>w.charAt(0)).join('').toUpperCase())+'</span><div class="account-person-copy"><strong>'+escapeHTML(u.fullName||u.username)+'</strong><small>'+escapeHTML(u.username?'@'+u.username:'Tài khoản Google')+'</small></div></div>';
+      const role=u=>u.uid===window.BIOBLING_OWNER_UID?'<span class="account-badge is-owner"><i class="fa-solid fa-crown" aria-hidden="true"></i>Chủ hệ thống</span>':u.role==='admin'?'<span class="account-badge is-teacher">Giảng viên</span>':'<span class="account-badge">Học viên</span>';
+      const status=u=>u.status==='approved'?'<span class="account-badge is-approved"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>Đã duyệt</span>':u.status==='suspended'?'<span class="account-badge is-suspended"><i class="fa-solid fa-lock" aria-hidden="true"></i>Tạm khóa</span>':'<span class="account-badge is-pending"><i class="fa-regular fa-clock" aria-hidden="true"></i>Chờ duyệt</span>';
+      const query=(document.getElementById('superStudentAccountSearch')?.value||'').trim().toLocaleLowerCase('vi');
+      const users=userDatabase.filter(u=>[u.fullName,u.username,u.email].some(value=>String(value||'').toLocaleLowerCase('vi').includes(query)));
+      const rows=users.map(u=>'<tr><td data-label="Họ tên">'+person(u)+'</td><td data-label="Google"><div class="account-google">'+escapeHTML(u.email||'Chưa liên kết Google')+'<small><i class="fa-solid '+(u.uid?'fa-link':'fa-link-slash')+'" aria-hidden="true"></i>'+(u.uid?'Đã liên kết':'Chờ liên kết hồ sơ')+'</small></div></td><td data-label="Vai trò">'+role(u)+'</td><td data-label="Trạng thái">'+status(u)+'</td><td data-label="Quản lý">'+(u.uid===window.BIOBLING_OWNER_UID?'<span class="account-owner-label"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>Được bảo vệ</span>':u.status==='suspended'?'<button type="button" class="secondary account-action" disabled><i class="fa-solid fa-lock" aria-hidden="true"></i>Đã tạm khóa</button>':'<button type="button" class="secondary account-action is-caution" onclick="deleteUserPermanently('+Number(u.id)+')" aria-label="Tạm khóa '+escapeHTML(u.fullName||u.username)+'"><i class="fa-solid fa-user-lock" aria-hidden="true"></i>Tạm khóa</button>')+'</td></tr>').join('');
+      document.getElementById('adminListSuperView').innerHTML=userDatabase.filter(u=>u.role==='admin').map(u=>'<div class="account-admin-card">'+person(u)+role(u)+'</div>').join('');
+      document.getElementById('accountSummary').innerHTML='<span><b>'+userDatabase.length+'</b> tài khoản</span><span><b>'+userDatabase.filter(u=>u.uid).length+'</b> đã liên kết Google</span><span><b>'+userDatabase.filter(u=>u.status==='pending').length+'</b> chờ duyệt</span>'+(query?'<span>Hiển thị <b>'+users.length+'</b> kết quả</span>':'');
+      document.getElementById('superStudentAccountsTableWrap').innerHTML=rows?'<table class="member-compact-table account-table" aria-label="Danh sách tài khoản"><thead><tr><th scope="col">Họ tên</th><th scope="col">Tài khoản Google</th><th scope="col">Vai trò</th><th scope="col">Trạng thái</th><th scope="col">Quản lý</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="account-empty" role="status"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><strong>Không tìm thấy tài khoản</strong>Thử tìm bằng tên, email hoặc tên đăng nhập khác.</div>';
     }
 
     async function handleCreateAdmin(e) {
@@ -9108,7 +9204,7 @@
     function openApprovalModal() {
       if(!requireAdmin())return;
       const pending=userDatabase.filter(u=>u.status==='pending'&&u.uid),legacy=userDatabase.filter(u=>u.migrationRequired&&!u.uid&&(u.role!=='admin'||isSuperAdmin()));
-      document.getElementById('approvalUsersList').innerHTML=pending.length?pending.map(u=>'<div style="padding:12px;border-bottom:1px solid #ddd"><b>'+escapeHTML(u.fullName)+'</b><div>'+escapeHTML(u.email||'')+'</div><button onclick="approveUser('+u.id+')">Duyệt học viên mới</button><div style="margin-top:8px"><select id="linkLegacy_'+u.id+'"><option value="">Liên kết hồ sơ cũ để giữ lớp và bài làm</option>'+legacy.map(l=>'<option value="'+l.id+'">'+escapeHTML(l.fullName+' (@'+l.username+')')+'</option>').join('')+'</select><button onclick="linkLegacyAccount('+u.id+')">Liên kết</button></div></div>').join(''):'<p>Không có học viên chờ duyệt.</p>';
+      document.getElementById('approvalUsersList').innerHTML=pending.length?pending.map(u=>'<div class="account-approval-card"><div class="account-approval-head"><div class="account-person-copy"><strong>'+escapeHTML(u.fullName)+'</strong><small>'+escapeHTML(u.email||'')+'</small></div><span class="account-badge is-pending">Chờ duyệt</span></div><button type="button" class="primary" onclick="approveUser('+Number(u.id)+')"><i class="fa-solid fa-user-check" aria-hidden="true"></i>Duyệt học viên mới</button><div class="account-link-field"><label for="linkLegacy_'+Number(u.id)+'">Hoặc liên kết với hồ sơ học viên cũ</label><div class="account-link-controls"><select id="linkLegacy_'+Number(u.id)+'"><option value="">Chọn hồ sơ để giữ lớp và bài làm</option>'+legacy.map(l=>'<option value="'+Number(l.id)+'">'+escapeHTML(l.fullName+' (@'+l.username+')')+'</option>').join('')+'</select><button type="button" class="secondary" onclick="linkLegacyAccount('+Number(u.id)+')"><i class="fa-solid fa-link" aria-hidden="true"></i>Liên kết</button></div></div></div>').join(''):'<div class="account-empty"><i class="fa-solid fa-user-check" aria-hidden="true"></i><strong>Đã xử lý hết yêu cầu</strong>Học viên đăng nhập lần đầu sẽ xuất hiện tại đây để bạn duyệt.</div>';
       document.getElementById('approvalModal').classList.add('open');
     }
     async function linkLegacyAccount(pendingId) {
@@ -9357,3 +9453,4 @@
   </script>
 </body>
 </html>
+
