@@ -3,12 +3,14 @@
 <head>
   <link rel="icon" type="image/png" href="favicon.png">
   
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-auth-compat.js"></script>
   <!-- Firebase Firestore v9 Compat cho Khảo thí -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="secure-config.js"></script>
+  <script src="secure-client.js"></script>
   
   <meta charset="utf-8">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>BioBling - 2B | LMS</title>
@@ -17,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@1.74.0/dist/umd/lucide.js"></script>
   
   <style>
     .status-dot {
@@ -2421,6 +2423,18 @@
     .exam-v8-actions {display:flex;flex-wrap:wrap;gap:7px;margin-top:9px;}
     .exam-v8-actions button {flex:1;justify-content:center;font-size:11px;}
     @media(max-width:650px) {.exam-v8-controls{align-items:stretch;flex-direction:column}.exam-v8-controls select{width:100%}}
+
+    #examQuestionDialog { width:min(620px,calc(100% - 24px)); max-height:85dvh; padding:20px; border:1px solid #dbe8de; border-radius:18px; color:#19342c; box-shadow:0 20px 70px #0004; }
+    #examQuestionDialog::backdrop { background:#0f172a88; }
+    .question-map-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(82px,1fr)); gap:8px; }
+    .question-map-item { min-height:52px; border:1px solid #cbd5e1; border-radius:10px; background:#f8fafc; color:#475569; padding:7px; }
+    .question-map-item small { display:block; font-size:10px; margin-top:3px; }
+    .question-map-item.done { background:#dcfce7; border-color:#86efac; color:#166534; }
+    .question-map-item.partial { background:#fff7ed; border-color:#fdba74; color:#9a3412; }
+    .question-map-target { outline:3px solid #2563eb; outline-offset:2px; scroll-margin:12px; }
+    #liveExamModal > div:first-of-type { flex-wrap:wrap; gap:8px; }
+    #liveAnswerSheetList { min-height:0; }
+    @media(max-width:600px) { #liveExamRightPanel { width:min(340px,100vw); min-width:min(290px,100vw); } #examQuestionDialog { padding:14px; } }
   </style>
 </head>
 <body>
@@ -2705,49 +2719,10 @@
 
         <div id="authNoticeBox" style="display:none; padding:10px 12px; border-radius:10px; font-size:12px; font-weight:650; margin-bottom:14px; line-height:1.45;"></div>
         <!-- Form Đăng Nhập -->
-        <form id="formLogin" onsubmit="handleLogin(event)">
-          <div class="field">
-            <label for="loginUsername">Tên đăng nhập</label>
-            <input type="text" id="loginUsername" required placeholder="Nhập tên đăng nhập">
-          </div>
-          <div class="field">
-            <label for="loginPassword">Mật khẩu</label>
-            <input type="password" id="loginPassword" required placeholder="Nhập mật khẩu">
-          </div>
-          <div style="margin-top:18px;">
-            <button type="submit" class="primary" style="width:100%;justify-content:center;padding:12px;font-size:13px;">
-              Đăng nhập hệ thống
-            </button>
-          </div>
-        </form>
+        <form id="formLogin" onsubmit="handleLogin(event)"><p>Đăng nhập bằng Google. Học viên mới cần giảng viên duyệt; hồ sơ và bài làm cũ sẽ được liên kết sau khi xác nhận.</p><button type="submit" class="primary" style="width:100%">Tiếp tục với Google</button></form>
 
         <!-- Form Đăng Ký -->
-        <form id="formRegister" onsubmit="handleRegister(event)" style="display:none;">
-          <div class="field">
-            <label for="regUsername">Tên đăng nhập</label>
-            <input type="text" id="regUsername" required placeholder="Ví dụ: hoangminh">
-          </div>
-          <div class="field">
-            <label for="regFullName">Họ và tên hiển thị</label>
-            <input type="text" id="regFullName" required placeholder="Ví dụ: Hoàng Minh">
-          </div>
-          <div class="field">
-            <label for="regPassword">Mật khẩu</label>
-            <input type="password" id="regPassword" required placeholder="Tối thiểu 4 ký tự">
-          </div>
-          <div class="field">
-            <label for="regConfirmPassword">Xác nhận mật khẩu</label>
-            <input type="password" id="regConfirmPassword" required placeholder="Nhập lại mật khẩu">
-          </div>
-          <div style="background:#fffaf0;border:1px solid #fde7b9;padding:11px 13px;border-radius:12px;margin:12px 0;font-size:11.5px;color:#85540b;line-height:1.5;">
-            🔒 Tài khoản mới sẽ ở hàng đợi chờ Giảng viên phê duyệt.
-          </div>
-          <div>
-            <button type="submit" class="primary" style="width:100%;justify-content:center;padding:12px;font-size:13px;background:#1e593d;">
-              Tạo tài khoản học viên
-            </button>
-          </div>
-        </form>
+        <form id="formRegister" onsubmit="handleRegister(event)" style="display:none"><p>Dùng tài khoản Google của bạn để đăng ký BioBling.</p><button type="submit" class="primary">Đăng ký bằng Google</button></form>
       </div>
     </div>
 
@@ -3073,7 +3048,7 @@
               <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:14px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                   <span class="tag session-badge" id="currentVideoSessionBadge">Chuyên đề</span>
-                  <a id="btnOpenExternalVideo" href="#" target="_blank" class="text-btn" style="display:inline-flex;align-items:center;gap:4px;">
+                  <a id="btnOpenExternalVideo" href="#" target="_blank" rel="noopener noreferrer" class="text-btn" style="display:inline-flex;align-items:center;gap:4px;">
                     Mở toàn màn hình trên Drive ↗
                   </a>
                 </div>
@@ -3339,29 +3314,7 @@
               <h3 style="color:#991b1b; display:flex; align-items:center; gap:8px;">
                 <i class="fa-solid fa-shield-halved"></i> Tạo Tài Khoản Admin Mới
               </h3>
-              <form onsubmit="handleCreateAdmin(event)">
-                <div class="field">
-                  <label>Tên đăng nhập (Username):</label>
-                  <input type="text" id="newAdminUser" required placeholder="Ví dụ: giangvien_bio2b">
-                </div>
-                <div class="field">
-                  <label>Họ và tên hiển thị:</label>
-                  <input type="text" id="newAdminFullName" required placeholder="Ví dụ: Thầy Trần Anh">
-                </div>
-                <div class="field">
-                  <label>Mật khẩu khởi tạo:</label>
-                  <input type="password" id="newAdminPassword" required placeholder="Nhập mật khẩu cho admin mới">
-                </div>
-                <div class="field">
-                  <label>Mô tả / Tiểu sử (Bio):</label>
-                  <input type="text" id="newAdminBio" placeholder="Ví dụ: Giảng viên chuyên đề Di truyền phân tử">
-                </div>
-                <div style="text-align:right; margin-top:14px;">
-                  <button type="submit" class="primary" style="background:#b91c1c; border-color:#b91c1c;">
-                    Tạo tài khoản Admin
-                  </button>
-                </div>
-              </form>
+              <form onsubmit="handleCreateAdmin(event)"><p>Người được cấp quyền cần đăng nhập Google vào BioBling trước.</p><select id="newAdminUser" required></select><button type="submit" class="primary">Cấp quyền giảng viên</button></form>
             </div>
 
             <div class="panel">
@@ -3374,9 +3327,9 @@
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
               <div>
                 <h3 style="margin:0; color:#92400e; display:flex; align-items:center; gap:8px;">
-                  <i class="fa-solid fa-user-lock"></i> Tra Cứu Tài Khoản & Mật Khẩu Học Viên (Đặc Quyền Super Admin)
+                  <i class="fa-solid fa-user-lock"></i> Quản lý tài khoản học viên
                 </h3>
-                <p style="margin:4px 0 0; font-size:12px; color:#78716c;">Kiểm tra tên đăng nhập, mật khẩu, lớp học đang tham gia và đổi mật khẩu nhanh cho học viên.</p>
+                <p style="margin:4px 0 0; font-size:12px; color:#78716c;">Quản lý trạng thái tài khoản và liên kết Google. BioBling không lưu mật khẩu.</p>
               </div>
               <div class="exam-search-box" style="max-width:300px;">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -3536,14 +3489,7 @@
               <!-- Đổi mật khẩu -->
               <div class="panel">
                 <h3>🔒 Đổi mật khẩu tài khoản</h3>
-                <form onsubmit="handleChangePassword(event)">
-                  <div class="field"><label>Mật khẩu hiện tại</label><input type="password" id="pwdOld" required></div>
-                  <div class="field"><label>Mật khẩu mới</label><input type="password" id="pwdNew" required></div>
-                  <div class="field"><label>Xác nhận mật khẩu mới</label><input type="password" id="pwdConfirm" required></div>
-                  <div style="text-align:right;margin-top:16px;">
-                    <button type="submit" class="secondary">Cập nhật mật khẩu</button>
-                  </div>
-                </form>
+                <div class="notice">Bạn đăng nhập qua Google. Mật khẩu được quản lý trong tài khoản Google của bạn.</div>
               </div>
             </div>
           </div>
@@ -3685,6 +3631,13 @@
 
   <!-- ================= GIAO DIỆN PHÒNG THI TOÀN MÀN HÌNH ================= -->
   <div id="liveExamModal">
+    <dialog id="examQuestionDialog" aria-labelledby="examQuestionTitle">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h2 id="examQuestionTitle" style="font-size:18px;margin:0">Danh sách câu hỏi</h2><button type="button" class="secondary" onclick="document.getElementById('examQuestionDialog').close()" autofocus>Đóng ✕</button></div>
+      <p style="font-size:12px;color:#64748b">Bấm số câu để tới ô trả lời. Câu Đúng/Sai chỉ hoàn tất khi đã chọn đủ 4 ý.</p>
+      <p id="examQuestionSummary" role="status" style="font-size:13px;font-weight:700"></p>
+      <label style="display:block;margin:12px 0;font-size:13px"><input id="examQuestionIncomplete" type="checkbox" onchange="renderExamQuestionMap()"> Chỉ hiện câu chưa hoàn tất</label>
+      <div id="examQuestionGroups"></div>
+    </dialog>
     <!-- Header Phòng Thi -->
     <div style="background:#fff; border-bottom:1px solid #e2e8f0; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; z-index:20;">
       <div style="display:flex; align-items:center; gap:12px;">
@@ -3702,12 +3655,13 @@
           <i class="fa-solid fa-key"></i> Sửa đáp án toàn đề
         </button>
         <button type="button" id="btnSaveInlineKeyChanges" onclick="saveInlineEditedKeysToMasterExam()" class="primary" style="display:none; font-size:11.5px; padding:6px 12px; background:#d97706; border-color:#d97706;">
-          <i class="fa-solid fa-floppy-disk"></i> Lưu đáp án mới & Chấm lại
+          <i class="fa-solid fa-floppy-disk"></i> Lưu đáp án cho lượt mới
         </button>
+        <button type="button" id="btnExamQuestionMap" onclick="openExamQuestionMap()" class="secondary" aria-haspopup="dialog" aria-controls="examQuestionDialog">☷ Danh sách câu hỏi <span id="examQuestionRemaining"></span></button>
         <button type="button" id="btnExamFullscreenNow" onclick="toggleBrowserFullscreenForExam()" class="secondary" style="font-size:11.5px; padding:6px 11px;" title="Bật / Tắt toàn màn hình máy tính">
           <i class="fa-solid fa-expand"></i> Toàn màn hình
         </button>
-        <a id="btnExamDirectDocs" href="#" target="_blank" class="secondary" style="font-size:11.5px; padding:6px 12px; display:inline-flex; align-items:center; gap:6px;">
+        <a id="btnExamDirectDocs" href="#" target="_blank" rel="noopener noreferrer" class="secondary" style="font-size:11.5px; padding:6px 12px; display:inline-flex; align-items:center; gap:6px;">
           Mở tab mới ↗
         </a>
         <div id="liveExamTimerBox" style="background:#fff1f2; color:#e11d48; border:1px solid #fecdd3; padding:6px 14px; border-radius:8px; font-weight:700; font-family:monospace; font-size:14px; display:flex; align-items:center; gap:6px;">
@@ -3968,7 +3922,7 @@
       <div class="doc-viewer-header">
         <h3 id="docViewerTitle">Đang tải tài liệu...</h3>
         <div style="display:flex;gap:10px;align-items:center;">
-          <a id="btnDocViewerNewTab" href="#" target="_blank" class="secondary" style="font-size:11px;padding:6px 12px;border-radius:8px;">
+          <a id="btnDocViewerNewTab" href="#" target="_blank" rel="noopener noreferrer" class="secondary" style="font-size:11px;padding:6px 12px;border-radius:8px;">
             Mở cửa sổ mới ↗
           </a>
           <button style="border:0;background:#f1f2ed;color:#557463;width:32px;height:32px;border-radius:8px;font-size:16px;font-weight:700;" onclick="closeDocViewer()">✕</button>
@@ -4114,6 +4068,10 @@
         return Object.prototype.hasOwnProperty.call(_memoryStore, k) ? _memoryStore[k] : null;
       },
       setItem(k, v) {
+        if (k === 'atelier_auth_users_v9') { this.removeItem(k); return; }
+        if (k === 'atelier_current_session_v9') {
+          try { const u=JSON.parse(v); v=JSON.stringify({id:u.id,username:u.username}); } catch (_) { return; }
+        }
         const str = String(v);
         _memoryStore[k] = str;
         try { window.localStorage.setItem(k, str); } catch (e) {}
@@ -4150,27 +4108,17 @@
 
     
     function safeConfirm(msg) {
-      return true;
+      try { return window.confirm(String(msg || 'Xác nhận thao tác?')); }
+      catch (err) { showToast('Không thể mở xác nhận. Thao tác đã được hủy.'); return false; }
     }
 
     function safeAlert(msg) {
       showAuthNotice(String(msg || ''), false);
     }
 
-    const DEFAULT_ADMIN_ACCOUNTS = [
-      { id: 1, username: "admin1", fullName: "Casta Nguyễn", password: "Meocon@123", role: "admin", status: "approved", classId: "all", avatar: "", bio: "BioBling - 2B", createdAt: "2026-10-01" },
-      { id: 2, username: "tranducanh", fullName: "Trần Đức Anh", password: "12345678", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Giảng viên Sinh học BioBling - 2B", createdAt: "2026-10-01" },
-      { id: 3, username: "admin2", fullName: "Admin BioBling", password: "05012009", role: "admin", status: "approved", classId: "all", avatar: "", bio: "Trợ giảng chuyên đề BioBling - 2B", createdAt: "2026-10-01" }
-    ];
-
+    // Legacy account normalization only. Never bootstrap credentials from public code.
     function mergeDefaultAdmins(list) {
-      const arr = Array.isArray(list) ? list.filter(Boolean) : (list && typeof list === 'object' ? Object.values(list).filter(Boolean) : []);
-      DEFAULT_ADMIN_ACCOUNTS.forEach(def => {
-        if (!arr.some(u => u && String(u.username || '').toLowerCase() === def.username.toLowerCase())) {
-          arr.push({ ...def });
-        }
-      });
-      return arr;
+      return Array.isArray(list) ? list.filter(Boolean) : (list && typeof list === 'object' ? Object.values(list).filter(Boolean) : []);
     }
 
     /* ================= STORAGE KEYS ================= */
@@ -4183,7 +4131,7 @@
     const STUDY_LOG_KEY = "atelier_study_logs_v1";
     const DEVICE_ID_KEY = "biobling_device_unique_id";
 
-    /* ================= FIREBASE INITIALIZATION (ĐÃ MÃ HÓA CHỐNG BOT QUÉT GITHUB) ================= */
+    /* ================= FIREBASE AUTH INITIALIZATION (public application configuration) ================= */
     const _decodeCfg = (arr) => arr.map(p => atob(p)).join('');
     const firebaseConfig = {
       apiKey: _decodeCfg(["QUl6YVN5QjNX", "UTdkZF8wSklx", "eFR5VlZGaTho", "cEs4ZUx0UHR3TWRB"]),
@@ -4196,20 +4144,19 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const rtdb = firebase.database();
-    const db = firebase.firestore();
+    const rtdb = BioBling;
+    const db = BioBling.db;
     let liveOnlineStatus = {};
 
     /* ================= STATE GỐC ================= */
     const ACTIVE_PAGE_STORAGE_KEY = "atelier_active_page_v9";
-    let userDatabase = mergeDefaultAdmins(safeParseJSON(safeStorage.getItem(AUTH_STORAGE_KEY), null));
-    let classDatabase = safeParseJSON(safeStorage.getItem(CLASSES_STORAGE_KEY), [{ id: "cls_a1", name: "Lớp Sinh Học Chuyên Sâu - BioBling 2B" }]);
-    let sessionDatabase = safeParseJSON(safeStorage.getItem(SESSIONS_STORAGE_KEY), [
-      { id: "ses_1", title: "Chuyên đề 01: Cơ sở vật chất & Cơ chế di truyền ADN" },
-      { id: "ses_2", title: "Chuyên đề 02: Phiên mã, Dịch mã & Điều hòa hoạt động Gen" }
-    ]);
-    let mediaDatabase = safeParseJSON(safeStorage.getItem(MEDIA_STORAGE_KEY), []);
-    let currentUser = safeParseJSON(safeStorage.getItem(SESSION_STORAGE_KEY), null);
+    let userDatabase = [];
+    let usersReady = false;
+    safeStorage.removeItem(AUTH_STORAGE_KEY);
+    let classDatabase = [];
+    let sessionDatabase = [];
+    let mediaDatabase = [];
+    let currentUser = null;
     let notesDatabase = safeParseJSON(safeStorage.getItem(NOTES_STORAGE_KEY), [
       { id: "note_1", content: "Nguyên tắc bổ sung trong phân tử ADN: A-T (2 liên kết hydro), G-X (3 liên kết hydro).", time: "10:15 - 01/10/2026" }
     ]);
@@ -4236,11 +4183,21 @@
     let historyExamCode = null;
     let scoreboardV8Tab = 'students';
 
-    function isSuperAdmin() {
-      return currentUser && 
-             currentUser.username.toLowerCase() === 'admin1' && 
-             currentUser.password === 'Meocon@123';
+    function isSuperAdmin() { return !!(currentUser && currentUser.role==='admin' && currentUser.uid===window.BIOBLING_OWNER_UID); }
+    // UI checks are defense in depth, not a replacement for Firebase Rules.
+    function requireAdmin() {
+      if (currentUser && currentUser.role === 'admin' && currentUser.status === 'approved') return true;
+      safeAlert('Bạn không có quyền thực hiện thao tác này.'); return false;
     }
+    function safeWebUrl(value) {
+      try { const url = new URL(String(value || '').trim()); return url.protocol === 'https:' && !url.username && !url.password ? url.href : ''; }
+      catch (_) { return ''; }
+    }
+    function safeAvatarUrl(value) {
+      const s=String(value || '');
+      return /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(s) ? s : safeWebUrl(s);
+    }
+    function hasValidLegacySession(user) { return !!(user && BioBling.auth?.currentUser && user.uid===BioBling.auth.currentUser.uid && user.status==='approved'); }
 
     /* ================= REALTIME & FIRESTORE LISTENERS ================= */
     rtdb.ref('/classes').on('value', (snapshot) => {
@@ -4291,30 +4248,14 @@
       if (document.querySelector('.page.active')?.id === 'dashboard') initDashboardView();
     });
 
-    rtdb.ref('/users').on('value', (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        userDatabase = mergeDefaultAdmins(data);
-        safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-        
-        if (currentUser) {
-          const fresh = userDatabase.find(u => u && (
-            String(u.id) === String(currentUser.id) ||
-            String(u.username || '').toLowerCase() === String(currentUser.username || '').toLowerCase()
-          ));
-          if (fresh) {
-            currentUser = fresh;
-            safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
-            updateUserUI();
-          }
-        }
-      } else if (userDatabase && userDatabase.length > 0) {
-        rtdb.ref('/users').set(userDatabase);
-      }
-      const activePageId = document.querySelector('.page.active')?.id;
-      if (activePageId === 'my_class') renderClassMembersView(currentClassViewId);
-      if (activePageId === 'create_admin') renderSuperAdminView();
-      if (activePageId === 'class_admin') renderAdminClassDashboard();
+    rtdb.ref('/users').on('value', snapshot => {
+      userDatabase = snapshot.val() || [];
+      const fresh=userDatabase.find(u=>u.uid===BioBling.auth?.currentUser?.uid);
+      if(fresh && fresh.status==='approved') { currentUser=fresh;updateUserUI(); }
+      const page=document.querySelector('.page.active')?.id;
+      if(page==='my_class')renderClassMembersView(currentClassViewId);
+      if(page==='create_admin')renderSuperAdminView();
+      if(page==='class_admin')renderAdminClassDashboard();
     });
 
     rtdb.ref('/status').on('value', (snapshot) => {
@@ -4357,24 +4298,7 @@
       }
     });
 
-    function setupLivePresence(user) {
-      if (!user) return;
-      const userStatusRef = rtdb.ref('/status/' + user.username.toLowerCase());
-      const connectedRef = rtdb.ref('.info/connected');
-
-      connectedRef.on('value', (snap) => {
-        if (snap.val() === false) return;
-        userStatusRef.onDisconnect().set({ 
-          state: 'offline', 
-          lastChanged: firebase.database.ServerValue.TIMESTAMP 
-        }).then(() => {
-          userStatusRef.set({ 
-            state: 'online', 
-            lastChanged: firebase.database.ServerValue.TIMESTAMP 
-          });
-        });
-      });
-    }
+    function setupLivePresence(user) { if(user) BioBling.call('/presence',{state:'online'}).catch(()=>{}); }
 
     function getOrCreateDeviceId() {
       let devId = safeStorage.getItem(DEVICE_ID_KEY);
@@ -4647,6 +4571,7 @@
     }
     // Transaction tránh việc nhiều quản trị viên ghi đè dữ liệu của nhau.
     async function commitRtdbList(path, modifier) {
+      if (!requireAdmin()) throw new Error('Không đủ quyền quản trị.');
       const result = await rtdb.ref('/'+path).transaction(value => {
         const list = Array.isArray(value) ? value.filter(Boolean) : (value && typeof value==='object' ? Object.values(value) : []);
         return modifier(list);
@@ -5072,12 +4997,17 @@
 
       const reviewExam = {
         ...exam,
+        ...(submission.questionStructure || {}),
         mcqKeys: JSON.parse(JSON.stringify(masterMcq)),
         tfKeys: JSON.parse(JSON.stringify(masterTf)),
         saKeys: JSON.parse(JSON.stringify(masterSa)),
         rawDocsUrl: exam.rawDocsUrl || submission.rawDocsUrl || '',
         embedUrl: exam.embedUrl || submission.embedUrl || ''
       };
+      if(currentUser.role!=='admin' && submission.questionStructure)Object.assign(reviewExam,submission.questionStructure);
+      if(currentUser.role==='admin' && submission.gradingKeys){
+        reviewExam.mcqKeys=submission.gradingKeys.mcq||{};reviewExam.tfKeys=submission.gradingKeys.tf||{};reviewExam.saKeys=submission.gradingKeys.sa||{};reviewExam.answersHidden=false;
+      }
       startExamRoom(reviewExam, true);
     }
 
@@ -5209,53 +5139,12 @@
     }
 
     function syncStudentLiveExamStateToRtdb() {
-      if (!activeExam || isLiveReviewMode || isLiveSpectatorMode || !currentUser) return;
-      const sessionKey = getLiveExamSessionKey();
-      if (!sessionKey) return;
-
-      const mcqKeys = activeExam.mcqKeys || {};
-      const tfKeys = activeExam.tfKeys || {};
-      const saKeys = activeExam.saKeys || {};
-      const totalItems = Object.keys(mcqKeys).length + Object.keys(tfKeys).length + Object.keys(saKeys).length;
-
-      const mcqDone = Object.values(studentLiveAnswers.mcq || {}).filter(Boolean).length;
-      let tfDone = 0;
-      Object.keys(studentLiveAnswers.tf || {}).forEach(k => {
-        if (Object.values(studentLiveAnswers.tf[k] || {}).filter(Boolean).length === 4) tfDone++;
-      });
-      const saDone = Object.values(studentLiveAnswers.sa || {}).filter(v => v && String(v).trim().length > 0).length;
-
-      try {
-        rtdb.ref('/live_exams/' + sessionKey).update({
-          sessionKey,
-          userId: currentUser.id,
-          username: currentUser.username,
-          fullName: currentUser.fullName || currentUser.username,
-          classNames: getUserEnrolledClassNames(currentUser),
-          examCode: activeExam.code,
-          examTitle: activeExam.title,
-          status: 'active',
-          startedAt: activeDraftStartedAt || Date.now(),
-          expiresAt: activeExam.isUnlimited ? null : activeDraftExpiresAt,
-          timeRemainingSec: activeExam.isUnlimited ? null : examTimeRemaining,
-          answeredCount: mcqDone + tfDone + saDone,
-          totalCount: totalItems,
-          answers: JSON.parse(JSON.stringify(studentLiveAnswers)),
-          updatedAt: Date.now()
-        });
-      } catch (e) {}
+      if(!activeExam||isLiveReviewMode||!activeDraftAttemptId||!currentUser)return;
+      BioBling.call('/live',{examCode:activeExam.code,attemptId:activeDraftAttemptId,data:{status:'active'}}).catch(()=>{});
     }
 
-    function markStudentLiveExamStatus(newStatus) {
-      if (isLiveSpectatorMode) return;
-      const sessionKey = getLiveExamSessionKey();
-      if (!sessionKey) return;
-      try {
-        rtdb.ref('/live_exams/' + sessionKey).update({
-          status: newStatus,
-          updatedAt: Date.now()
-        });
-      } catch (e) {}
+    function markStudentLiveExamStatus(status) {
+      if(activeExam&&activeDraftAttemptId)BioBling.call('/live',{examCode:activeExam.code,attemptId:activeDraftAttemptId,data:{status}}).catch(()=>{});
     }
 
     // Hiển thị Tín hiệu nhỏ chạy ngang màn hình hoặc Emote bay lên khi Mentor gửi
@@ -5967,8 +5856,8 @@
       };
       try {
         safeStorage.setItem(key, JSON.stringify(snapshot));
-        syncStudentLiveExamStateToRtdb();
-        showExamDraftStatus(`✅ Đã tự động lưu & đồng bộ Live lúc ${formatDraftClock(snapshot.savedAt)}`);
+        BioBling.queueDraft(activeDraftAttemptId, studentLiveAnswers);
+        showExamDraftStatus('Đã lưu trên thiết bị · đang đồng bộ…');
         return true;
       } catch(err) {
         showExamDraftStatus('⚠️ Không lưu được bài làm trên thiết bị. Hãy kiểm tra dung lượng/quyền lưu của trình duyệt.',true);
@@ -6016,11 +5905,6 @@
       }
 
       let draft = readExamDraft(exam);
-      // Nếu bản nháp cũ đã hết giờ từ trước thì tự động xóa để lượt làm mới có đủ thời gian từ đầu
-      if (draft && !exam.isUnlimited && typeof draft.expiresAt === 'number' && draft.expiresAt <= Date.now() + 2000) {
-        clearExamDraft(exam);
-        draft = null;
-      }
 
       const isUnlimited = !!exam.isUnlimited;
       const btnProceed = document.getElementById('btnProceedExam');
@@ -6107,12 +5991,24 @@
       }
     });
 
-    function startExamRoom(exam, reviewOnly = false, restoredDraft = null) {
+    async function startExamRoom(exam, reviewOnly = false, restoredDraft = null) {
+      if(!reviewOnly){
+        try{
+          const attemptId=restoredDraft?.attemptId||makeExamAttemptId();
+          const state=await BioBling.call('/attempt/start',{code:exam.code,attemptId});
+          if(state.result){await BioBling.refresh();return openReviewExamDirectly(exam.code,null,state.result.id);}
+          exam=state.exam;
+          const localAnswers=restoredDraft?.answers;
+          restoredDraft={attemptId:state.attemptId,startedAt:state.startedAt,expiresAt:state.expiresAt,answers:localAnswers||state.answers};
+        }catch(err){safeAlert(err.message);return;}
+      }
       if (!exam) {
         safeAlert("Lỗi: Không tìm thấy dữ liệu bài thi!");
         return;
       }
 
+      document.getElementById('examQuestionDialog').close();
+      document.getElementById('examQuestionIncomplete').checked = false;
       activeExam = exam;
       isLiveReviewMode = reviewOnly;
       isAdminEditingExamKeys = false;
@@ -6122,7 +6018,7 @@
       const btnKeyEdit = document.getElementById('btnAdminInlineKeyEdit');
       const btnKeySave = document.getElementById('btnSaveInlineKeyChanges');
       if (btnKeyEdit) {
-        btnKeyEdit.style.display = isAdmin ? 'inline-flex' : 'none';
+        btnKeyEdit.style.display = isAdmin && reviewOnly ? 'inline-flex' : 'none';
         btnKeyEdit.innerHTML = '<i class="fa-solid fa-key"></i> Sửa đáp án toàn đề';
         btnKeyEdit.style.background = '#fffbeb';
         btnKeyEdit.style.color = '#b45309';
@@ -6160,7 +6056,7 @@
       document.getElementById('liveExamTitle').innerText = activeExam.title || "Bài Thi Sinh Học";
       document.getElementById('liveExamCode').innerText = activeExam.code || "---";
 
-      const rawUrl = activeExam.rawDocsUrl || activeExam.embedUrl || "";
+      const rawUrl = safeWebUrl(activeExam.rawDocsUrl || activeExam.embedUrl);
       const embedUrl = convertDocsToPreview(rawUrl) || activeExam.embedUrl || "";
       
       const docIframe = document.getElementById('liveExamIframe');
@@ -6190,10 +6086,10 @@
           sa: {...(answers && answers.sa || {})}
         };
         activeDraftStartedAt = restoredDraft && restoredDraft.startedAt || Date.now();
-        activeDraftExpiresAt = activeExam.isUnlimited ? null :
+        activeDraftExpiresAt = restoredDraft?.expiresAt ?? (activeExam.isUnlimited ? null :
           (restoredDraft && typeof restoredDraft.expiresAt === 'number'
             ? restoredDraft.expiresAt
-            : activeDraftStartedAt + (activeExam.timeLimit || 50)*60000);
+            : activeDraftStartedAt + (activeExam.timeLimit || 50)*60000));
         persistExamDraft();
         stopExamDraftHeartbeat();
         examDraftHeartbeat = setInterval(persistExamDraft, 15000);
@@ -6220,7 +6116,7 @@
         submitBtn.style.background = "#2563eb";
         submitBtn.style.borderColor = "#2563eb";
 
-        if (activeExam.isUnlimited) {
+        if (!activeDraftExpiresAt) {
           timerBox.style.display = 'flex';
           timerDisplay.innerText = "Vô hạn";
           clearInterval(examCountdownTimer);
@@ -6266,7 +6162,7 @@
       }
       renderLiveExamAnswerSheet();
       if (isAdminEditingExamKeys) {
-        showToast("🔑 Đang bật chế độ Sửa Đáp Án: Bấm trực tiếp vào đáp án đúng mới trên phiếu rồi nhấn 'Lưu đáp án mới & Chấm lại'!");
+        showToast("🔑 Đang bật chế độ Sửa Đáp Án: Bấm trực tiếp vào đáp án đúng mới trên phiếu rồi nhấn 'Lưu đáp án cho lượt mới'!");
       }
     }
 
@@ -6334,75 +6230,12 @@
     }
 
     async function saveInlineEditedKeysToMasterExam() {
-      if (!currentUser || currentUser.role !== 'admin' || !activeExam) return;
-      const btnSave = document.getElementById('btnSaveInlineKeyChanges');
-      if (btnSave) {
-        btnSave.disabled = true;
-        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang cập nhật toàn đề...';
-      }
-
-      try {
-        const examCode = activeExam.code;
-        const mcqKeys = JSON.parse(JSON.stringify(activeExam.mcqKeys || {}));
-        const tfKeys = JSON.parse(JSON.stringify(activeExam.tfKeys || {}));
-        const saKeys = JSON.parse(JSON.stringify(activeExam.saKeys || {}));
-
-        const rawMcq = Object.entries(mcqKeys).sort((a,b)=>Number(a[0])-Number(b[0])).map(([q,a])=>`${q}.${a}`).join(' ');
-        const rawTf = Object.entries(tfKeys).sort((a,b)=>Number(a[0])-Number(b[0])).map(([q,a])=>`${q}: ${['a','b','c','d'].map(k=>a[k]).join(' ')}`).join('\n');
-        const rawSa = Object.entries(saKeys).sort((a,b)=>Number(a[0])-Number(b[0])).map(([q,a])=>`${q}: ${a}`).join('\n');
-        const newUpdatedAt = new Date().toISOString();
-
-        // 1. Cập nhật đáp án gốc của toàn đề trên Firestore
-        await db.collection("exams").doc(examCode).set({
-          mcqKeys,
-          tfKeys,
-          saKeys,
-          keys: mcqKeys,
-          rawMcq,
-          rawTf,
-          rawSa,
-          updatedAt: newUpdatedAt
-        }, { merge: true });
-
-        // 2. Chấm lại toàn bộ các bài nộp đã có của đề này để đồng bộ điểm chuẩn xác
-        const subsOfExam = studentSubmissions.filter(s => String(s.examCode) === String(examCode));
-        for (const sub of subsOfExam) {
-          const ans = sub.answers || { mcq: {}, tf: {}, sa: {} };
-          const res = computeScoreForAnswersAndKeys(ans, mcqKeys, tfKeys, saKeys, !!sub.practiceOnly);
-          await db.collection("submissions").doc(sub.id).set({
-            mcqCorrect: res.mcqCorrect,
-            tfCorrectSubCount: res.tfCorrectSubCount,
-            saCorrect: res.saCorrect,
-            mcqTotal: res.totalMcq,
-            tfTotalSubCount: res.totalTf * 4,
-            saTotal: res.totalSa,
-            score: res.finalScore,
-            examUpdatedAt: newUpdatedAt,
-            gradingKeys: { mcq: mcqKeys, tf: tfKeys, sa: saKeys }
-          }, { merge: true });
-        }
-
-        isAdminEditingExamKeys = false;
-        const btnEdit = document.getElementById('btnAdminInlineKeyEdit');
-        if (btnEdit) {
-          btnEdit.innerHTML = '<i class="fa-solid fa-key"></i> Sửa đáp án toàn đề';
-          btnEdit.style.background = '#fffbeb';
-          btnEdit.style.color = '#b45309';
-        }
-        if (btnSave) btnSave.style.display = 'none';
-        renderLiveExamAnswerSheet();
-        showToast(`✅ Đã lưu đáp án mới cho toàn đề [${examCode}] và tự động chấm lại ${subsOfExam.length} lượt bài nộp!`);
-      } catch (err) {
-        safeAlert("Lỗi khi cập nhật đáp án: " + err.message);
-      } finally {
-        if (btnSave) {
-          btnSave.disabled = false;
-          btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu đáp án mới & Chấm lại';
-        }
-      }
+      if(!requireAdmin()||!activeExam)return;const btn=document.getElementById('btnSaveInlineKeyChanges');btn.disabled=true;
+      try{await db.collection('exams').doc(activeExam.code).set({...activeExam});isAdminEditingExamKeys=false;btn.style.display='none';renderLiveExamAnswerSheet();showToast('Đã lưu đáp án cho các lượt mới. Bài đã nộp giữ điểm theo phiên bản lúc bắt đầu.');}catch(err){presentStorageError(err);}finally{btn.disabled=false;}
     }
 
     function renderLiveExamAnswerSheet() {
+      const showCorrectAnswers=isLiveReviewMode && !activeExam?.answersHidden;
       const container = document.getElementById('liveAnswerSheetList');
       const statsBanner = document.getElementById('liveReviewStatsBanner');
       if (!container || !activeExam) return;
@@ -6419,7 +6252,7 @@
       if (isAdminEditingExamKeys) {
         const editNote = document.createElement('div');
         editNote.className = 'admin-key-edit-banner';
-        editNote.innerHTML = `🔑 <strong>CHẾ ĐỘ SỬA ĐÁP ÁN TOÀN ĐỀ:</strong> Bấm trực tiếp vào đáp án đúng mới (A/B/C/D, Đúng/Sai hoặc nhập ô Trả lời ngắn), sau đó bấm nút <strong>"Lưu đáp án mới & Chấm lại"</strong> ở thanh trên cùng.`;
+        editNote.innerHTML = `🔑 <strong>CHẾ ĐỘ SỬA ĐÁP ÁN TOÀN ĐỀ:</strong> Bấm trực tiếp vào đáp án đúng mới (A/B/C/D, Đúng/Sai hoặc nhập ô Trả lời ngắn), sau đó bấm nút <strong>"Lưu đáp án cho lượt mới"</strong> ở thanh trên cùng.`;
         container.appendChild(editNote);
       }
 
@@ -6440,21 +6273,21 @@
           const isUnanswered = !userPick;
           const isQuestionCorrect = userPick === mcqKeys[q];
 
-          if (isLiveReviewMode) {
+          if (showCorrectAnswers) {
             if (isUnanswered) reviewBlankCount++;
             else if (isQuestionCorrect) reviewCorrectCount++;
             else reviewWrongCount++;
           }
 
           const row = document.createElement('div');
-          const rowBorder = isLiveReviewMode
+          const rowBorder = showCorrectAnswers
             ? (isUnanswered ? '#fdba74' : (isQuestionCorrect ? '#bbf7d0' : '#fecaca'))
             : '#e2e8f0';
-          const rowBg = isLiveReviewMode && isUnanswered ? '#fffaf5' : '#f8fafc';
+          const rowBg = showCorrectAnswers && isUnanswered ? '#fffaf5' : '#f8fafc';
           row.style.cssText = `display:flex; justify-content:space-between; align-items:center; background:${rowBg}; border:1px solid ${rowBorder}; border-radius:8px; padding:6px 10px; font-size:12px; gap:6px; flex-wrap:wrap;`;
           
           let statusBadge = '';
-          if (isLiveReviewMode) {
+          if (showCorrectAnswers) {
             if (isUnanswered) {
               statusBadge = `<span class="unanswered-pill" title="Câu này học sinh bỏ trống chưa chọn đáp án">⚪ Chưa làm</span>`;
             } else if (isQuestionCorrect) {
@@ -6470,7 +6303,7 @@
             const isCorrect = mcqKeys[q] === opt;
 
             let st = "width:28px; height:28px; border-radius:50%; font-weight:700; border:1px solid #cbd5e1; display:inline-flex; align-items:center; justify-content:center; font-size:12px; margin-left:3px; transition:0.15s; cursor:pointer;";
-            if (isLiveReviewMode || isAdminEditingExamKeys) {
+            if (showCorrectAnswers || isAdminEditingExamKeys) {
               if (isCorrect) st += "background:#16a34a; color:#fff; border-color:#16a34a; box-shadow:0 0 0 2px rgba(22,163,74,.25);";
               else if (isSelected && !isCorrect) st += "background:#dc2626; color:#fff; border-color:#dc2626;";
               else st += "color:#94a3b8; background:#fff;";
@@ -6488,6 +6321,8 @@
           });
 
           row.innerHTML = `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-weight:700; color:#334155;">Câu ${q}:</span>${statusBadge}</div><div>${btns}</div>`;
+          row.id = examQuestionTargetId('mcq', q);
+          row.tabIndex = -1;
           list1.appendChild(row);
         });
         wrap1.appendChild(list1);
@@ -6514,14 +6349,14 @@
             const isSubBlank = !userPick;
             const isSubCorrect = userPick === correctPick;
 
-            if (isLiveReviewMode) {
+            if (showCorrectAnswers) {
               if (isSubBlank) { reviewBlankCount++; blankSubsInQ++; }
               else if (isSubCorrect) reviewCorrectCount++;
               else reviewWrongCount++;
             }
 
             let subBadge = '';
-            if (isLiveReviewMode) {
+            if (showCorrectAnswers) {
               if (isSubBlank) subBadge = `<span class="unanswered-pill" style="font-size:9.5px;padding:1px 6px;">⚪ Chưa làm</span>`;
               else if (isSubCorrect) subBadge = `<span class="correct-pill" style="font-size:9.5px;padding:1px 6px;">✓ Đúng</span>`;
               else subBadge = `<span class="wrong-pill" style="font-size:9.5px;padding:1px 6px;">✕ Sai</span>`;
@@ -6529,7 +6364,7 @@
 
             const getStyle = (val) => {
               const sel = userPick === val;
-              if (isLiveReviewMode || isAdminEditingExamKeys) {
+              if (showCorrectAnswers || isAdminEditingExamKeys) {
                 if (correctPick === val) return "background:#16a34a; color:#fff; border-color:#16a34a; font-weight:700;";
                 if (sel && correctPick !== val) return "background:#dc2626; color:#fff; border-color:#dc2626; font-weight:700;";
                 return "color:#94a3b8; border-color:#e2e8f0; background:#fff;";
@@ -6542,7 +6377,7 @@
             const disabledAttr = (isLiveReviewMode && !isAdminEditingExamKeys) ? 'disabled' : '';
 
             subRows += `
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px; padding:3px 6px; border-radius:6px; background:${isLiveReviewMode && isSubBlank ? '#fff7ed' : 'transparent'};">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px; padding:3px 6px; border-radius:6px; background:${showCorrectAnswers && isSubBlank ? '#fff7ed' : 'transparent'};">
                 <div style="display:flex;align-items:center;gap:6px;">
                   <span style="font-weight:700; color:#475569;">Ý (${sub})</span>
                   ${subBadge}
@@ -6555,11 +6390,13 @@
             `;
           });
 
-          const qHeaderBadge = (isLiveReviewMode && blankSubsInQ === 4)
+          const qHeaderBadge = (showCorrectAnswers && blankSubsInQ === 4)
             ? `<span class="unanswered-pill">⚪ Bỏ trống cả câu</span>`
             : '';
 
           card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2e8f0;padding-bottom:4px;"><strong style="color:#1e293b;">Câu ${q} (Đ/S):</strong>${qHeaderBadge}</div>${subRows}`;
+          card.id = examQuestionTargetId('tf', q);
+          card.tabIndex = -1;
           list2.appendChild(card);
         });
         wrap2.appendChild(list2);
@@ -6580,34 +6417,34 @@
           const correctVal = saKeys[q];
           const isCorrect = !isBlank && (normalizeShortExamAnswer(val) === normalizeShortExamAnswer(correctVal));
 
-          if (isLiveReviewMode) {
+          if (showCorrectAnswers) {
             if (isBlank) reviewBlankCount++;
             else if (isCorrect) reviewCorrectCount++;
             else reviewWrongCount++;
           }
 
           const card = document.createElement('div');
-          const borderCol = isLiveReviewMode
+          const borderCol = showCorrectAnswers
             ? (isBlank ? '#fdba74' : (isCorrect ? '#bbf7d0' : '#fecaca'))
             : '#e2e8f0';
-          const bgCol = isLiveReviewMode && isBlank ? '#fffaf5' : '#f8fafc';
+          const bgCol = showCorrectAnswers && isBlank ? '#fffaf5' : '#f8fafc';
           card.style.cssText = `background:${bgCol}; border:1px solid ${borderCol}; border-radius:8px; padding:7px 10px; font-size:12px; display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap;`;
 
           let statusBadge = '';
-          if (isLiveReviewMode) {
+          if (showCorrectAnswers) {
             if (isBlank) statusBadge = `<span class="unanswered-pill">⚪ Chưa làm</span>`;
             else if (isCorrect) statusBadge = `<span class="correct-pill">✓ Đúng</span>`;
             else statusBadge = `<span class="wrong-pill">✕ Sai</span>`;
           }
 
           let inputSt = "border:1px solid #cbd5e1; border-radius:6px; padding:4px 8px; font-size:12px; font-family:monospace; width:105px; outline:none; ";
-          if (isLiveReviewMode) {
+          if (showCorrectAnswers) {
             if (isBlank) inputSt += "background:#fff7ed; border-color:#fdba74; color:#c2410c; font-style:italic;";
             else if (isCorrect) inputSt += "background:#dcfce7; border-color:#22c55e; color:#15803d; font-weight:700;";
             else inputSt += "background:#fee2e2; border-color:#ef4444; color:#991b1b; text-decoration:line-through;";
           }
 
-          const displayVal = (isLiveReviewMode && isBlank) ? "Bỏ trống" : val;
+          const displayVal = (showCorrectAnswers && isBlank) ? "Bỏ trống" : val;
 
           let rightControlHtml = '';
           if (isAdminEditingExamKeys) {
@@ -6621,7 +6458,7 @@
             rightControlHtml = `
               <div style="display:flex; align-items:center; gap:6px;">
                 <input type="text" value="${escapeHTML(displayVal)}" ${isLiveReviewMode ? 'disabled' : ''} oninput="pickLiveSaAnswer('${q}', this.value)" style="${inputSt}" placeholder="Đáp án...">
-                ${isLiveReviewMode ? `<span style="font-size:11px; font-weight:800; color:#15803d; font-family:monospace; background:#dcfce7; padding:2px 6px; border-radius:5px;">Đ/A: ${escapeHTML(correctVal)}</span>` : ''}
+                ${showCorrectAnswers ? `<span style="font-size:11px; font-weight:800; color:#15803d; font-family:monospace; background:#dcfce7; padding:2px 6px; border-radius:5px;">Đ/A: ${escapeHTML(correctVal)}</span>` : ''}
               </div>
             `;
           }
@@ -6633,6 +6470,8 @@
             </div>
             ${rightControlHtml}
           `;
+          card.id = examQuestionTargetId('sa', q);
+          card.tabIndex = -1;
           list3.appendChild(card);
         });
         wrap3.appendChild(list3);
@@ -6640,7 +6479,7 @@
       }
 
       if (statsBanner) {
-        if (isLiveReviewMode) {
+        if (showCorrectAnswers) {
           statsBanner.style.display = 'flex';
           statsBanner.style.justifyContent = 'space-between';
           statsBanner.style.flexWrap = 'wrap';
@@ -6680,19 +6519,64 @@
       updateLiveProgress();
     }
 
+
+    function examQuestionTargetId(type, q) { return 'exam-question-' + type + '-' + encodeURIComponent(q); }
+    function examQuestionItems() {
+      if (!activeExam) return [];
+      return ['mcq','tf','sa'].flatMap(type => Object.keys(activeExam[type+'Keys'] || {}).sort((a,b)=>Number(a)-Number(b)).map(q => {
+        const answer = (studentLiveAnswers[type] || {})[q];
+        const count = type === 'tf' ? ['a','b','c','d'].filter(s => answer && (answer[s] === 'Đ' || answer[s] === 'S')).length
+          : (String(answer ?? '').trim() ? 1 : 0);
+        return {type, q, count, status:count === (type === 'tf' ? 4 : 1) ? 'done' : count ? 'partial' : 'blank'};
+      }));
+    }
+    function openExamQuestionMap() {
+      renderExamQuestionMap();
+      document.getElementById('examQuestionDialog').showModal();
+    }
+    function renderExamQuestionMap() {
+      const items = examQuestionItems();
+      const done = items.filter(x=>x.status==='done').length;
+      const partial = items.filter(x=>x.status==='partial').length;
+      setElText('examQuestionSummary', '✓ Đã làm: '+done+' · ◐ Làm dở: '+partial+' · ○ Chưa làm: '+(items.length-done-partial));
+      const host = document.getElementById('examQuestionGroups');
+      host.replaceChildren();
+      const incomplete = document.getElementById('examQuestionIncomplete').checked;
+      const labels = {mcq:'Phần I · Trắc nghiệm',tf:'Phần II · Đúng / Sai',sa:'Phần III · Trả lời ngắn'};
+      for (const type of ['mcq','tf','sa']) {
+        const visible = items.filter(x=>x.type===type && (!incomplete || x.status!=='done'));
+        if (!visible.length) continue;
+        const heading = document.createElement('h3'); heading.style.fontSize='13px'; heading.textContent=labels[type]; host.appendChild(heading);
+        const grid = document.createElement('div'); grid.className='question-map-grid'; host.appendChild(grid);
+        visible.forEach(item=>{
+          const button=document.createElement('button'); button.type='button'; button.className='question-map-item '+item.status;
+          const state=item.status==='done'?'✓ Đã làm':item.status==='partial'?'◐ '+item.count+'/4 ý':'○ Chưa làm';
+          button.textContent='Câu '+item.q;
+          const small=document.createElement('small'); small.textContent=state; button.appendChild(small);
+          button.setAttribute('aria-label',labels[type]+', câu '+item.q+', '+state);
+          button.onclick=()=>jumpToExamQuestion(item.type,item.q); grid.appendChild(button);
+        });
+      }
+      if (!host.children.length) host.textContent=items.length?'Bạn đã hoàn tất tất cả câu hỏi.':'Đề chưa có câu hỏi.';
+    }
+    function jumpToExamQuestion(type,q) {
+      document.getElementById('examQuestionDialog').close();
+      if (document.getElementById('liveExamRightPanel').classList.contains('collapsed')) toggleExamWideDocMode();
+      const target=document.getElementById(examQuestionTargetId(type,q));
+      if (!target) return;
+      document.querySelectorAll('.question-map-target').forEach(el=>el.classList.remove('question-map-target'));
+      target.classList.add('question-map-target');
+      target.scrollIntoView({block:'center',behavior:'instant'});
+      target.focus({preventScroll:true});
+      setTimeout(()=>target.classList.remove('question-map-target'),2500);
+    }
     function updateLiveProgress() {
-      const mcqDone = Object.values(studentLiveAnswers.mcq).filter(Boolean).length;
-      let tfDone = 0;
-      Object.keys(studentLiveAnswers.tf).forEach(k => {
-        if (Object.values(studentLiveAnswers.tf[k] || {}).filter(Boolean).length === 4) tfDone++;
-      });
-      const saDone = Object.values(studentLiveAnswers.sa).filter(v => v && v.trim().length > 0).length;
-
-      const totalItems = Object.keys(activeExam.mcqKeys || {}).length + Object.keys(activeExam.tfKeys || {}).length + Object.keys(activeExam.saKeys || {}).length;
-      const totalDone = mcqDone + tfDone + saDone;
-
-      document.getElementById('liveAnsweredCount').innerText = totalDone;
-      document.getElementById('liveProgressBar').style.width = `${totalItems ? (totalDone / totalItems) * 100 : 0}%`;
+      const items=examQuestionItems();
+      const done=items.filter(x=>x.status==='done').length;
+      setElText('liveAnsweredCount',done);
+      setElText('examQuestionRemaining',items.length-done ? '('+(items.length-done)+' chưa xong)' : '(✓)');
+      document.getElementById('liveProgressBar').style.width=(items.length?done/items.length*100:0)+'%';
+      if (document.getElementById('examQuestionDialog').open) renderExamQuestionMap();
     }
 
     function startExamTimer(expiresAt) {
@@ -6750,166 +6634,19 @@
     }
 
     async function submitLiveExam() {
-      if (examSubmitting || !activeExam || isLiveReviewMode) return;
-      examSubmitting = true;
-      const submitButton=document.getElementById('btnLiveSubmitExam');
-      if(submitButton)submitButton.disabled=true;
-      persistExamDraft();
-      stopExamDraftHeartbeat();
-      clearInterval(examCountdownTimer);
-      
-      const mcqKeys = activeExam.mcqKeys || {};
-      const tfKeys = activeExam.tfKeys || {};
-      const saKeys = activeExam.saKeys || {};
-
-      let mcqCorrect = 0;
-      let tfCorrectSubCount = 0;
-      let saCorrect = 0;
-
-      const totalMcq = Object.keys(mcqKeys).length;
-      const totalTf = Object.keys(tfKeys).length;
-      const totalSa = Object.keys(saKeys).length;
-
-      // 1. Chấm Trắc nghiệm
-      for (let q in mcqKeys) {
-        if (studentLiveAnswers.mcq[q] === mcqKeys[q]) mcqCorrect++;
-      }
-
-      // 2. Chấm Đúng / Sai (1 ý=0.1, 2 ý=0.25, 3 ý=0.5, 4 ý=1.0đ)
-      let tfTotalScore = 0;
-      for (let q in tfKeys) {
-        let subCorrect = 0;
-        ['a', 'b', 'c', 'd'].forEach(sub => {
-          if (studentLiveAnswers.tf[q] && studentLiveAnswers.tf[q][sub] === tfKeys[q][sub]) {
-            subCorrect++;
-            tfCorrectSubCount++;
-          }
-        });
-        if (subCorrect === 1) tfTotalScore += 0.1;
-        else if (subCorrect === 2) tfTotalScore += 0.25;
-        else if (subCorrect === 3) tfTotalScore += 0.5;
-        else if (subCorrect === 4) tfTotalScore += 1.0;
-      }
-
-      // 3. Chấm Trả lời ngắn
-      let saTotalScore = 0;
-      for (let q in saKeys) {
-        const uAns = normalizeShortExamAnswer(studentLiveAnswers.sa[q]);
-        const kAns = normalizeShortExamAnswer(saKeys[q]);
-        if (uAns === kAns && uAns !== "") {
-          saCorrect++;
-          saTotalScore += 1.0;
-        }
-      }
-
-      let finalScore = 0;
-      let breakdownHtml = '';
-
-      if (activeExam.practiceOnly) {
-        document.getElementById('resultScoreNumber').innerText = "HOÀN THÀNH";
-        document.getElementById('resultScoreLabel').innerText = "CHẾ ĐỘ ĐỀ CƯƠNG / LUYỆN TẬP";
-        breakdownHtml = `
-          <div>✅ <strong>Trắc nghiệm (Phần I):</strong> Đúng ${mcqCorrect}/${totalMcq} câu</div>
-          <div>✅ <strong>Đúng / Sai (Phần II):</strong> Đúng ${tfCorrectSubCount}/${totalTf * 4} ý con</div>
-          <div>✅ <strong>Trả lời ngắn (Phần III):</strong> Đúng ${saCorrect}/${totalSa} câu</div>
-          <p style="margin-top:6px; color:#64748b; font-style:italic;">* Đề cương luyện tập không tính quy đổi điểm số thang 10.</p>
-        `;
-      } else {
-        if (totalMcq === 18 && totalTf === 4 && totalSa === 6) {
-          const p1 = mcqCorrect * 0.25;
-          const p2 = tfTotalScore;
-          const p3 = saCorrect * 0.25;
-          finalScore = (p1 + p2 + p3).toFixed(2);
-        } else {
-          finalScore = (mcqCorrect * 0.25 + tfTotalScore + saTotalScore).toFixed(2);
-        }
-
-        document.getElementById('resultScoreNumber').innerText = finalScore;
-        document.getElementById('resultScoreLabel').innerText = "ĐIỂM SỐ / THANG ĐIỂM 10";
-        breakdownHtml = `
-          <div>🔹 <strong>Phần I (Trắc nghiệm):</strong> Đúng ${mcqCorrect}/${totalMcq} câu</div>
-          <div>🔹 <strong>Phần II (Đúng/Sai):</strong> Đúng ${tfCorrectSubCount}/${totalTf * 4} ý (Đạt ${tfTotalScore.toFixed(2)} điểm)</div>
-          <div>🔹 <strong>Phần III (Trả lời ngắn):</strong> Đúng ${saCorrect}/${totalSa} câu</div>
-        `;
-      }
-
-      document.getElementById('resultModalExamTitle').innerText = activeExam.title;
-      document.getElementById('resultBreakdownText').innerHTML = breakdownHtml;
-
-      if (currentUser) {
-        try {
-          const docId=`${String(currentUser.id)}_${String(activeExam.code).replace(/[^a-zA-Z0-9_-]/g,'_')}_${activeDraftAttemptId || makeExamAttemptId()}`;
-          const submissionRef = db.collection("submissions").doc(docId);
-          const submissionPayload = {
-            attemptId: activeDraftAttemptId,
-            attemptNo: examSubmissionsFor(activeExam.code,currentUser.id).length + 1,
-            startedAt: activeDraftStartedAt ? new Date(activeDraftStartedAt).toISOString() : null,
-            rawDocsUrl: activeExam.rawDocsUrl || null,
-            embedUrl: activeExam.embedUrl || null,
-            userId: currentUser.id,
-            username: currentUser.username,
-            fullName: currentUser.fullName || currentUser.username,
-            classId: currentUser.classId || "",
-            examCode: activeExam.code,
-            examTitle: activeExam.title,
-            score: activeExam.practiceOnly ? null : parseFloat(finalScore),
-            practiceOnly: !!activeExam.practiceOnly,
-            mcqCorrect,
-            tfCorrectSubCount,
-            saCorrect,
-            mcqTotal: totalMcq,
-            mcqAnswered: Object.keys(mcqKeys).filter(q => !!studentLiveAnswers.mcq[q]).length,
-            tfTotalSubCount: totalTf * 4,
-            tfAnsweredSubCount: Object.keys(tfKeys).reduce((sum, q) => sum + ['a','b','c','d'].filter(x => !!(studentLiveAnswers.tf[q] || {})[x]).length, 0),
-            saTotal: totalSa,
-            saAnswered: Object.keys(saKeys).filter(q => String(studentLiveAnswers.sa[q] || '').trim() !== '').length,
-            examUpdatedAt: activeExam.updatedAt || null,
-            gradingKeys: {mcq: JSON.parse(JSON.stringify(mcqKeys)), tf: JSON.parse(JSON.stringify(tfKeys)), sa: JSON.parse(JSON.stringify(saKeys))},
-            answers: JSON.parse(JSON.stringify(studentLiveAnswers)),
-            submittedAt: new Date().toISOString()
-          };
-          // Giao dịch chỉ-tạo-mới: không ghi đè lượt đã nộp ngay cả khi mở lại bản nháp cũ.
-          if (typeof db.runTransaction === 'function') {
-            await db.runTransaction(async transaction => {
-              const existing = await transaction.get(submissionRef);
-              if (existing.exists) {
-                const duplicateError = new Error('Lượt làm này đã được gửi thành công trước đó.');
-                duplicateError.code = 'already-exists';
-                throw duplicateError;
-              }
-              transaction.set(submissionRef, submissionPayload);
-            });
-          } else {
-            // Chỉ dùng trong môi trường mock / bản Firebase không hỗ trợ transaction.
-            await submissionRef.set(submissionPayload);
-          }
-          currentResultSubmissionId=docId;
-          clearExamDraft();
-        } catch (err) {
-          if (err && err.code === 'already-exists') {
-            // Bản lưu cũ đã nộp rồi: giữ bản nộp trên Firebase, không chấm/ghi đè lần thứ hai.
-            clearExamDraft();
-            examSubmitting = false;
-            examDraftCompleted = true;
-            safeAlert('Lượt này đã được nộp trước đó và đã có trong lịch sử. Không ghi đè kết quả cũ.');
-            exitExamToHome();
-            return;
-          }
-          console.error('Lỗi lưu điểm thi:', err);
-          showExamDraftStatus('⚠️ Chưa gửi được bài lên Firebase. Bản nháp vẫn an toàn trên thiết bị; hãy kết nối mạng và bấm Nộp bài lại.', true);
-          safeAlert('Chưa thể gửi bài thi lên Firebase. Bài làm đã được lưu trên thiết bị. Hãy kiểm tra kết nối mạng và bấm Nộp bài lại.');
-          examSubmitting = false;
-          if(submitButton)submitButton.disabled=false;
-          return;
-        }
-      } else {
-        // Chế độ dùng thử không đăng nhập: không có kết quả trên đám mây.
-        clearExamDraft();
-      }
-      markStudentLiveExamStatus('submitted');
-      examSubmitting = false;
-      examDraftCompleted = true;
-      document.getElementById('examResultScoreModal').classList.add('open');
+      if(examSubmitting||!activeExam||isLiveReviewMode||!currentUser)return;
+      examSubmitting=true;const button=document.getElementById('btnLiveSubmitExam');button.disabled=true;persistExamDraft();
+      try{
+        const result=await BioBling.submit(activeDraftAttemptId,studentLiveAnswers);
+        if(!result)throw Error('Máy chủ chưa xác nhận bài nộp.');
+        clearInterval(examCountdownTimer);stopExamDraftHeartbeat();clearExamDraft();examDraftCompleted=true;currentResultSubmissionId=result.id;
+        document.getElementById('resultModalExamTitle').textContent=activeExam.title;
+        document.getElementById('resultScoreNumber').textContent=result.practiceOnly?'HOÀN THÀNH':result.score;
+        document.getElementById('resultScoreLabel').textContent=result.practiceOnly?'ĐÃ CHẤM BÀI LUYỆN TẬP':'ĐIỂM / '+result.maxScore;
+        document.getElementById('resultBreakdownText').innerHTML='<p>Trắc nghiệm: '+result.mcqCorrect+'/'+result.mcqTotal+' câu đúng</p><p>Đúng / Sai: '+result.tfCorrectSubCount+'/'+result.tfTotalSubCount+' ý đúng</p><p>Trả lời ngắn: '+result.saCorrect+'/'+result.saTotal+' câu đúng</p>'+(result.lateSubmission?'<p>Đã hết giờ: máy chủ chấm bản nháp cuối cùng được đồng bộ đúng hạn.</p>':'');
+        markStudentLiveExamStatus('submitted');document.getElementById('examResultScoreModal').classList.add('open');
+      }catch(err){showExamDraftStatus('Chưa nộp được. Bản nháp trên thiết bị vẫn được giữ.',true);safeAlert(err.message);button.disabled=false;}
+      finally{examSubmitting=false;}
     }
 
     function exitExamToHome() {
@@ -7012,6 +6749,7 @@
     }
 
     function convertDocsToPreview(url) {
+      url = safeWebUrl(url);
       if (!url) return "";
       url = url.trim();
       const docsMatch = url.match(/\/document\/d\/([a-zA-Z0-9-_]+)/);
@@ -7124,6 +6862,7 @@
     });
 
     async function saveAdminExamToFirestore() {
+      if (!requireAdmin()) return;
       const code = document.getElementById('inpAdminExamCode').value.trim();
       const title = document.getElementById('inpAdminExamTitle').value.trim();
       const timeLimit = parseInt(document.getElementById('inpAdminExamTime').value) || 50;
@@ -7133,7 +6872,8 @@
       const isUnlimited = document.getElementById('chkAdminIsUnlimited').checked;
       const practiceOnly = document.getElementById('chkAdminPracticeOnly').checked;
       const deadline = document.getElementById('inpAdminExamDeadline').value || '';
-      const rawDocsUrl = document.getElementById('inpAdminDocsUrl').value.trim();
+      const rawDocsUrl = safeWebUrl(document.getElementById('inpAdminDocsUrl').value);
+      if (!rawDocsUrl) return safeAlert('Đường dẫn đề thi phải là HTTPS hợp lệ.');
 
       const rawMcq = document.getElementById('inpAdminMcqKeys').value.trim();
       const rawTf = document.getElementById('inpAdminTfKeys').value.trim();
@@ -7233,6 +6973,7 @@
     }
 
     async function deleteAdminExam(code) {
+      if (!requireAdmin()) return;
       if (safeConfirm(`Bạn có chắc chắn muốn xóa đề thi [${code}] vĩnh viễn không?`)) {
         try {
           await db.collection("exams").doc(code).delete();
@@ -7245,6 +6986,7 @@
 
     /* ================= CÁC HÀM GỐC CỦA HỆ THỐNG LMS ================= */
     function convertToDrivePreviewUrl(rawUrl) {
+      rawUrl = safeWebUrl(rawUrl);
       if (!rawUrl) return '';
       let url = rawUrl.trim();
       const matchFileId = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
@@ -7260,6 +7002,7 @@
     }
 
     function openDocViewer(rawUrl, title) {
+      rawUrl = safeWebUrl(rawUrl);
       if (!rawUrl) return showToast("Chưa có đường dẫn tài liệu để hiển thị.");
       const modal = document.getElementById('docViewerModal');
       const iframe = document.getElementById('docViewerIframe');
@@ -7606,16 +7349,10 @@
     }
 
     function checkAuthSession() {
-      if (!currentUser) {
-        const savedSession = safeParseJSON(safeStorage.getItem(SESSION_STORAGE_KEY), null);
-        if (savedSession && savedSession.username) {
-          // Đối chiếu xem phiên thiết bị còn hợp lệ không
-          const dbUser = userDatabase.find(u => u && (
-            String(u.id) === String(savedSession.id) ||
-            String(u.username || '').toLowerCase() === String(savedSession.username || '').toLowerCase()
-          ));
-          currentUser = dbUser || savedSession;
-        }
+      if (!usersReady) {
+        currentUser = null;
+        document.getElementById('authOverlay').style.display = 'block';
+        return;
       }
       if (!currentUser) { 
         document.getElementById('authOverlay').style.display = 'block';
@@ -7640,87 +7377,9 @@
       document.getElementById('formRegister').style.display = tab==='register' ? 'block' : 'none';
     }
 
-    function handleLogin(e) {
-      e.preventDefault();
-      userDatabase = mergeDefaultAdmins(userDatabase);
-      const enteredUsername = document.getElementById('loginUsername').value.trim().toLowerCase();
-      const enteredPassword = document.getElementById('loginPassword').value.trim();
+    async function handleLogin(e) { e?.preventDefault();try { await BioBling.login(); } catch(err){showAuthNotice(err.message||'Không thể đăng nhập Google.',false);} }
 
-      const userIdx = userDatabase.findIndex(u => u && String(u.username || '').trim().toLowerCase() === enteredUsername && String(u.password || '').trim() === enteredPassword);
-      if (userIdx === -1) {
-        showAuthNotice("Sai tên đăng nhập hoặc mật khẩu!", false);
-        return;
-      }
-      
-      const user = userDatabase[userIdx];
-      if (user.status === "pending") {
-        showAuthNotice("Tài khoản đang chờ duyệt từ Quản trị viên BioBling!", false);
-        return;
-      }
-
-      if (!Array.isArray(user.activeSessions)) user.activeSessions = [];
-      const currentDevId = getOrCreateDeviceId();
-      const existingSessionIdx = user.activeSessions.findIndex(s => s && s.deviceId === currentDevId);
-
-      if (existingSessionIdx !== -1) {
-        user.activeSessions[existingSessionIdx].lastActive = new Date().toLocaleString('vi-VN');
-      } else {
-        if (user.activeSessions.length >= 2) {
-          user.activeSessions.shift();
-          showToast("Đã tự động thay thế phiên thiết bị cũ nhất.");
-        }
-
-        user.activeSessions.push({
-          deviceId: currentDevId,
-          deviceName: getDeviceName(),
-          lastActive: new Date().toLocaleString('vi-VN')
-        });
-      }
-
-      userDatabase[userIdx] = user;
-      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-      try { rtdb.ref('/users').set(userDatabase); } catch (err) { console.warn(err); }
-
-      currentUser = user;
-      safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
-      const box = document.getElementById('authNoticeBox');
-      if (box) box.style.display = 'none';
-      checkAuthSession();
-      showToast("Đăng nhập thành công!");
-    }
-
-    function handleRegister(e) {
-      e.preventDefault();
-      const un = document.getElementById('regUsername').value.trim().toLowerCase();
-      if(userDatabase.some(u=>u && String(u.username || '').toLowerCase()===un)) {
-        showAuthNotice("Tên đăng nhập đã tồn tại!", false);
-        return;
-      }
-      if(document.getElementById('regPassword').value !== document.getElementById('regConfirmPassword').value) {
-        showAuthNotice("Mật khẩu xác nhận không khớp!", false);
-        return;
-      }
-      
-      const newUser = { 
-        id: Date.now(), 
-        username: un, 
-        fullName: document.getElementById('regFullName').value.trim(), 
-        password: document.getElementById('regPassword').value.trim(), 
-        role: "student", 
-        status: "pending", 
-        classId: "", 
-        avatar: "", 
-        bio: "", 
-        createdAt: new Date().toLocaleDateString('vi-VN') 
-      };
-      
-      userDatabase.push(newUser);
-      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-      try { rtdb.ref('/users').set(userDatabase); } catch (err) { console.warn(err); }
-
-      switchAuthTab('login');
-      showAuthNotice("Đăng ký thành công! Vui lòng chờ Giảng viên BioBling duyệt.", true);
-    }
+    async function handleRegister(e) { return handleLogin(e); }
 
     function handleLogout() {
       const chk = document.getElementById('chkLogoutAllDevices');
@@ -7739,46 +7398,7 @@
     }
 
     async function executeConfirmedLogout() {
-      closeLogoutModal();
-      const logoutAll = !!document.getElementById('chkLogoutAllDevices')?.checked;
-      if (currentUser) {
-        const uname = String(currentUser.username || '').toLowerCase();
-        const uid = currentUser.id;
-        const currentDevId = getOrCreateDeviceId();
-
-        // Xóa ngay phiên cục bộ để đảm bảo an toàn tức thì
-        currentUser = null;
-        safeStorage.removeItem(SESSION_STORAGE_KEY);
-        safeStorage.removeItem(ACTIVE_PAGE_STORAGE_KEY);
-
-        try {
-          const user = userDatabase.find(u => u && (String(u.id) === String(uid) || String(u.username || '').toLowerCase() === uname));
-          if (user) {
-            if (logoutAll || !Array.isArray(user.activeSessions)) {
-              user.activeSessions = [];
-            } else {
-              user.activeSessions = user.activeSessions.filter(s => s && s.deviceId !== currentDevId);
-            }
-            safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-            rtdb.ref('/users').set(userDatabase);
-          }
-          if (uname) {
-            rtdb.ref('/status/' + uname).set({
-              state: 'offline',
-              lastChanged: firebase.database.ServerValue.TIMESTAMP
-            });
-          }
-        } catch (err) {
-          console.warn(err);
-        }
-      } else {
-        currentUser = null;
-        safeStorage.removeItem(SESSION_STORAGE_KEY);
-        safeStorage.removeItem(ACTIVE_PAGE_STORAGE_KEY);
-      }
-
-      checkAuthSession();
-      showToast(logoutAll ? "Đã đăng xuất an toàn khỏi tất cả thiết bị!" : "Đã đăng xuất an toàn khỏi thiết bị này.");
+      closeLogoutModal();persistExamDraft();await BioBling.logout();safeStorage.removeItem(SESSION_STORAGE_KEY);safeStorage.removeItem(ACTIVE_PAGE_STORAGE_KEY);showToast('Đã đăng xuất khỏi thiết bị này.');
     }
 
     function updateUserUI() {
@@ -7816,7 +7436,7 @@
       const drawAvatar = (elId) => {
         const el = document.getElementById(elId);
         if (el) {
-          if (currentUser.avatar) el.innerHTML = `<img src="${currentUser.avatar}">`;
+          if (currentUser.avatar) el.innerHTML = `<img src="${escapeHTML(safeAvatarUrl(currentUser.avatar))}">`;
           else el.textContent = initChar;
         }
       };
@@ -7824,218 +7444,34 @@
       drawAvatar('topbarAvatar');
     }
 
-    function deleteUserPermanently(userId) {
-      if (!isSuperAdmin()) {
-        safeAlert("Chỉ tài khoản admin1 mới có quyền xóa tài khoản!");
-        return;
-      }
-      const userToDelete = userDatabase.find(u => u.id === userId);
-      if (!userToDelete || userToDelete.username.toLowerCase() === 'admin1') return;
-
-      if (!safeConfirm(`Xác nhận xóa vĩnh viễn tài khoản @${userToDelete.username}?`)) return;
-
-      userDatabase = userDatabase.filter(u => u.id !== userId);
-      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-      rtdb.ref('/users').set(userDatabase).then(() => {
-        rtdb.ref('/status/' + userToDelete.username.toLowerCase()).remove();
-        showToast(`Đã xóa vĩnh viễn tài khoản @${userToDelete.username}!`);
-      });
-
-      renderClassMembersView(currentClassViewId);
-      renderAdminClassDashboard();
-      renderSuperAdminView();
+    async function deleteUserPermanently(userId) {
+      if(!isSuperAdmin())return;const user=userDatabase.find(u=>u.id===userId);if(!user||user.uid===window.BIOBLING_OWNER_UID)return;
+      if(!safeConfirm('Tạm khóa tài khoản này? Bài làm và hồ sơ vẫn được giữ lại.'))return;
+      try{await BioBling.mutate('/users',{users:[{...user,status:'suspended'}]});showToast('Đã tạm khóa tài khoản.');}catch(err){presentStorageError(err);}
     }
 
     let revealedAccountIds = {};
 
-    function toggleRevealPassword(userId) {
-      if (!isSuperAdmin()) return;
-      revealedAccountIds[userId] = !revealedAccountIds[userId];
-      renderClassMembersView(currentClassViewId);
-      renderSuperAdminView();
-    }
+    function toggleRevealPassword() { showToast('BioBling không lưu hay hiển thị mật khẩu Google.'); }
 
-    function copyAccountCredentials(username, password) {
-      if (!isSuperAdmin()) return;
-      const text = `Tài khoản: ${username} | Mật khẩu: ${password}`;
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text);
-        } else {
-          const ta = document.createElement('textarea');
-          ta.value = text;
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand('copy');
-          ta.remove();
-        }
-        showToast(`Đã sao chép TK & MK của @${username}`);
-      } catch (e) {
-        showToast(text);
-      }
-    }
+    function copyAccountCredentials() { showToast('BioBling không lưu hay hiển thị mật khẩu Google.'); }
 
-    function updateStudentPasswordByMaster(userId, newPwd) {
-      if (!isSuperAdmin()) return;
-      const u = userDatabase.find(x => x && x.id === userId);
-      if (!u) return;
-      const clean = String(newPwd || '').trim();
-      if (clean.length < 4) {
-        showToast("Mật khẩu phải có ít nhất 4 ký tự!");
-        return;
-      }
-      u.password = clean;
-      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-      try { rtdb.ref('/users').set(userDatabase); } catch (e) {}
-      showToast(`Đã cập nhật mật khẩu mới cho @${u.username}!`);
-      renderClassMembersView(currentClassViewId);
-      renderSuperAdminView();
-    }
+    function updateStudentPasswordByMaster() { showToast('BioBling không lưu hay hiển thị mật khẩu Google.'); }
 
     function renderSuperAdminView() {
-      if (!isSuperAdmin()) {
-        navigateTo('dashboard');
-        return;
-      }
-      const container = document.getElementById('adminListSuperView');
-      if (!container) return;
-
-      const adminUsers = userDatabase.filter(u => u && u.role === 'admin');
-      container.innerHTML = adminUsers.map(admin => {
-        const isMasterSelf = admin.username.toLowerCase() === 'admin1';
-        const showPass = !!revealedAccountIds[admin.id];
-        return `
-          <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #dce8df; padding:12px 14px; border-radius:12px; gap:10px; flex-wrap:wrap;">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <div class="user-avatar-small" style="background:${isMasterSelf ? '#b91c1c' : '#287c54'}; font-size:12px;">
-                ${admin.avatar ? `<img src="${admin.avatar}">` : admin.username.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <b style="font-size:13.5px; color:#173d2e;">${escapeHTML(admin.fullName || admin.username)}</b>
-                <span style="font-size:11px; color:#6a8274; display:block;">TK: <strong>@${escapeHTML(admin.username)}</strong> · MK: <code>${showPass ? escapeHTML(admin.password || '') : '••••••••'}</code></span>
-              </div>
-            </div>
-            <div style="display:flex; gap:6px; align-items:center;">
-              <button type="button" class="secondary" style="padding:4px 8px; font-size:11px;" onclick="toggleRevealPassword(${admin.id})">
-                <i class="fa-solid ${showPass ? 'fa-eye-slash' : 'fa-eye'}"></i> ${showPass ? 'Ẩn MK' : 'Xem MK'}
-              </button>
-              ${!isMasterSelf ? `
-                <button onclick="deleteUserPermanently(${admin.id})" class="super-del-btn">
-                  <i class="fa-solid fa-trash-can"></i> Xóa
-                </button>
-              ` : '<span style="font-size:11px; font-weight:700; color:#15803d; background:#dcfce7; padding:3px 8px; border-radius:99px;">Chính chủ</span>'}
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      const studentTableWrap = document.getElementById('superStudentAccountsTableWrap');
-      if (!studentTableWrap) return;
-      const q = (document.getElementById('superStudentAccountSearch')?.value || '').trim().toLowerCase();
-      const students = userDatabase.filter(u => u && u.role !== 'admin' && (
-        !q || String(u.fullName || '').toLowerCase().includes(q) || String(u.username || '').toLowerCase().includes(q)
-      ));
-
-      if (!students.length) {
-        studentTableWrap.innerHTML = `<div class="notice" style="margin:12px;">Chưa có tài khoản học viên nào khớp với tìm kiếm.</div>`;
-        return;
-      }
-
-      studentTableWrap.innerHTML = `
-        <table class="member-compact-table">
-          <thead>
-            <tr>
-              <th>STT</th>
-              <th>Họ và Tên Học Viên</th>
-              <th>Tên Đăng Nhập (Username)</th>
-              <th>Mật Khẩu (Password)</th>
-              <th>Đổi Mật Khẩu Nhanh</th>
-              <th>Lớp Đang Học</th>
-              <th>Trạng Thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${students.map((st, idx) => {
-              const showPass = !!revealedAccountIds[st.id];
-              return `
-                <tr>
-                  <td style="font-weight:700; color:#64748b;">#${idx + 1}</td>
-                  <td>
-                    <b style="color:#173d2e;">${escapeHTML(st.fullName || st.username)}</b>
-                    <div style="font-size:10.5px; color:#64748b;">Tạo: ${escapeHTML(st.createdAt || '---')}</div>
-                  </td>
-                  <td>
-                    <span style="font-family:monospace; font-weight:800; color:#1e40af; background:#eff6ff; padding:3px 8px; border-radius:6px;">
-                      @${escapeHTML(st.username)}
-                    </span>
-                  </td>
-                  <td>
-                    <div class="cred-box">
-                      <span>${showPass ? escapeHTML(st.password || '') : '••••••••'}</span>
-                      <button type="button" onclick="toggleRevealPassword(${st.id})" title="${showPass ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}">
-                        <i class="fa-solid ${showPass ? 'fa-eye-slash' : 'fa-eye'}"></i>
-                      </button>
-                      <button type="button" onclick="copyAccountCredentials(${escapeHTML(JSON.stringify(String(st.username || '')))}, ${escapeHTML(JSON.stringify(String(st.password || '')))})" title="Sao chép tên đăng nhập & mật khẩu">
-                        <i class="fa-regular fa-copy"></i>
-                      </button>
-                    </div>
-                  </td>
-                  <td>
-                    <div style="display:flex; gap:4px; align-items:center;">
-                      <input type="text" id="inpMasterPwd_${st.id}" placeholder="Mật khẩu mới..." style="padding:5px 8px; border:1px solid #cbd5e1; border-radius:7px; font-size:11.5px; width:115px;">
-                      <button type="button" class="secondary" style="padding:5px 8px; font-size:11px;" onclick="updateStudentPasswordByMaster(${st.id}, document.getElementById('inpMasterPwd_${st.id}').value)">
-                        Lưu
-                      </button>
-                    </div>
-                  </td>
-                  <td>
-                    <span style="font-size:11.5px; font-weight:650; color:#23694b;">${escapeHTML(getUserEnrolledClassNames(st))}</span>
-                  </td>
-                  <td>
-                    <span class="tag ${st.status === 'pending' ? 'session-badge' : 'status-done'}" style="font-size:10px;">
-                      ${st.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
-                    </span>
-                  </td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      `;
+      if(!isSuperAdmin())return;
+      const select=document.getElementById('newAdminUser');if(select)select.innerHTML='<option value="">Chọn người đã đăng nhập Google</option>'+userDatabase.filter(u=>u.uid&&u.role!=='admin').map(u=>'<option value="'+u.id+'">'+escapeHTML(u.fullName+' · '+u.email)+'</option>').join('');
+      const rows=userDatabase.map(u=>'<tr><td>'+escapeHTML(u.fullName||u.username)+'</td><td>'+escapeHTML(u.email||'Chưa liên kết Google')+'</td><td>'+escapeHTML(u.role)+'</td><td>'+escapeHTML(u.status)+'</td><td>'+(u.uid!==window.BIOBLING_OWNER_UID?'<button onclick="deleteUserPermanently('+u.id+')">Tạm khóa</button>':'Chủ hệ thống')+'</td></tr>').join('');
+      document.getElementById('adminListSuperView').innerHTML='<p>Giảng viên đăng nhập bằng tài khoản Google của chính mình.</p>';
+      document.getElementById('superStudentAccountsTableWrap').innerHTML='<table style="width:100%"><thead><tr><th>Họ tên</th><th>Google</th><th>Vai trò</th><th>Trạng thái</th><th>Quản lý</th></tr></thead><tbody>'+rows+'</tbody></table>';
     }
 
-    function handleCreateAdmin(e) {
-      e.preventDefault();
-      if (!isSuperAdmin()) return safeAlert("Chỉ admin1 mới có quyền tạo thêm admin!");
-
-      const username = document.getElementById('newAdminUser').value.trim().toLowerCase();
-      const fullName = document.getElementById('newAdminFullName').value.trim();
-      const password = document.getElementById('newAdminPassword').value;
-      const bio = document.getElementById('newAdminBio').value.trim();
-
-      if (userDatabase.some(u => u.username.toLowerCase() === username)) return safeAlert("Tên đăng nhập đã tồn tại!");
-
-      const newAdmin = {
-        id: Date.now(),
-        username,
-        fullName,
-        password,
-        role: "admin",
-        status: "approved",
-        classId: "all",
-        avatar: "",
-        bio: bio || "Giảng viên Sinh học BioBling - 2B",
-        createdAt: new Date().toLocaleDateString('vi-VN')
-      };
-
-      userDatabase.push(newAdmin);
-      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-      rtdb.ref('/users').set(userDatabase).then(() => {
-        showToast(`Đã tạo thành công tài khoản Admin [@${username}]!`);
-      });
-
-      e.target.reset();
-      renderSuperAdminView();
+    async function handleCreateAdmin(e) {
+      e.preventDefault();if(!isSuperAdmin())return;
+      const u=userDatabase.find(u=>String(u.id)===document.getElementById('newAdminUser').value);
+      if(!u||!u.uid)return safeAlert('Chọn người đã đăng nhập Google.');
+      if(!safeConfirm('Cấp quyền giảng viên cho '+u.fullName+'? Người này sẽ được quản lý học liệu và xem bài làm.'))return;
+      try{await BioBling.mutate('/users',{users:[{...u,role:'admin',status:'approved'}]});showToast('Đã cấp quyền giảng viên.');}catch(err){presentStorageError(err);}
     }
 
     function getTodayKey() {
@@ -8448,7 +7884,7 @@
                   <th style="width:44px;">STT</th>
                   <th>Thành Viên</th>
                   <th>Tên Đăng Nhập (Account)</th>
-                  ${isMaster ? '<th>Mật Khẩu (Super Admin)</th>' : ''}
+                  
                   <th>Các Lớp Đang Học</th>
                   <th>Trạng Thái</th>
                   ${isAdmin ? '<th style="text-align:right;">Quản Lý</th>' : ''}
@@ -8477,21 +7913,6 @@
                   }
 
                   let masterPassCell = '';
-                  if (isMaster) {
-                    masterPassCell = `
-                      <td>
-                        <div class="cred-box">
-                          <span>${showPass ? escapeHTML(m.password || '') : '••••••••'}</span>
-                          <button type="button" onclick="toggleRevealPassword(${m.id})" title="${showPass ? 'Ẩn mật khẩu' : 'Xem mật khẩu'}">
-                            <i class="fa-solid ${showPass ? 'fa-eye-slash' : 'fa-eye'}"></i>
-                          </button>
-                          <button type="button" onclick="copyAccountCredentials(${escapeHTML(JSON.stringify(String(m.username || '')))}, ${escapeHTML(JSON.stringify(String(m.password || '')))})" title="Sao chép TK & MK">
-                            <i class="fa-regular fa-copy"></i>
-                          </button>
-                        </div>
-                      </td>
-                    `;
-                  }
 
                   let adminActionsCell = '';
                   if (isAdmin) {
@@ -8525,7 +7946,7 @@
                       <td>
                         <div style="display:flex; align-items:center; gap:10px;">
                           <div class="user-avatar-small" style="width:34px; height:34px; font-size:12px;">
-                            ${m.avatar ? `<img src="${m.avatar}">` : initial}
+                            ${m.avatar ? `<img src="${escapeHTML(safeAvatarUrl(m.avatar))}">` : initial}
                           </div>
                           <div>
                             <b style="font-size:13px; color:#173d2e;">${escapeHTML(m.fullName || m.username)} ${isMe ? '(Tôi)' : ''}</b>
@@ -8592,21 +8013,13 @@
         }
 
         let masterCredHtml = '';
-        if (isMaster) {
-          masterCredHtml = `
-            <div style="margin-top:8px; padding:7px 10px; background:#fff8eb; border:1px solid #fde68a; border-radius:8px; font-size:11.5px; display:flex; justify-content:space-between; align-items:center;">
-              <span>🔑 TK: <strong>@${escapeHTML(m.username)}</strong> · MK: <code>${showPass ? escapeHTML(m.password || '') : '••••••••'}</code></span>
-              <button type="button" class="text-btn" style="font-size:11px; color:#b45309;" onclick="toggleRevealPassword(${m.id})">${showPass ? 'Ẩn' : 'Xem'}</button>
-            </div>
-          `;
-        }
 
         return `
           <div class="card" style="padding: 16px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <div style="display:flex; align-items:center; gap:10px;">
                 <div class="user-avatar-small" style="width:40px; height:40px; font-size:14px;">
-                  ${m.avatar ? `<img src="${m.avatar}">` : initial}
+                  ${m.avatar ? `<img src="${escapeHTML(safeAvatarUrl(m.avatar))}">` : initial}
                 </div>
                 <div>
                   <b style="font-size:13.5px; color:#173d2e;">${escapeHTML(m.fullName || m.username)} ${isMe ? '(Tôi)' : ''}</b>
@@ -8694,6 +8107,7 @@
     }
 
     function quickAddUserToClass(userId, classId) {
+      if (!requireAdmin()) return;
       const user = userDatabase.find(u => u && u.id === userId);
       if (!user || !classId) return;
       const currentIds = getUserEnrolledClassIds(user);
@@ -8709,6 +8123,7 @@
     }
 
     function addCandidateToClass(userId) {
+      if (!requireAdmin()) return;
       const user = userDatabase.find(u => u && u.id === userId);
       if (!user || !targetClassForAdd) return;
 
@@ -8727,6 +8142,7 @@
     }
 
     function removeUserFromClass(userId, classIdToRemove = null) {
+      if (!requireAdmin()) return;
       const user = userDatabase.find(u => u && u.id === userId);
       if (!user) return;
       const targetCid = classIdToRemove || (currentClassViewId !== 'all_users' && currentClassViewId !== 'unassigned' ? currentClassViewId : '');
@@ -9424,7 +8840,8 @@
       const classIds = Object.keys(classSessionIds);
       const sessionId = classSessionIds[classIds[0]];
       const title = document.getElementById('mediaTitle').value.trim();
-      const url = document.getElementById('mediaUrl').value.trim();
+      const url = safeWebUrl(document.getElementById('mediaUrl').value);
+      if (!url) return safeAlert('Đường dẫn học liệu phải là HTTPS hợp lệ.');
       if (!classIds.length) return safeAlert('Chọn ít nhất một lớp cho học liệu.');
       if (!title || !url) return safeAlert('Vui lòng nhập tiêu đề và đường dẫn học liệu.');
       const sesObj = sessionDatabase.find(s => s.id === sessionId);
@@ -9487,7 +8904,7 @@
         sessionId, sessionName: ses.title, classSessionIds,
         type: document.getElementById('editMediaType').value,
         title: document.getElementById('editMediaTitle').value.trim(),
-        url: document.getElementById('editMediaUrl').value.trim(),
+        url: safeWebUrl(document.getElementById('editMediaUrl').value),
         note: document.getElementById('editMediaNote').value.trim(),
         deadline: document.getElementById('editMediaDeadline').value || '',
         updatedAt: new Date().toISOString()
@@ -9689,36 +9106,20 @@
     }
 
     function openApprovalModal() {
-      const pending = userDatabase.filter(u => u.status === 'pending');
-      const isMaster = isSuperAdmin();
-
-      document.getElementById('approvalUsersList').innerHTML = pending.length 
-        ? pending.map(u => `
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;">
-              <div>
-                <b>${escapeHTML(u.fullName)}</b> (@${escapeHTML(u.username)})<br>
-                <small style="color:#71877d;">Đăng ký: ${escapeHTML(u.createdAt)}</small>
-              </div>
-              <div style="display:flex;gap:6px;">
-                <button class="primary" onclick="approveUser(${u.id})">Phê duyệt</button>
-                ${isMaster ? `<button onclick="deleteUserPermanently(${u.id})" class="super-del-btn">Xóa</button>` : ''}
-              </div>
-            </div>
-          `).join('')
-        : '<div class="notice">Không có học viên nào đang chờ phê duyệt.</div>';
+      if(!requireAdmin())return;
+      const pending=userDatabase.filter(u=>u.status==='pending'&&u.uid),legacy=userDatabase.filter(u=>u.migrationRequired&&!u.uid&&(u.role!=='admin'||isSuperAdmin()));
+      document.getElementById('approvalUsersList').innerHTML=pending.length?pending.map(u=>'<div style="padding:12px;border-bottom:1px solid #ddd"><b>'+escapeHTML(u.fullName)+'</b><div>'+escapeHTML(u.email||'')+'</div><button onclick="approveUser('+u.id+')">Duyệt học viên mới</button><div style="margin-top:8px"><select id="linkLegacy_'+u.id+'"><option value="">Liên kết hồ sơ cũ để giữ lớp và bài làm</option>'+legacy.map(l=>'<option value="'+l.id+'">'+escapeHTML(l.fullName+' (@'+l.username+')')+'</option>').join('')+'</select><button onclick="linkLegacyAccount('+u.id+')">Liên kết</button></div></div>').join(''):'<p>Không có học viên chờ duyệt.</p>';
       document.getElementById('approvalModal').classList.add('open');
     }
+    async function linkLegacyAccount(pendingId) {
+      const legacyId=Number(document.getElementById('linkLegacy_'+pendingId).value);if(!legacyId)return;
+      if(!safeConfirm('Bạn đã xác nhận tài khoản Google này thuộc đúng chủ hồ sơ cũ?'))return;
+      try{await BioBling.mutate('/users/link',{pendingId,legacyId});openApprovalModal();showToast('Đã liên kết và giữ nguyên lịch sử học tập.');}catch(err){presentStorageError(err);}
+    }
 
-    function approveUser(userId) {
-      const u = userDatabase.find(x => x.id === userId);
-      if(u) {
-        u.status = 'approved';
-        safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-        rtdb.ref('/users').set(userDatabase);
-        showToast(`Đã duyệt @${u.username}`);
-        renderAdminClassDashboard();
-        openApprovalModal();
-      }
+    async function approveUser(userId) {
+      if(!requireAdmin())return;const u=userDatabase.find(x=>x.id===userId);if(!u)return;
+      try{await BioBling.mutate('/users',{users:[{...u,status:'approved'}]});openApprovalModal();showToast('Đã duyệt học viên.');}catch(err){presentStorageError(err);}
     }
 
     function renderNotesView() {
@@ -9787,7 +9188,7 @@
 
       const idAvatar = document.getElementById('idCardAvatarBox');
       if (idAvatar) {
-        if (currentUser.avatar) idAvatar.innerHTML = `<img src="${currentUser.avatar}">`;
+        if (currentUser.avatar) idAvatar.innerHTML = `<img src="${escapeHTML(safeAvatarUrl(currentUser.avatar))}">`;
         else idAvatar.textContent = nameVal.charAt(0).toUpperCase();
       }
     }
@@ -9915,7 +9316,7 @@
       document.getElementById('settingBio').value = currentUser.bio || "";
       const prevBox = document.getElementById('settingAvatarPreview');
       prevBox.removeAttribute('data-temp-avatar'); 
-      if(currentUser.avatar) prevBox.innerHTML = `<img src="${currentUser.avatar}">`;
+      if(currentUser.avatar) prevBox.innerHTML = `<img src="${escapeHTML(safeAvatarUrl(currentUser.avatar))}">`;
       else prevBox.textContent = (currentUser.fullName||currentUser.username).charAt(0).toUpperCase();
 
       updateLiveStudentIdCard();
@@ -9925,44 +9326,33 @@
       applyAppAccentTheme(savedTheme, true);
     }
 
-    function handleUpdateProfile(e) {
-      e.preventDefault();
-      currentUser.fullName = document.getElementById('settingFullName').value.trim();
-      currentUser.bio = document.getElementById('settingBio').value.trim();
-      const tempAvatar = document.getElementById('settingAvatarPreview').getAttribute('data-temp-avatar');
-      if (tempAvatar) currentUser.avatar = tempAvatar;
-
-      const idx = userDatabase.findIndex(u=>u.id===currentUser.id);
-      if(idx > -1) {
-        userDatabase[idx].fullName = currentUser.fullName;
-        userDatabase[idx].bio = currentUser.bio;
-        userDatabase[idx].avatar = currentUser.avatar;
-        safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-        rtdb.ref('/users').set(userDatabase);
-      }
-      safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
-      updateUserUI(); 
-      showToast("Đã lưu thông tin hồ sơ!");
+    async function handleUpdateProfile(e) {
+      e.preventDefault();if(!currentUser)return;
+      const avatar=document.getElementById('settingAvatarPreview').getAttribute('data-temp-avatar')||currentUser.avatar||'';
+      try{await BioBling.mutate('/profile',{fullName:document.getElementById('settingFullName').value.trim(),bio:document.getElementById('settingBio').value.trim(),avatar});showToast('Đã lưu hồ sơ.');}catch(err){presentStorageError(err);}
     }
     
-    function handleChangePassword(e) {
-      e.preventDefault();
-      if(document.getElementById('pwdOld').value !== currentUser.password) return safeAlert("Mật khẩu cũ không chính xác!");
-      if(document.getElementById('pwdNew').value !== document.getElementById('pwdConfirm').value) return safeAlert("Mật khẩu mới không khớp!");
-      currentUser.password = document.getElementById('pwdNew').value;
-      userDatabase.find(u=>u.id===currentUser.id).password = currentUser.password;
-      safeStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userDatabase));
-      rtdb.ref('/users').set(userDatabase);
-      safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
-      e.target.reset(); 
-      showToast("Đổi mật khẩu thành công!");
-    }
+    function handleChangePassword(e) { e.preventDefault();safeAlert('BioBling dùng đăng nhập Google. Bạn quản lý mật khẩu trong tài khoản Google.'); }
 
     window.addEventListener('DOMContentLoaded', () => {
       if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
       const savedTheme = safeStorage.getItem(APP_THEME_STORAGE_KEY);
       if (savedTheme) applyAppAccentTheme(savedTheme, true);
-      checkAuthSession();
+      const logoutAll=document.getElementById('chkLogoutAllDevices');if(logoutAll)logoutAll.closest('label')?.remove();
+      BioBling.onProfile=(p)=>{
+        const was=currentUser;usersReady=true;currentUser=p?.status==='approved'?p:null;
+        if(!currentUser){
+          if(was)persistExamDraft();clearInterval(examCountdownTimer);stopExamDraftHeartbeat();detachStudentLiveMentorChatListener();
+          document.getElementById('liveExamModal')?.classList.remove('open');document.getElementById('examQuestionDialog')?.close();document.body.style.overflow='';
+          userDatabase=[];classDatabase=[];sessionDatabase=[];mediaDatabase=[];examsList=[];studentSubmissions=[];
+          for(const key of [AUTH_STORAGE_KEY,SESSION_STORAGE_KEY,CLASSES_STORAGE_KEY,SESSIONS_STORAGE_KEY,MEDIA_STORAGE_KEY])safeStorage.removeItem(key);
+          checkAuthSession();if(p)showAuthNotice(p.status==='pending'?'Đã đăng nhập Google. Tài khoản đang chờ giảng viên duyệt hoặc liên kết hồ sơ cũ.':'Tài khoản hiện bị tạm khóa. Hãy liên hệ giảng viên.',false);
+        }else if(!was||was.id!==currentUser.id)checkAuthSession();else updateUserUI();
+      };
+      BioBling.onError=e=>showAuthNotice(e.message,false);
+      BioBling.onDraftSaved=()=>{showExamDraftStatus('Đã lưu trên thiết bị và máy chủ');syncStudentLiveExamStateToRtdb();};
+      BioBling.onDraftError=e=>showExamDraftStatus('Đã lưu trên thiết bị. Chưa đồng bộ: '+e.message,true);
+      BioBling.init();checkAuthSession();
     });
   </script>
 </body>

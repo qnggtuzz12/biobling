@@ -1,0 +1,11 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const h=fs.readFileSync('index.html','utf8');
+for(const m of h.matchAll(/<script>([\s\S]*?)<\/script>/g)) new vm.Script(m[1]);
+const s=h.slice(h.indexOf('    function examQuestionTargetId'),h.indexOf('    function openExamQuestionMap'));
+const c=vm.createContext({activeExam:{mcqKeys:{1:'A',2:'B'},tfKeys:{1:{}},saKeys:{1:'0'}},studentLiveAnswers:{mcq:{1:'A',99:'B'},tf:{1:{a:'Đ',b:'S'}},sa:{1:'0'}}});
+vm.runInContext(s,c);
+assert.deepStrictEqual(Array.from(vm.runInContext('examQuestionItems().map(x=>x.status)',c)),['done','blank','partial','done']);
+vm.runInContext("studentLiveAnswers.tf[1]={a:'Đ',b:'S',c:'Đ',d:'S'};studentLiveAnswers.sa[1]='  ';studentLiveAnswers.mcq[1]=null",c);
+assert.deepStrictEqual(Array.from(vm.runInContext('examQuestionItems().map(x=>x.status)',c)),['blank','blank','done','blank']);
+assert.notEqual(vm.runInContext("examQuestionTargetId('mcq',1)",c),vm.runInContext("examQuestionTargetId('tf',1)",c));
+console.log('PASS: script syntax, blank/partial/complete states, deselection, zero answer, stale answers, distinct section targets');

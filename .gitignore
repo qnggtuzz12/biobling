@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars*
+.env*
+*-debug.log
+firebase-debug.log
+private/
+*service-account*.json
+*backup*.json

@@ -1,6 +1,6 @@
 /* All database access goes through the authenticated API. Firebase client Rules stay deny-all. */
 window.BioBling = (() => {
-  let auth, profile, data = {}, timer, loading, epoch=0, draftTimer, draftPromise=Promise.resolve();
+  let auth, profile, data = {}, timer, loading, epoch=0, draftTimer, draftPromise=Promise.resolve(), loginPromise;
   const listeners=new Map();
   const clone=x=>JSON.parse(JSON.stringify(x??null));
   function apiBase(){const value=window.BIOBLING_API_URL;if(!/^https:\/\/[a-z0-9.-]+\.workers\.dev$/.test(value||''))throw Error('Hệ thống đang bảo trì.');return value;}
@@ -18,9 +18,13 @@ window.BioBling = (() => {
   }
   function clear(){data={};profile=null;epoch++;clearTimeout(timer);clearTimeout(draftTimer);notify(true);BioBling.onProfile?.(null);}
   async function refresh(){
-    if(loading)return loading;if(!auth?.currentUser||profile?.status!=='approved')return;
+    if(loading)return loading;if(!auth?.currentUser)return;
     const currentEpoch=epoch;
     loading=(async()=>{try{
+      if(profile?.status!=='approved'){
+        const session=await call('/session');if(currentEpoch!==epoch)return;
+        profile=session.profile;BioBling.onProfile?.(profile);if(profile?.status!=='approved')return;
+      }
       const next=await call('/snapshot');if(currentEpoch!==epoch)return;
       profile=next.profile;data=next;BioBling.onProfile?.(profile);notify();
     }catch(e){
@@ -76,7 +80,11 @@ window.BioBling = (() => {
       clear();if(!user)return;
       try{const s=await call('/session');profile=s.profile;BioBling.onProfile?.(profile);await refresh();schedule();}catch(e){BioBling.onError?.(e);}
     });document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});},
-    async login(){await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);return auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());},
+    async login(){
+      if(loginPromise)return loginPromise;
+      loginPromise=(async()=>{await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);return auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());})();
+      try{return await loginPromise;}finally{loginPromise=null;}
+    },
     async logout(){try{if(profile?.status==='approved')await call('/presence',{state:'offline'});}catch{}await auth.signOut();clear();},
     queueDraft(attemptId,answers){
       clearTimeout(draftTimer);const snapshot=clone(answers);
@@ -85,4 +93,3 @@ window.BioBling = (() => {
     async submit(attemptId,answers){clearTimeout(draftTimer);await draftPromise;const r=await mutate('/attempt/submit',{attemptId,answers});return r.result;}
   };
 })();
-

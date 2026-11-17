@@ -1,0 +1,8 @@
+{
+  "database": {
+    "rules": "database.lockdown.rules.json"
+  },
+  "firestore": {
+    "rules": "firestore.lockdown.rules"
+  }
+}
