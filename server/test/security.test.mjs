@@ -92,6 +92,8 @@ test('verified Firebase signature, issuer, audience, provider and expiry are req
   const sign=async p=>{const content=enc({alg:'RS256',kid:'test-key'})+'.'+enc(p);const signature=await crypto.subtle.sign('RSASSA-PKCS1-v1_5',pair.privateKey,new TextEncoder().encode(content));return content+'.'+Buffer.from(signature).toString('base64url');};
   const fetcher=async()=>Response.json({keys:[jwk]});
   assert.equal((await verifyIdentity(await sign(payload),'biobling',fetcher)).uid,'alice');
+  assert.equal((await verifyIdentity(await sign({...payload,auth_time:now-29*86400}),'biobling',fetcher)).uid,'alice');
+  for(const auth_time of [now-30*86400,now-31*86400,0,'123',null])await assert.rejects(verifyIdentity(await sign({...payload,auth_time}),'biobling',fetcher));
   for(const p of [{...payload,aud:'other'},{...payload,iss:'https://evil.test'},{...payload,exp:now-1},{...payload,email_verified:false},{...payload,firebase:{sign_in_provider:'custom'}}])await assert.rejects(verifyIdentity(await sign(p),'biobling',fetcher));
   const valid=await sign(payload);const forged=valid.split('.');forged[1]=enc({...payload,sub:'teacher'});await assert.rejects(verifyIdentity(forged.join('.'),'biobling',fetcher));
 });

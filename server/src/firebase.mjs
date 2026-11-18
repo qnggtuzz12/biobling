@@ -26,6 +26,7 @@ export async function verifyIdentity(token, project, fetcher=fetch) {
     const jwk=googleKeys.keys.find(k=>k.kid===h.kid);requireValue(jwk,'Phiên đăng nhập không hợp lệ.',401);
     const key=await crypto.subtle.importKey('jwk',jwk,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['verify']);
     requireValue(await crypto.subtle.verify('RSASSA-PKCS1-v1_5',key,unbase64(parts[2]),encoder.encode(parts[0]+'.'+parts[1])),'Phiên đăng nhập không hợp lệ.',401);
+    requireValue(Number.isFinite(p.auth_time)&&p.auth_time>0&&now-p.auth_time<30*24*60*60,'Phiên đăng nhập đã đủ 30 ngày. Vui lòng đăng nhập Google lại.',401);
     return {...p,uid:p.sub};
   } catch(e) { if(e instanceof HttpError)throw e;throw new HttpError(401,'Phiên đăng nhập không hợp lệ.'); }
 }

@@ -1235,6 +1235,8 @@
     .auth-intro h3 { margin:0 0 7px; font-size:17px; font-weight:750; color:var(--green-dark); }
     .auth-intro p { margin:0; font-size:12.5px; line-height:1.75; color:var(--muted); }
     .auth-google-button.primary { width:100%; min-height:48px; justify-content:center; gap:11px; font-size:13px; border-radius:12px; box-shadow:0 5px 14px #266f511c; }
+    .auth-google-button:disabled { opacity:.72; cursor:wait; }
+    .auth-remember { display:flex; align-items:center; justify-content:center; gap:7px; margin:12px 0 0; font-size:11px; color:var(--muted); }
     .auth-google-mark { width:25px; height:25px; border-radius:7px; background:#fff; color:#266f51; display:grid; place-items:center; font-size:15px; }
     .auth-help { display:flex; gap:11px; align-items:flex-start; padding:14px; margin-top:18px; background:var(--mint-2); border:1px solid var(--line); border-radius:13px; }
     .auth-help > i { color:var(--green); margin-top:3px; font-size:15px; }
@@ -2799,6 +2801,7 @@
         <form id="formLogin" onsubmit="handleLogin(event)">
           <div class="auth-intro"><h3>Chào mừng bạn trở lại</h3><p>Tiếp tục hành trình học Sinh học cùng BioBling.</p></div>
           <button type="submit" class="primary auth-google-button"><span class="auth-google-mark" aria-hidden="true"><i class="fa-brands fa-google"></i></span>Tiếp tục với Google<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+          <p class="auth-remember"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i>Lưu đăng nhập trên thiết bị này trong 30 ngày</p>
           <div class="auth-help"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i><div><strong>Bạn đã học tại BioBling?</strong><p>Đăng nhập Google, sau đó giảng viên sẽ xác nhận và liên kết hồ sơ cũ để giữ nguyên lớp học và bài làm của bạn.</p></div></div>
           <p class="auth-footnote"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>BioBling không lưu mật khẩu Google của bạn.</p>
         </form>
@@ -2807,6 +2810,7 @@
         <form id="formRegister" onsubmit="handleRegister(event)" style="display:none">
           <div class="auth-intro"><h3>Bắt đầu cùng BioBling</h3><p>Dùng tài khoản Google của bạn để tạo hồ sơ học tập.</p></div>
           <button type="submit" class="primary auth-google-button"><span class="auth-google-mark" aria-hidden="true"><i class="fa-brands fa-google"></i></span>Đăng ký bằng Google<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+          <p class="auth-remember"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i>Lưu đăng nhập trên thiết bị này trong 30 ngày</p>
           <div class="auth-help"><i class="fa-solid fa-user-check" aria-hidden="true"></i><div><strong>Một bước nữa để vào lớp</strong><p>Sau khi đăng ký, giảng viên sẽ duyệt tài khoản và xếp lớp cho bạn. Học viên cũ sẽ được liên kết với hồ sơ đã có.</p></div></div>
           <p class="auth-footnote"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>BioBling không lưu mật khẩu Google của bạn.</p>
         </form>
@@ -4183,13 +4187,14 @@
       }
     }
 
-    function showAuthNotice(msg, isSuccess = false) {
+    function showAuthNotice(msg, isSuccess = false, isNeutral = false) {
       const box = document.getElementById('authNoticeBox');
       if (box) {
         box.style.display = 'block';
-        box.style.background = isSuccess ? '#dcfce7' : '#fef2f2';
-        box.style.color = isSuccess ? '#166534' : '#b91c1c';
-        box.style.border = isSuccess ? '1px solid #bbf7d0' : '1px solid #fecaca';
+        box.style.background = isNeutral ? '#f0f8f2' : isSuccess ? '#dcfce7' : '#fef2f2';
+        box.style.color = isNeutral ? '#35644b' : isSuccess ? '#166534' : '#b91c1c';
+        box.style.border = isNeutral ? '1px solid #d8e8dd' : isSuccess ? '1px solid #bbf7d0' : '1px solid #fecaca';
+        box.setAttribute('role',isNeutral?'status':'alert');
         box.textContent = msg;
       }
       if (typeof showToast === 'function') showToast(msg);
@@ -7466,7 +7471,17 @@
       document.getElementById('formRegister').style.display = tab==='register' ? 'block' : 'none';
     }
 
-    async function handleLogin(e) { e?.preventDefault();try { await BioBling.login(); } catch(err){showAuthNotice(err.message||'Không thể đăng nhập Google.',false);} }
+    let loginUiBusy=false;
+    async function handleLogin(e) {
+      e?.preventDefault();if(loginUiBusy)return;loginUiBusy=true;
+      const buttons=[...document.querySelectorAll('#formLogin button[type="submit"], #formRegister button[type="submit"]')];
+      const original=buttons.map(button=>button.innerHTML);
+      const notice=document.getElementById('authNoticeBox');if(notice)notice.style.display='none';
+      buttons.forEach(button=>{button.disabled=true;button.setAttribute('aria-busy','true');button.innerHTML='<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>Đang chờ Google…';});
+      try { await BioBling.login(); }
+      catch(err){const notice=BioBling.loginError(err);showAuthNotice(notice.message,false,notice.neutral);}
+      finally{buttons.forEach((button,i)=>{button.disabled=false;button.removeAttribute('aria-busy');button.innerHTML=original[i];});loginUiBusy=false;}
+    }
 
     async function handleRegister(e) { return handleLogin(e); }
 
@@ -9445,7 +9460,7 @@
           checkAuthSession();if(p)showAuthNotice(p.status==='pending'?'Đã đăng nhập Google. Tài khoản đang chờ giảng viên duyệt hoặc liên kết hồ sơ cũ.':'Tài khoản hiện bị tạm khóa. Hãy liên hệ giảng viên.',false);
         }else if(!was||was.id!==currentUser.id)checkAuthSession();else updateUserUI();
       };
-      BioBling.onError=e=>showAuthNotice(e.message,false);
+      BioBling.onError=e=>showAuthNotice(e.code?.startsWith('auth/')?BioBling.loginError(e).message:e.message,false);
       BioBling.onDraftSaved=()=>{showExamDraftStatus('Đã lưu trên thiết bị và máy chủ');syncStudentLiveExamStateToRtdb();};
       BioBling.onDraftError=e=>showExamDraftStatus('Đã lưu trên thiết bị. Chưa đồng bộ: '+e.message,true);
       BioBling.init();checkAuthSession();
@@ -9453,4 +9468,3 @@
   </script>
 </body>
 </html>
-

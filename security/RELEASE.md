@@ -3,6 +3,8 @@
 ## Architecture
 
 - Google Firebase Authentication identifies each user. The Worker verifies JWT signature, issuer, audience, provider, verified email and expiration.
+- Login uses Firebase LOCAL persistence. Both client and Worker expire a session 30 days after its signed `auth_time`; token refresh and page reload do not extend the deadline. Manual sign-out clears Firebase persistence. Browsers that clear/block site storage cannot retain the session.
+- Persistence is prepared during page initialization so Google popup login starts directly from the click. Duplicate clicks share one operation; popup cancellation/blocking receives Vietnamese guidance, with retry enabled. No redirect fallback is used across the Firebase/Vercel domains.
 - Both Firebase client databases remain deny-all. The authenticated Cloudflare API enforces class membership, account status and role for all operations.
 - A dedicated service account, explicitly approved by the owner with Database Admin only in BioBling, is stored in Cloudflare Secrets. It is never included in the website or GitHub.
 - `/secure` contains migrated accounts, catalogs, exams and history. Legacy data remains preserved. Passwords and device sessions are excluded from the new accounts.
@@ -17,6 +19,7 @@
 ## Verification
 
 - 14 server tests cover forged JWTs, privilege escalation, cross-class access, private keys, foreign submissions, malformed answers, expired attempts, idempotence, exam version snapshots, Firebase numeric-map conversion, CORS and JSON validation.
+- 7 additional client auth tests cover LOCAL persistence, synchronous popup start, duplicate clicks/cancellation/retry, restored sessions, the 30-day cutoff, sleeping-tab expiry and manual logout. Signed-token tests also reject refreshed tokens whose original login is 30 days old. Live Google popup retesting was unavailable due to the browser tool usage limit; automated tests do not substitute for an end-to-end Google sign-in.
 - Frontend syntax, URL validation, UID matching, fail-closed confirmation and question-map status tests pass.
 - Service-account access verified; all 19 migrated exams pass validation.
 - Owner browser login verified on the Vercel preview. A three-part QA attempt graded immediately: 1/1 MCQ, 4/4 TF, 1/1 short answer, 2.25 points as expected. Navigator statuses, partial TF, incomplete filter and question navigation verified. QA exam archived; test submission retained under its own exam code.
