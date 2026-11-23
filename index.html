@@ -3,11 +3,9 @@
 <head>
   <link rel="icon" type="image/png" href="favicon.png">
   
-  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-auth-compat.js"></script>
   <!-- Firebase Firestore v9 Compat cho Khảo thí -->
-  <script src="secure-config.js"></script>
-  <script src="secure-client.js"></script>
+<script src="secure-client.js"></script>
   
   <meta charset="utf-8">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -19,9 +17,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://unpkg.com/lucide@1.74.0/dist/umd/lucide.js"></script>
-  
-  <style>
+<style>
     .status-dot {
       width: 8px;
       height: 8px;
@@ -2514,9 +2510,10 @@
     #liveExamModal > div:first-of-type { flex-wrap:wrap; gap:8px; }
     #liveAnswerSheetList { min-height:0; }
     @media(max-width:600px) { #liveExamRightPanel { width:min(340px,100vw); min-width:min(290px,100vw); } #examQuestionDialog { padding:14px; } }
-  </style>
+.startup-screen{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;background:radial-gradient(ellipse at top,#e3f3e8,#f6faf6 65%);padding:24px}.startup-screen[hidden]{display:none}.startup-card{max-width:390px;text-align:center;color:#19342c;font-family:Inter,system-ui,sans-serif}.startup-card img{width:76px;height:76px;border-radius:22px;box-shadow:0 12px 32px #266f5126;margin-bottom:18px}.startup-card h1{font-size:21px}.startup-card p{font-size:13px;line-height:1.7;color:#71877d}.startup-spinner{width:30px;height:30px;border:3px solid #d9eade;border-top-color:#287c54;border-radius:50%;margin:24px auto;animation:startup-spin .9s linear infinite}@keyframes startup-spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.startup-spinner{animation:none}}#videoComments{margin-top:0!important;scroll-margin-top:90px}#videoCommentList{max-height:340px;overflow:auto}.video-side-column{min-width:0;display:flex;flex-direction:column;gap:16px}.video-discussion-shortcut{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:12px;border:1px solid #c7e4cc;border-radius:14px;background:var(--mint-2);font-size:12px;color:var(--green-dark)}
+</style>
 </head>
-<body>
+<body><div id="startupScreen" class="startup-screen" role="status" aria-live="polite"><div class="startup-card"><img src="favicon.png" alt="BioBling"><h1>Đang mở lớp học của bạn…</h1><p>Đang khôi phục phiên đăng nhập và chuẩn bị bài học.</p><div class="startup-spinner" aria-hidden="true"></div><div id="startupRetry" hidden><p>Kết nối đang mất nhiều thời gian hơn thường lệ.</p><button class="primary" onclick="location.reload()">Thử tải lại</button><button class="secondary" onclick="document.getElementById('startupScreen').hidden=true">Về trang giới thiệu</button></div></div></div><script>window.startupWaitTimer=setTimeout(function(){document.getElementById('startupRetry').hidden=false;},12000);</script>
 
   <!-- AUTH OVERLAY & PUBLIC MENTOR SHOWCASE LANDING -->
   <div id="authOverlay" style="display:none;">
@@ -3135,7 +3132,7 @@
 
           <div class="drive-player-layout" id="videoMainPlayerLayout">
             <div>
-              <div class="drive-video-wrapper" id="driveVideoContainer"></div>
+              <div class="video-discussion-shortcut"><strong>Có câu hỏi về bài học?</strong><button type="button" class="primary" onclick="document.getElementById('videoComments').scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('videoCommentText').focus({preventScroll:true})"><i class="fa-regular fa-comments" aria-hidden="true"></i>Bình luận bài giảng</button></div><div class="drive-video-wrapper" id="driveVideoContainer"></div>
               <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:14px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                   <span class="tag session-badge" id="currentVideoSessionBadge">Chuyên đề</span>
@@ -3146,7 +3143,10 @@
                 <h2 id="currentVideoTitle" style="font-size:18px;color:#173d2e;margin:0 0 6px;">Chưa chọn video</h2>
                 <p id="currentVideoNote" style="font-size:13px;color:#657f72;margin:0;line-height:1.6;"></p>
               </div>
-              <section id="videoComments" class="panel" style="margin-top:16px;display:none">
+
+            </div>
+
+<div class="video-side-column">              <section id="videoComments" class="panel" style="margin-top:16px;display:none">
                 <h3 class="account-section-title"><i class="fa-regular fa-comments" aria-hidden="true"></i>Thảo luận bài giảng</h3>
                 <p class="account-description">Đặt câu hỏi và trao đổi cùng giảng viên, học viên có quyền xem video.</p>
                 <form onsubmit="sendVideoComment(event)" class="account-access-form">
@@ -3157,10 +3157,7 @@
                 <p id="videoCommentStatus" role="status" class="account-description"></p>
                 <button type="button" class="secondary" onclick="loadVideoComments()">Làm mới bình luận</button>
                 <div id="videoCommentList" style="display:grid;gap:10px;margin-top:14px"></div>
-              </section>
-            </div>
-
-            <div class="session-playlist" id="videoPlaylistContainer" style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;max-height:520px;overflow-y:auto;"></div>
+              </section>            <div class="session-playlist" id="videoPlaylistContainer" style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;max-height:520px;overflow-y:auto;"></div></div>
           </div>
         </section>
 
@@ -4157,7 +4154,11 @@
   <div id="toast" class="toast"></div>
 
   <!-- LOGIC HỆ THỐNG TOÀN DIỆN & TÍCH HỢP PHÒNG THI -->
-  <script>
+  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-app-compat.js"></script>
+    <script src="secure-config.js"></script>
+    <script src="https://unpkg.com/lucide@1.74.0/dist/umd/lucide.js"></script>
+  
+    <script>
     /* ================= SAFE STORAGE & DIALOG HELPERS (TƯƠNG THÍCH CANVAS & MỌI TRÌNH DUYỆT) ================= */
     const _memoryStore = {};
     const safeStorage = {
@@ -8449,9 +8450,10 @@
         setElText('currentVideoSessionBadge', sessionTitleForMedia(v, selectedClassId));
         document.getElementById('btnOpenExternalVideo').href = v.url;
         document.getElementById('btnOpenExternalVideo').style.display = 'inline-flex';
-        player.innerHTML = `<iframe src="${convertToDrivePreviewUrl(v.url)}" allowfullscreen></iframe>`;
+        const videoSrc=convertToDrivePreviewUrl(v.url);
+        if(player.querySelector('iframe')?.getAttribute('src')!==videoSrc)player.innerHTML = `<iframe src="${videoSrc}" allowfullscreen></iframe>`;
       };
-      loadVid(filtered[0]);
+      loadVid(filtered.find(v=>String(v.id)===commentVideoId)||filtered[0]);
       playlist.innerHTML = filtered.map(v => `<div class="playlist-item" style="padding:12px;border:1px solid #e7eee9;background:#fbfdfb;border-radius:12px;cursor:pointer;" onclick="loadDriveVideoPlayer('${escapeHTML(v.id)}')">
         <div><span class="tag session-badge" style="font-size:9.5px;">${escapeHTML(sessionTitleForMedia(v, selectedClassId))}</span></div>
         <b style="font-size:13px;display:block;margin-top:4px;color:#183d2e;">${escapeHTML(v.title)}</b>
@@ -9497,6 +9499,7 @@
       BioBling.onError=e=>showAuthNotice(e.code?.startsWith('auth/')?BioBling.loginError(e).message:e.message,false);
       BioBling.onDraftSaved=()=>{showExamDraftStatus('Đã lưu trên thiết bị và máy chủ');syncStudentLiveExamStateToRtdb();};
       BioBling.onDraftError=e=>showExamDraftStatus('Đã lưu trên thiết bị. Chưa đồng bộ: '+e.message,true);
+      BioBling.onReady=()=>{clearTimeout(window.startupWaitTimer);document.getElementById('startupScreen').hidden=true;};
       BioBling.init();checkAuthSession();
     });
   </script>

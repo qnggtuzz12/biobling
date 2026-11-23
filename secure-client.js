@@ -113,9 +113,9 @@ window.BioBling = (() => {
   };}};
   return {call,mutate,refresh,ref,db,loginError,get profile(){return profile;},get auth(){return auth;},
     init(){auth=firebase.auth();preparePersistence();auth.onAuthStateChanged(async user=>{
-      clear();if(!user)return;
+      clear();if(!user){BioBling.onReady?.();return;}
       const currentEpoch=epoch;
-      try{const s=await call('/bootstrap');if(currentEpoch!==epoch)return;profile=s.profile;data=s;BioBling.onProfile?.(profile);notify(true);schedule();}catch(e){if(!e.reported)BioBling.onError?.(e);}
+      try{const s=await call('/bootstrap');if(currentEpoch!==epoch)return;profile=s.profile;data=s;BioBling.onProfile?.(profile);notify(true);schedule();}catch(e){if(!e.reported)BioBling.onError?.(e);}finally{BioBling.onReady?.();}
     });document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});},
     async login(){
       if(loginPromise)return loginPromise;
