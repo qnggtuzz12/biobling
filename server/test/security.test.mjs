@@ -19,6 +19,21 @@ class MemoryStore {
 const env={OWNER_UID:'teacher',FIREBASE_PROJECT:'biobling',RELEASE_ENABLED:'true',ALLOWED_ORIGINS:'https://qnggtuzz12.github.io'};
 const as=uid=>({uid,email:uid+'@example.com',name:uid});
 const answers={mcq:{1:'B',2:'C'},tf:{1:{a:'Đ',b:'S',c:'Đ',d:'S'}},sa:{1:'0',2:'1.50'}};
+test('teacher invitations are visible to recipients without a shared class and accepted chat works both ways',async()=>{
+ const s=new MemoryStore();
+ await dispatch('/social/friend',{userId:2},as('teacher'),env,s);
+ const inbox=await dispatch('/social/list',{},as('alice'),env,s);assert.equal(inbox.friends.length,1);assert.ok(inbox.peers.some(p=>p.id===1));assert.ok(!inbox.peers.some(p=>p.id===3));
+ await assert.rejects(dispatch('/social/friend',{userId:2,accept:true},as('teacher'),env,s));
+ await dispatch('/social/friend',{userId:1,accept:true},as('alice'),env,s);
+ assert.equal((await dispatch('/social/list',{},as('teacher'),env,s)).friends[0].accepted,true);
+ const {room}=await dispatch('/social/create',{roomId:'teacher-chat',members:['1'],title:'Teacher chat',group:false},as('alice'),env,s);assert.equal(room.classId,'a');
+ await dispatch('/social/send',{roomId:room.id,messageId:'reply',content:'Question'},as('alice'),env,s);
+ assert.equal((await dispatch('/social/messages',{roomId:room.id},as('teacher'),env,s)).messages.length,1);
+ await assert.rejects(dispatch('/social/messages',{roomId:room.id},as('bob'),env,s));
+ s.data.accounts[4]={...teacher,id:4,uid:'teacher2'};await dispatch('/social/friend',{userId:4},as('teacher'),env,s);await dispatch('/social/friend',{userId:1,accept:true},as('teacher2'),env,s);
+ assert.equal((await dispatch('/social/create',{roomId:'staff-chat',members:['4'],title:'Staff',group:false},as('teacher'),env,s)).room.classId,'staff');
+ s.data.accounts[5]={...alice,id:5,uid:undefined};assert.ok(!(await dispatch('/social/list',{},as('teacher'),env,s)).peers.some(p=>p.id===5));
+});
 test('community confines discovery and messages to class and room membership; admin can inspect',async()=>{
  const s=new MemoryStore();let r=await dispatch('/social/list',{},as('alice'),env,s);assert.ok(!r.peers.some(p=>p.id===3));
  await assert.rejects(dispatch('/social/friend',{userId:3},as('alice'),env,s));

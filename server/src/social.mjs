@@ -1,14 +1,14 @@
 import {requireValue,classesOf,admin,text,id} from './domain.mjs';
 export async function social(path,b,user,accounts,store){
-  const users=Object.values(accounts).filter(u=>u.status==='approved');
-  const peers=users.filter(u=>u.id!==user.id&&(admin(user)||classesOf(u).some(c=>classesOf(user).includes(c))));
+  const users=Object.values(accounts).filter(u=>u.status==='approved'&&u.uid);
+  const peers=users.filter(u=>String(u.id)!==String(user.id)&&(admin(user)||admin(u)||classesOf(u).some(c=>classesOf(user).includes(c))));
   const visible=new Set(peers.map(u=>String(u.id)));
   const me=String(user.id);
   const key=other=>[me,String(other)].sort().join('_');
   const allowed=r=>admin(user)||(r.members.includes(me)&&classesOf(user).includes(r.classId));
   if(path==='/social/list'){
     const [friends,rooms]=await Promise.all([store.get('friendships'),store.get('rooms')]);
-    return {peers:peers.map(u=>({id:u.id,name:u.fullName||u.username,avatar:u.avatar||'',classIds:classesOf(u)})),friends:Object.values(friends||{}).filter(f=>f.members.includes(me)&&f.members.every(m=>m===me||visible.has(m))),rooms:Object.values(rooms||{}).filter(allowed)};
+    return {peers:peers.map(u=>({id:u.id,name:u.fullName||u.username,role:u.role,avatar:u.avatar||'',classIds:classesOf(u)})),friends:Object.values(friends||{}).filter(f=>f.members.includes(me)&&f.members.every(m=>m===me||visible.has(m))),rooms:Object.values(rooms||{}).filter(allowed)};
   }
   if(path==='/social/friend'){
     const other=id(String(b.userId));requireValue(visible.has(other),'Chỉ kết bạn với người cùng lớp.',403);
@@ -19,10 +19,14 @@ export async function social(path,b,user,accounts,store){
     });return {ok:true};
   }
   if(path==='/social/create'){
-    const classId=id(b.classId),members=[...new Set([me,...(b.members||[]).map(String)])];
+    const members=[...new Set([me,...(b.members||[]).map(String)])];
     requireValue(members.length>=2&&members.length<=30);
+    requireValue(members.every(m=>m===me||visible.has(m)),'Thành viên không hợp lệ.',403);
+    const students=members.map(m=>users.find(u=>String(u.id)===m)).filter(u=>u&&!admin(u));
+    const common=students.length?classesOf(students[0]).filter(c=>students.every(u=>classesOf(u).includes(c))):['staff'];
+    const classId=id(b.group?b.classId:common[0]);
     requireValue(admin(user)||classesOf(user).includes(classId),'Bạn không thuộc lớp này.',403);
-    requireValue(members.every(m=>m===me||visible.has(m))&&members.every(m=>m===me||classesOf(users.find(u=>String(u.id)===m)||{}).includes(classId)),'Thành viên phải cùng lớp.',403);
+    requireValue(students.every(u=>classesOf(u).includes(classId)),'Học viên trong nhóm phải cùng lớp.',403);
     if(!b.group){requireValue(members.length===2);requireValue((await store.get('friendships/'+key(members.find(m=>m!==me))))?.accepted,'Hãy kết bạn trước khi nhắn riêng.',403);}
     const roomId=id(b.roomId);const room={id:roomId,title:text(b.title,80,true),classId,members,createdBy:me,group:!!b.group};
     await store.transaction('rooms/'+roomId,old=>{requireValue(!old,'Phòng đã tồn tại.');return room;});return {room};
