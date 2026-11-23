@@ -1,5 +1,16 @@
 const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
 const html=fs.readFileSync('index.html','utf8');
+// Firebase Auth registers against App at script evaluation time. Wrong ordering
+// stops startup before the auth observer can dismiss the loading screen.
+const externalScripts=[...html.matchAll(/<script\s+src="([^"]+)"[^>]*><\/script>/g)].map(m=>m[1]);
+const dependencies=['firebase-app-compat.js','firebase-auth-compat.js','secure-config.js','secure-client.js'];
+let previous=-1;
+for(const name of dependencies){
+  const matches=externalScripts.filter(src=>src.endsWith(name));assert.equal(matches.length,1,'Exactly one '+name);
+  const index=externalScripts.indexOf(matches[0]);assert.ok(index>previous,'Dependency order: '+name);previous=index;
+}
+assert.ok(html.indexOf('id="startupScreen"')<html.indexOf('<script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-app-compat.js"'));
+assert.ok(!html.includes('>Về trang giới thiệu</button>'));
 const script=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]).join('\n');
 new vm.Script(script);
 const helpers=script.slice(script.indexOf('    function safeWebUrl'),script.indexOf('    /* ================= REALTIME'));

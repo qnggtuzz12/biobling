@@ -3,9 +3,9 @@
 <head>
   <link rel="icon" type="image/png" href="favicon.png">
   
-<script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-auth-compat.js"></script>
+
   <!-- Firebase Firestore v9 Compat cho Khảo thí -->
-<script src="secure-client.js"></script>
+
   
   <meta charset="utf-8">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -2513,7 +2513,7 @@
 .startup-screen{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;background:radial-gradient(ellipse at top,#e3f3e8,#f6faf6 65%);padding:24px}.startup-screen[hidden]{display:none}.startup-card{max-width:390px;text-align:center;color:#19342c;font-family:Inter,system-ui,sans-serif}.startup-card img{width:76px;height:76px;border-radius:22px;box-shadow:0 12px 32px #266f5126;margin-bottom:18px}.startup-card h1{font-size:21px}.startup-card p{font-size:13px;line-height:1.7;color:#71877d}.startup-spinner{width:30px;height:30px;border:3px solid #d9eade;border-top-color:#287c54;border-radius:50%;margin:24px auto;animation:startup-spin .9s linear infinite}@keyframes startup-spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.startup-spinner{animation:none}}#videoComments{margin-top:0!important;scroll-margin-top:90px}#videoCommentList{max-height:340px;overflow:auto}.video-side-column{min-width:0;display:flex;flex-direction:column;gap:16px}.video-discussion-shortcut{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:12px;border:1px solid #c7e4cc;border-radius:14px;background:var(--mint-2);font-size:12px;color:var(--green-dark)}
 </style>
 </head>
-<body><div id="startupScreen" class="startup-screen" role="status" aria-live="polite"><div class="startup-card"><img src="favicon.png" alt="BioBling"><h1>Đang mở lớp học của bạn…</h1><p>Đang khôi phục phiên đăng nhập và chuẩn bị bài học.</p><div class="startup-spinner" aria-hidden="true"></div><div id="startupRetry" hidden><p>Kết nối đang mất nhiều thời gian hơn thường lệ.</p><button class="primary" onclick="location.reload()">Thử tải lại</button><button class="secondary" onclick="document.getElementById('startupScreen').hidden=true">Về trang giới thiệu</button></div></div></div><script>window.startupWaitTimer=setTimeout(function(){document.getElementById('startupRetry').hidden=false;},12000);</script>
+<body><div id="startupScreen" class="startup-screen" role="status" aria-live="polite"><div class="startup-card"><img src="favicon.png" alt="BioBling"><h1>Đang mở lớp học của bạn…</h1><p>Đang khôi phục phiên đăng nhập và chuẩn bị bài học.</p><div class="startup-spinner" aria-hidden="true"></div><div id="startupRetry" hidden><p>Chưa thể mở lớp học. Kiểm tra kết nối rồi thử tải lại.</p><button class="primary" onclick="location.reload()">Thử tải lại</button></div></div></div><script>window.startupWaitTimer=setTimeout(function(){document.getElementById('startupRetry').hidden=false;},12000);</script>
 
   <!-- AUTH OVERLAY & PUBLIC MENTOR SHOWCASE LANDING -->
   <div id="authOverlay" style="display:none;">
@@ -4154,10 +4154,15 @@
   <div id="toast" class="toast"></div>
 
   <!-- LOGIC HỆ THỐNG TOÀN DIỆN & TÍCH HỢP PHÒNG THI -->
-  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-app-compat.js"></script>
-    <script src="secure-config.js"></script>
-    <script src="https://unpkg.com/lucide@1.74.0/dist/umd/lucide.js"></script>
   
+    
+    
+  
+<script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-auth-compat.js"></script>
+<script src="secure-config.js"></script>
+<script src="secure-client.js"></script>
+<script src="https://unpkg.com/lucide@1.74.0/dist/umd/lucide.js"></script>
     <script>
     /* ================= SAFE STORAGE & DIALOG HELPERS (TƯƠNG THÍCH CANVAS & MỌI TRÌNH DUYỆT) ================= */
     const _memoryStore = {};
