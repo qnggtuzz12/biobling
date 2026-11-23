@@ -1,4 +1,5 @@
 import {Store,verifyIdentity} from './firebase.mjs';
+import {social} from './social.mjs';
 import {HttpError,requireValue,object,list,text,id,httpsUrl,classesOf,assigned,admin,canAccess,requireAdmin,safeUser,validateKeys,publicExam,cleanAnswers,grade,deadlineMs,studentSubmission} from './domain.mjs';
 
 function owner(user,env){return admin(user) && user.uid===env.OWNER_UID;}
@@ -63,6 +64,7 @@ export async function dispatch(path,body,identity,env,store){
   }
   requireValue(user,'Hãy đăng nhập lại.',401);assertApproved(user);
   if(path==='/snapshot')return snapshot(store,user);
+  if(path.startsWith('/social/'))return social(path,body,user,accounts,store);
   if(path==='/comments/list'||path==='/comments/add'){
     const mediaId=id(String(body.mediaId));
     const media=list(await store.get('catalog/media')).find(m=>String(m.id)===mediaId);
@@ -78,7 +80,7 @@ export async function dispatch(path,body,identity,env,store){
         return {...old,[commentId]:{id:commentId,uid:user.uid,name:user.fullName||user.username,content,createdAt:Date.now(),teacher:admin(user)}};
       });
     }
-    return {comments:Object.values(await store.get(location)||{}).sort((a,b)=>b.createdAt-a.createdAt).map(({uid,...c})=>c)};
+    return {comments:Object.values(await store.get(location)||{}).sort((a,b)=>b.createdAt-a.createdAt).map(({uid,...c})=>({...c,avatar:uidUser(accounts,uid)?.avatar||''}))};
   }
   if(path==='/profile'){
     const patch=profileChanges(body);await store.transaction('accounts',old=>{requireValue(old?.[user.id]?.uid===identity.uid,'Tài khoản đã thay đổi.',403);return {...old,[user.id]:{...old[user.id],...patch}};});return {ok:true};

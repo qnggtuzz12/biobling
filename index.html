@@ -8391,7 +8391,7 @@
       catch(e){if(version===commentLoadVersion)status.textContent=e.message;}
     }
     function renderVideoComments(comments){
-      document.getElementById('videoCommentList').innerHTML=comments.length?comments.map(c=>`<article class="account-approval-card" style="margin:0"><div class="account-approval-head"><div class="account-person-copy"><strong>${escapeHTML(c.name)} ${c.teacher?'<span class="account-badge is-teacher">Giảng viên</span>':''}</strong><small>${escapeHTML(new Date(c.createdAt).toLocaleString('vi-VN'))}</small></div></div><p style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:0">${escapeHTML(c.content)}</p></article>`).join(''):'<div class="account-empty">Chưa có bình luận. Hãy mở đầu cuộc trao đổi về bài học!</div>';
+      document.getElementById('videoCommentList').innerHTML=comments.length?comments.map(c=>`<article class="account-approval-card" style="margin:0"><div class="account-approval-head"><div class="account-person-copy"><strong>${window.socialAvatar?window.socialAvatar(c):''} ${escapeHTML(c.name)} ${c.teacher?'<span class="account-badge is-teacher">Giảng viên</span>':''}</strong><small>${escapeHTML(new Date(c.createdAt).toLocaleString('vi-VN'))}</small></div></div><p style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:0">${escapeHTML(c.content)}</p></article>`).join(''):'<div class="account-empty">Chưa có bình luận. Hãy mở đầu cuộc trao đổi về bài học!</div>';
     }
     async function sendVideoComment(event){
       event.preventDefault();const mediaId=commentVideoId,input=document.getElementById('videoCommentText'),content=input.value.trim(),button=document.getElementById('videoCommentSend');
@@ -9376,14 +9376,15 @@
     }
 
     function saveTargetExamDate(dateStr) {
-      if (!dateStr) return;
-      safeStorage.setItem(TARGET_EXAM_DATE_KEY, dateStr);
+      if(!currentUser)return;
+      if(dateStr)safeStorage.setItem(TARGET_EXAM_DATE_KEY+'_'+currentUser.id,dateStr);else safeStorage.removeItem(TARGET_EXAM_DATE_KEY+'_'+currentUser.id);
+      window.updateExamWidget?.();
       renderTargetExamCountdown();
       showToast("📅 Đã lưu ngày thi mục tiêu!");
     }
 
     function renderTargetExamCountdown() {
-      const saved = safeStorage.getItem(TARGET_EXAM_DATE_KEY) || "2027-06-26";
+      const saved = safeStorage.getItem(TARGET_EXAM_DATE_KEY+'_'+currentUser?.id) || '';
       const inp = document.getElementById('settingExamDateInput');
       if (inp && inp.value !== saved) inp.value = saved;
       const out = document.getElementById('settingExamCountdownText');
@@ -9508,5 +9509,6 @@
       BioBling.init();checkAuthSession();
     });
   </script>
+<script src="social-client.js"></script>
 </body>
 </html>

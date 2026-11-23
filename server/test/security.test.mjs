@@ -19,6 +19,20 @@ class MemoryStore {
 const env={OWNER_UID:'teacher',FIREBASE_PROJECT:'biobling',RELEASE_ENABLED:'true',ALLOWED_ORIGINS:'https://qnggtuzz12.github.io'};
 const as=uid=>({uid,email:uid+'@example.com',name:uid});
 const answers={mcq:{1:'B',2:'C'},tf:{1:{a:'Đ',b:'S',c:'Đ',d:'S'}},sa:{1:'0',2:'1.50'}};
+test('community confines discovery and messages to class and room membership; admin can inspect',async()=>{
+ const s=new MemoryStore();let r=await dispatch('/social/list',{},as('alice'),env,s);assert.ok(!r.peers.some(p=>p.id===3));
+ await assert.rejects(dispatch('/social/friend',{userId:3},as('alice'),env,s));
+ s.data.accounts[3].classIds=['a'];s.data.accounts[3].classId='a';
+ await dispatch('/social/friend',{userId:3},as('alice'),env,s);
+ await assert.rejects(dispatch('/social/create',{roomId:'r1',classId:'a',members:['3'],title:'Chat',group:false},as('alice'),env,s));
+ await dispatch('/social/friend',{userId:2,accept:true},as('bob'),env,s);
+ await dispatch('/social/create',{roomId:'r1',classId:'a',members:['3'],title:'Chat',group:false},as('alice'),env,s);
+ await dispatch('/social/send',{roomId:'r1',messageId:'m1',content:'Hello'},as('alice'),env,s);
+ assert.equal((await dispatch('/social/messages',{roomId:'r1'},as('teacher'),env,s)).messages.length,1);
+ s.data.accounts[3].classIds=['b'];s.data.accounts[3].classId='b';
+ await assert.rejects(dispatch('/social/messages',{roomId:'r1'},as('bob'),env,s));
+ s.data.accounts[4]={...alice,id:4,uid:'outsider'};await assert.rejects(dispatch('/social/messages',{roomId:'r1'},as('outsider'),env,s));
+});
 test('video comments require class membership and approved identity, preserve author and deduplicate retries',async()=>{
   const s=new MemoryStore();s.data.catalog.media[0].type='drive_video';
   const body={mediaId:'ma',commentId:'comment-1',content:'Câu hỏi bài học',name:'Forged teacher'};
