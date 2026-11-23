@@ -19,6 +19,20 @@ class MemoryStore {
 const env={OWNER_UID:'teacher',FIREBASE_PROJECT:'biobling',RELEASE_ENABLED:'true',ALLOWED_ORIGINS:'https://qnggtuzz12.github.io'};
 const as=uid=>({uid,email:uid+'@example.com',name:uid});
 const answers={mcq:{1:'B',2:'C'},tf:{1:{a:'Đ',b:'S',c:'Đ',d:'S'}},sa:{1:'0',2:'1.50'}};
+test('video comments require class membership and approved identity, preserve author and deduplicate retries',async()=>{
+  const s=new MemoryStore();s.data.catalog.media[0].type='drive_video';
+  const body={mediaId:'ma',commentId:'comment-1',content:'Câu hỏi bài học',name:'Forged teacher'};
+  await assert.rejects(dispatch('/comments/list',body,as('bob'),env,s));
+  await assert.rejects(dispatch('/comments/add',body,as('bob'),env,s));
+  const result=await dispatch('/comments/add',body,as('alice'),env,s);assert.equal(result.comments[0].name,'Alice');assert.equal(result.comments[0].uid,undefined);
+  assert.equal((await dispatch('/comments/add',body,as('alice'),env,s)).comments.length,1);
+  await assert.rejects(dispatch('/comments/add',{...body,commentId:'c2',content:'x'.repeat(2001)},as('alice'),env,s));
+  s.data.accounts[2].status='suspended';await assert.rejects(dispatch('/comments/list',body,as('alice'),env,s));
+});
+test('bootstrap returns filtered data in one request while pending users get only profile',async()=>{
+  const s=new MemoryStore();const result=await dispatch('/bootstrap',{},as('alice'),env,s);assert.equal(result.profile.uid,'alice');assert.equal(result.media.length,1);
+  s.data.accounts[2].status='pending';const pending=await dispatch('/bootstrap',{},as('alice'),env,s);assert.equal(pending.media,undefined);
+});
 test('student projection never includes keys or raw answers',()=>{
   const p=publicExam(exam);assert.equal(p.mcqKeys[1],'');assert.equal(p.tfKeys[1].a,'');assert.equal(p.saKeys[1],'');assert.equal(p.rawMcq,undefined);assert.equal(p.rawTf,undefined);assert.equal(p.rawSa,undefined);assert.equal(p.answersHidden,true);
 });

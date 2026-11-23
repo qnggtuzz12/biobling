@@ -3146,6 +3146,18 @@
                 <h2 id="currentVideoTitle" style="font-size:18px;color:#173d2e;margin:0 0 6px;">Chưa chọn video</h2>
                 <p id="currentVideoNote" style="font-size:13px;color:#657f72;margin:0;line-height:1.6;"></p>
               </div>
+              <section id="videoComments" class="panel" style="margin-top:16px;display:none">
+                <h3 class="account-section-title"><i class="fa-regular fa-comments" aria-hidden="true"></i>Thảo luận bài giảng</h3>
+                <p class="account-description">Đặt câu hỏi và trao đổi cùng giảng viên, học viên có quyền xem video.</p>
+                <form onsubmit="sendVideoComment(event)" class="account-access-form">
+                  <label for="videoCommentText">Bình luận của bạn</label>
+                  <textarea id="videoCommentText" maxlength="2000" required rows="3" placeholder="Bạn muốn trao đổi điều gì về bài học?" style="width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;font:inherit;font-size:13px;resize:vertical"></textarea>
+                  <button class="primary" id="videoCommentSend" type="submit"><i class="fa-regular fa-paper-plane" aria-hidden="true"></i>Gửi bình luận</button>
+                </form>
+                <p id="videoCommentStatus" role="status" class="account-description"></p>
+                <button type="button" class="secondary" onclick="loadVideoComments()">Làm mới bình luận</button>
+                <div id="videoCommentList" style="display:grid;gap:10px;margin-top:14px"></div>
+              </section>
             </div>
 
             <div class="session-playlist" id="videoPlaylistContainer" style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;max-height:520px;overflow-y:auto;"></div>
@@ -8364,7 +8376,27 @@
       }).join('');
     }
 
+    let commentVideoId=null,commentLoadVersion=0;
+    const videoCommentDrafts=new Map();
+    async function loadVideoComments(){
+      const mediaId=commentVideoId,version=++commentLoadVersion;if(!mediaId)return;
+      const status=document.getElementById('videoCommentStatus');status.textContent='Đang tải bình luận…';
+      try{const result=await BioBling.call('/comments/list',{mediaId});if(version!==commentLoadVersion||mediaId!==commentVideoId)return;renderVideoComments(result.comments);status.textContent='';}
+      catch(e){if(version===commentLoadVersion)status.textContent=e.message;}
+    }
+    function renderVideoComments(comments){
+      document.getElementById('videoCommentList').innerHTML=comments.length?comments.map(c=>`<article class="account-approval-card" style="margin:0"><div class="account-approval-head"><div class="account-person-copy"><strong>${escapeHTML(c.name)} ${c.teacher?'<span class="account-badge is-teacher">Giảng viên</span>':''}</strong><small>${escapeHTML(new Date(c.createdAt).toLocaleString('vi-VN'))}</small></div></div><p style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:0">${escapeHTML(c.content)}</p></article>`).join(''):'<div class="account-empty">Chưa có bình luận. Hãy mở đầu cuộc trao đổi về bài học!</div>';
+    }
+    async function sendVideoComment(event){
+      event.preventDefault();const mediaId=commentVideoId,input=document.getElementById('videoCommentText'),content=input.value.trim(),button=document.getElementById('videoCommentSend');
+      if(!mediaId||!content||button.disabled)return;button.disabled=true;
+      const status=document.getElementById('videoCommentStatus');status.textContent='Đang gửi…';
+      const prior=videoCommentDrafts.get(mediaId);const commentId=prior?.content===content?prior.commentId:crypto.randomUUID();videoCommentDrafts.set(mediaId,{content,commentId});
+      try{await BioBling.call('/comments/add',{mediaId,content,commentId});videoCommentDrafts.delete(mediaId);if(commentVideoId===mediaId){if(input.value.trim()===content)input.value='';await loadVideoComments();}}
+      catch(e){if(commentVideoId===mediaId)status.textContent=e.message;}finally{button.disabled=false;}
+    }
     function initVideosView() {
+      document.getElementById('videoComments').style.display='none';
       const playlist = document.getElementById('videoPlaylistContainer');
       const player = document.getElementById('driveVideoContainer');
       const emptyPrompt = document.getElementById('videoClassEmptyPrompt');
@@ -8410,6 +8442,8 @@
 
       const loadVid = (v) => {
         if (!v) return;
+        if(commentVideoId!==String(v.id)){commentVideoId=String(v.id);document.getElementById('videoCommentText').value=videoCommentDrafts.get(commentVideoId)?.content||'';document.getElementById('videoCommentList').innerHTML='';}
+        document.getElementById('videoComments').style.display='block';loadVideoComments();
         setElText('currentVideoTitle', v.title);
         setElText('currentVideoNote', `${v.note || 'Video bài giảng chính thức.'}${v.deadline ? ` • Hạn: ${formatDeadline(v.deadline)}` : ''}`);
         setElText('currentVideoSessionBadge', sessionTitleForMedia(v, selectedClassId));

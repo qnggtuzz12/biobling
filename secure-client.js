@@ -115,7 +115,7 @@ window.BioBling = (() => {
     init(){auth=firebase.auth();preparePersistence();auth.onAuthStateChanged(async user=>{
       clear();if(!user)return;
       const currentEpoch=epoch;
-      try{const s=await call('/session');if(currentEpoch!==epoch)return;profile=s.profile;BioBling.onProfile?.(profile);await refresh();schedule();}catch(e){if(!e.reported)BioBling.onError?.(e);}
+      try{const s=await call('/bootstrap');if(currentEpoch!==epoch)return;profile=s.profile;data=s;BioBling.onProfile?.(profile);notify(true);schedule();}catch(e){if(!e.reported)BioBling.onError?.(e);}
     });document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});},
     async login(){
       if(loginPromise)return loginPromise;

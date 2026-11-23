@@ -53,16 +53,33 @@ async function snapshot(store,user){
 export async function dispatch(path,body,identity,env,store){
   let accounts=await store.get('accounts')||{};
   let user=uidUser(accounts,identity.uid);
-  if(path==='/session') {
+  if(path==='/session'||path==='/bootstrap') {
     if(!user){
       const newId=Date.now()*100+crypto.getRandomValues(new Uint8Array(1))[0]%100;
       const p={id:newId,uid:identity.uid,username:'hv_'+String(newId),email:identity.email,fullName:text(identity.name||'Học viên',100,true),role:'student',status:'pending',classId:'',classIds:[],avatar:'',bio:'',createdAt:new Date().toLocaleDateString('vi-VN')};
       accounts=await store.transaction('accounts',old=>{old=old||{};if(!uidUser(old,identity.uid))old[newId]=p;return old;});user=uidUser(accounts,identity.uid);
     }
-    return {profile:safeUser(user,true)};
+    return path==='/bootstrap'&&user.status==='approved'?snapshot(store,user):{profile:safeUser(user,true)};
   }
   requireValue(user,'Hãy đăng nhập lại.',401);assertApproved(user);
   if(path==='/snapshot')return snapshot(store,user);
+  if(path==='/comments/list'||path==='/comments/add'){
+    const mediaId=id(String(body.mediaId));
+    const media=list(await store.get('catalog/media')).find(m=>String(m.id)===mediaId);
+    requireValue(media&&media.type==='drive_video'&&canAccess(user,media),'Bạn không có quyền xem video này.',403);
+    const location=`comments/${mediaId}`;
+    if(path==='/comments/add'){
+      const content=text(body.content,2000,true).trim();requireValue(content.length>0);
+      const commentId=id(body.commentId);
+      await store.transaction(location,old=>{
+        old=old||{};if(old[commentId]){requireValue(old[commentId].uid===user.uid,'Bình luận không hợp lệ.',403);return old;}
+        const recent=Object.values(old).filter(c=>c.uid===user.uid).sort((a,b)=>b.createdAt-a.createdAt)[0];
+        requireValue(!recent||Date.now()-recent.createdAt>=5000,'Bạn đợi vài giây rồi gửi tiếp nhé.',429);
+        return {...old,[commentId]:{id:commentId,uid:user.uid,name:user.fullName||user.username,content,createdAt:Date.now(),teacher:admin(user)}};
+      });
+    }
+    return {comments:Object.values(await store.get(location)||{}).sort((a,b)=>b.createdAt-a.createdAt).map(({uid,...c})=>c)};
+  }
   if(path==='/profile'){
     const patch=profileChanges(body);await store.transaction('accounts',old=>{requireValue(old?.[user.id]?.uid===identity.uid,'Tài khoản đã thay đổi.',403);return {...old,[user.id]:{...old[user.id],...patch}};});return {ok:true};
   }

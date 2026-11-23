@@ -30,7 +30,7 @@ test('repeated clicks share one popup; cancellation can be retried and is explai
   h.auth.signInWithPopup=async()=>({user:h.user});assert.equal((await h.api.login()).user.uid,'student');
 });
 test('restored 29-day session remains valid; reopening does not reset its age',async()=>{
-  for(let reopen=0;reopen<2;reopen++){const h=harness(29*86400*1000);await h.observe();assert.equal(h.signouts,0);assert.ok(h.requests.length>=2);assert.equal(h.api.profile.uid,'student');}
+  for(let reopen=0;reopen<2;reopen++){const h=harness(29*86400*1000);await h.observe();assert.equal(h.signouts,0);assert.equal(h.requests.length,1);assert.equal(h.api.profile.uid,'student');}
 });
 test('expired restored session signs out before data fetch and reports the 30-day limit',async()=>{
   const h=harness(MAX_AGE);await h.observe();assert.equal(h.signouts,1);assert.equal(h.requests.length,0);assert.equal(h.api.profile,null);assert.match(h.errors[0].message,/30 ngày/);
@@ -45,3 +45,4 @@ test('tab wake-up rejects expired session before any new data request',async()=>
 test('manual logout clears the saved Firebase session and future polling',async()=>{
   const h=harness();await h.observe();await h.api.logout();assert.equal(h.auth.currentUser,null);assert.equal(h.signouts,1);assert.equal(h.timers.size,0);
 });
+
