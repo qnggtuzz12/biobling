@@ -19,6 +19,20 @@ class MemoryStore {
 const env={OWNER_UID:'teacher',FIREBASE_PROJECT:'biobling',RELEASE_ENABLED:'true',ALLOWED_ORIGINS:'https://qnggtuzz12.github.io'};
 const as=uid=>({uid,email:uid+'@example.com',name:uid});
 const answers={mcq:{1:'B',2:'C'},tf:{1:{a:'Đ',b:'S',c:'Đ',d:'S'}},sa:{1:'0',2:'1.50'}};
+test('presence expires, visible snapshots renew it, hidden snapshots do not; class access remains restricted',async()=>{
+ const s=new MemoryStore();const old=Date.now()-100000;
+ s.data.status={alice:{state:'online',lastChanged:old},bob:{state:'online',lastChanged:Date.now()},admin1:{state:'online'}};
+ let r=await dispatch('/snapshot',{active:false},as('alice'),env,s);
+ assert.equal(r.status.alice.state,'offline');assert.equal(r.status.bob,undefined);assert.equal(s.data.status.alice.lastChanged,old);
+ r=await dispatch('/bootstrap',{active:true},as('alice'),env,s);assert.equal(r.status.alice.state,'online');assert.ok(s.data.status.alice.lastChanged>old);
+ r=await dispatch('/snapshot',{},as('teacher'),env,s);assert.equal(r.status.admin1.state,'offline');assert.equal(r.status.bob.state,'online');
+ s.data.status.alice={state:'online',lastChanged:Date.now()+100000};
+ assert.equal((await dispatch('/snapshot',{},as('alice'),env,s)).status.alice.state,'offline');
+ await dispatch('/presence',{state:'offline'},as('alice'),env,s);
+ assert.equal((await dispatch('/snapshot',{},as('alice'),env,s)).status.alice.state,'offline');
+ s.data.accounts[2].status='pending';await dispatch('/bootstrap',{active:true},as('alice'),env,s);assert.equal(s.data.status.alice.state,'offline');
+ await assert.rejects(dispatch('/snapshot',{active:true},as('alice'),env,s));
+});
 test('teacher invitations are visible to recipients without a shared class and accepted chat works both ways',async()=>{
  const s=new MemoryStore();
  await dispatch('/social/friend',{userId:2},as('teacher'),env,s);

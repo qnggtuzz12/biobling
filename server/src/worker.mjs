@@ -35,7 +35,8 @@ function validateExam(input){
   for(const k of ['rawMcq','rawTf','rawSa'])e[k]=text(input[k]||'',15000);
   e.updatedAt=new Date().toISOString();e.revision=crypto.randomUUID();return e;
 }
-async function snapshot(store,user){
+async function snapshot(store,user,active=false){
+  if(active)await store.put(`status/${user.username}`,{state:'online',lastChanged:Date.now()});
   const elevated=admin(user);
   const [catalog,exams,accounts,attempts,legacy,live,status,legacyKeys]=await Promise.all([
     store.get('catalog'),store.get('exams'),store.get('accounts'),store.get(elevated?'attempts':`attempts/${user.uid}`),store.get('legacySubmissions'),store.get(elevated?'live':`live/${user.id}`),store.get('status'),elevated?store.get('legacyPrivateKeys'):null
@@ -49,7 +50,7 @@ async function snapshot(store,user){
     sessions:list(catalog?.sessions).filter(s=>canAccess(user,s)),media:list(catalog?.media).filter(m=>canAccess(user,m)),users,
     exams:Object.values(exams||{}).filter(e=>!e.archived && canAccess(user,e,true)).map(e=>elevated?e:publicExam(e)),
     submissions:[...submissions.filter(a=>a.result).map(a=>elevated?{...a.result,gradingKeys:{mcq:a.examSnapshot.mcqKeys||{},tf:a.examSnapshot.tfKeys||{},sa:a.examSnapshot.saKeys||{}}}:studentSubmission(a.result)),...Object.values(legacy||{}).filter(s=>elevated||String(s.userId)===String(user.id)).map(s=>elevated?{...s,...(legacyKeys?.[s.id]?{gradingKeys:legacyKeys[s.id]}:{})}:studentSubmission(s))],
-    live_exams:Object.fromEntries(liveRows.filter(Boolean).map(s=>[s.sessionKey,s])),status:Object.fromEntries(Object.entries(status||{}).filter(([k])=>userNames.has(k))),serverTime:Date.now()};
+    live_exams:Object.fromEntries(liveRows.filter(Boolean).map(s=>[s.sessionKey,s])),status:Object.fromEntries(Object.entries(status||{}).filter(([k])=>userNames.has(k)).map(([k,s])=>[k.toLowerCase(),{state:s?.state==='online'&&Number.isFinite(s.lastChanged)&&Date.now()-s.lastChanged>=0&&Date.now()-s.lastChanged<90000?'online':'offline',lastChanged:s?.lastChanged||0}])),serverTime:Date.now()};
 }
 export async function dispatch(path,body,identity,env,store){
   let accounts=await store.get('accounts')||{};
@@ -60,10 +61,10 @@ export async function dispatch(path,body,identity,env,store){
       const p={id:newId,uid:identity.uid,username:'hv_'+String(newId),email:identity.email,fullName:text(identity.name||'Học viên',100,true),role:'student',status:'pending',classId:'',classIds:[],avatar:'',bio:'',createdAt:new Date().toLocaleDateString('vi-VN')};
       accounts=await store.transaction('accounts',old=>{old=old||{};if(!uidUser(old,identity.uid))old[newId]=p;return old;});user=uidUser(accounts,identity.uid);
     }
-    return path==='/bootstrap'&&user.status==='approved'?snapshot(store,user):{profile:safeUser(user,true)};
+    return path==='/bootstrap'&&user.status==='approved'?snapshot(store,user,body.active===true):{profile:safeUser(user,true)};
   }
   requireValue(user,'Hãy đăng nhập lại.',401);assertApproved(user);
-  if(path==='/snapshot')return snapshot(store,user);
+  if(path==='/snapshot')return snapshot(store,user,body.active===true);
   if(path.startsWith('/social/'))return social(path,body,user,accounts,store);
   if(path==='/comments/list'||path==='/comments/add'){
     const mediaId=id(String(body.mediaId));

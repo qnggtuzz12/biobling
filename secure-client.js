@@ -1,7 +1,7 @@
 /* All database access goes through the authenticated API. Firebase client Rules stay deny-all. */
 window.BioBling = (() => {
   let auth, profile, data = {}, timer, loading, epoch=0, draftTimer, draftPromise=Promise.resolve(), loginPromise;
-  let persistenceReady=false, persistenceError, expiryTimer;
+  let persistenceReady=false, persistenceError, expiryTimer, snapshotReceivedAt=0;
   const SESSION_MAX_AGE_MS=30*24*60*60*1000;
   const expiredMessage='Phiên đăng nhập đã đủ 30 ngày. Vui lòng đăng nhập Google lại để tiếp tục.';
   function loginError(error){
@@ -60,8 +60,8 @@ window.BioBling = (() => {
         const session=await call('/session');if(currentEpoch!==epoch)return;
         profile=session.profile;BioBling.onProfile?.(profile);if(profile?.status!=='approved')return;
       }
-      const next=await call('/snapshot');if(currentEpoch!==epoch)return;
-      profile=next.profile;data=next;BioBling.onProfile?.(profile);notify();
+      const next=await call('/snapshot',{active:!document.hidden});if(currentEpoch!==epoch)return;
+      profile=next.profile;data=next;snapshotReceivedAt=Date.now();BioBling.onProfile?.(profile);notify();
     }catch(e){
       if(e.reported||currentEpoch!==epoch)return;
       if(e.status===403){try{const s=await call('/session');if(currentEpoch===epoch){profile=s.profile;data={};notify(true);BioBling.onProfile?.(profile);}}catch(error){if(!error.reported)BioBling.onError?.(error);}}
@@ -112,10 +112,11 @@ window.BioBling = (() => {
     };}
   };}};
   return {call,mutate,refresh,ref,db,loginError,get profile(){return profile;},get auth(){return auth;},
+    isOnline(status){const now=Number(data.serverTime)+Math.max(0,Date.now()-snapshotReceivedAt);return status?.state==='online'&&Number.isFinite(status.lastChanged)&&now>=status.lastChanged&&now-status.lastChanged<90000;},
     init(){auth=firebase.auth();preparePersistence();auth.onAuthStateChanged(async user=>{
       clear();if(!user){BioBling.onReady?.();return;}
       const currentEpoch=epoch;
-      try{const s=await call('/bootstrap');if(currentEpoch!==epoch)return;profile=s.profile;data=s;BioBling.onProfile?.(profile);notify(true);schedule();}catch(e){if(!e.reported)BioBling.onError?.(e);}finally{BioBling.onReady?.();}
+      try{const s=await call('/bootstrap',{active:!document.hidden});if(currentEpoch!==epoch)return;profile=s.profile;data=s;snapshotReceivedAt=Date.now();BioBling.onProfile?.(profile);notify(true);schedule();}catch(e){if(!e.reported)BioBling.onError?.(e);}finally{BioBling.onReady?.();}
     });document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});},
     async login(){
       if(loginPromise)return loginPromise;
