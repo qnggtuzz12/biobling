@@ -3766,7 +3766,7 @@
           <i class="fa-solid fa-key"></i> Sửa đáp án toàn đề
         </button>
         <button type="button" id="btnSaveInlineKeyChanges" onclick="saveInlineEditedKeysToMasterExam()" class="primary" style="display:none; font-size:11.5px; padding:6px 12px; background:#d97706; border-color:#d97706;">
-          <i class="fa-solid fa-floppy-disk"></i> Lưu đáp án cho lượt mới
+          <i class="fa-solid fa-floppy-disk"></i> Lưu đáp án & tính lại điểm
         </button>
         <button type="button" id="btnExamQuestionMap" onclick="openExamQuestionMap()" class="secondary" aria-haspopup="dialog" aria-controls="examQuestionDialog">☷ Danh sách câu hỏi <span id="examQuestionRemaining"></span></button>
         <button type="button" id="btnExamFullscreenNow" onclick="toggleBrowserFullscreenForExam()" class="secondary" style="font-size:11.5px; padding:6px 11px;" title="Bật / Tắt toàn màn hình máy tính">
@@ -5168,7 +5168,7 @@
         currentExamClassFilter = String(accessible[0].id);
       }
       filter.innerHTML = '<option value="">-- Chọn lớp để xem đề --</option>' +
-        accessible.map(c => `<option value="${escapeHTML(c.id)}">${escapeHTML(c.name)} (${countExamsForClass(c.id)} đề)</option>`).join('');
+        accessible.map(c => `<option value="${escapeHTML(c.id)}">${escapeHTML(c.name)}${currentUser?.role === 'admin' ? ` (${countExamsForClass(c.id)} đề)` : ''}</option>`).join('');
       filter.value = currentExamClassFilter || '';
     }
 
@@ -5248,7 +5248,7 @@
         const cnt = countExamsForClass(cid);
         return `<button type="button" class="class-chip-btn ${active ? 'active' : ''}" onclick="selectExamClassFilter('${escapeHTML(cid)}')">
           <span>🏫 ${escapeHTML(c.name)}</span>
-          <span class="chip-count">${cnt} đề</span>
+          ${currentUser?.role === 'admin' ? `<span class="chip-count">${cnt} đề</span>` : ''}
         </button>`;
       }).join('');
     }
@@ -5439,7 +5439,7 @@
     }
 
     function updateSpectatorRoomFromRealtime(sData) {
-      if (!isLiveSpectatorMode || !activeExam || !sData) return;
+      if (!isLiveSpectatorMode || !activeExam || !sData || isAdminEditingExamKeys) return;
       studentLiveAnswers = JSON.parse(JSON.stringify(sData.answers || { mcq: {}, tf: {}, sa: {} }));
       const sheet=document.getElementById('liveAnswerSheetList'), scroll=sheet?.scrollTop || 0;
       renderLiveExamAnswerSheet();
@@ -6155,7 +6155,7 @@
 
       document.getElementById('examQuestionDialog').close();
       document.getElementById('examQuestionIncomplete').checked = false;
-      activeExam = exam;
+      activeExam = JSON.parse(JSON.stringify(exam));
       isLiveReviewMode = reviewOnly;
       isAdminEditingExamKeys = false;
       examDraftCompleted = !!reviewOnly;
@@ -6164,7 +6164,7 @@
       const btnKeyEdit = document.getElementById('btnAdminInlineKeyEdit');
       const btnKeySave = document.getElementById('btnSaveInlineKeyChanges');
       if (btnKeyEdit) {
-        btnKeyEdit.style.display = isAdmin && reviewOnly && !isLiveSpectatorMode ? 'inline-flex' : 'none';
+        btnKeyEdit.style.display = isAdmin && reviewOnly ? 'inline-flex' : 'none';
         btnKeyEdit.innerHTML = '<i class="fa-solid fa-key"></i> Sửa đáp án toàn đề';
         btnKeyEdit.style.background = '#fffbeb';
         btnKeyEdit.style.color = '#b45309';
@@ -6212,7 +6212,7 @@
           docIframe.src = 'about:blank';
           docIframe.setAttribute('data-loaded-url', embedUrl);
           setTimeout(() => {
-            if(activeExam === exam && docIframe.getAttribute('data-loaded-url') === embedUrl)docIframe.src = embedUrl;
+            if(activeExam?.code === exam.code && docIframe.getAttribute('data-loaded-url') === embedUrl)docIframe.src = embedUrl;
           }, 35);
         }
       }
@@ -6290,9 +6290,12 @@
     }
 
     let isAdminEditingExamKeys = false;
+    let inlineKeyBackup = null, inlineKeyRevision = null;
 
     function toggleAdminInlineKeyEditMode() {
       if (!currentUser || currentUser.role !== 'admin' || !activeExam) return;
+      if(!isAdminEditingExamKeys){inlineKeyBackup=JSON.parse(JSON.stringify(activeExam));inlineKeyRevision=examsList.find(e=>String(e.code)===String(activeExam.code))?.revision||activeExam.revision;}
+      else if(inlineKeyBackup){activeExam=inlineKeyBackup;inlineKeyBackup=null;}
       isAdminEditingExamKeys = !isAdminEditingExamKeys;
       const btnEdit = document.getElementById('btnAdminInlineKeyEdit');
       const btnSave = document.getElementById('btnSaveInlineKeyChanges');
@@ -6308,7 +6311,7 @@
       }
       renderLiveExamAnswerSheet();
       if (isAdminEditingExamKeys) {
-        showToast("🔑 Đang bật chế độ Sửa Đáp Án: Bấm trực tiếp vào đáp án đúng mới trên phiếu rồi nhấn 'Lưu đáp án cho lượt mới'!");
+        showToast("🔑 Đang bật chế độ Sửa Đáp Án: Bấm trực tiếp vào đáp án đúng mới trên phiếu rồi nhấn 'Lưu đáp án & tính lại điểm'!");
       }
     }
 
@@ -6376,8 +6379,15 @@
     }
 
     async function saveInlineEditedKeysToMasterExam() {
-      if(!requireAdmin()||!activeExam)return;const btn=document.getElementById('btnSaveInlineKeyChanges');btn.disabled=true;
-      try{await db.collection('exams').doc(activeExam.code).set({...activeExam});isAdminEditingExamKeys=false;btn.style.display='none';renderLiveExamAnswerSheet();showToast('Đã lưu đáp án cho các lượt mới. Bài đã nộp giữ điểm theo phiên bản lúc bắt đầu.');}catch(err){presentStorageError(err);}finally{btn.disabled=false;}
+      if(!requireAdmin()||!activeExam)return;
+      const btn=document.getElementById('btnSaveInlineKeyChanges');if(btn.disabled)return;btn.disabled=true;
+      const code=activeExam.code;
+      try {
+        const result=await BioBling.call('/exam/regrade',{code,revision:inlineKeyRevision,mcqKeys:activeExam.mcqKeys,tfKeys:activeExam.tfKeys,saKeys:activeExam.saKeys});
+        await BioBling.refresh();
+        if(activeExam?.code===code){Object.assign(activeExam,{mcqKeys:result.exam.mcqKeys,tfKeys:result.exam.tfKeys,saKeys:result.exam.saKeys,revision:result.exam.revision,feedback:null});isAdminEditingExamKeys=false;inlineKeyBackup=null;btn.style.display='none';document.getElementById('btnAdminInlineKeyEdit').innerHTML='<i class="fa-solid fa-key"></i> Sửa đáp án toàn đề';renderLiveExamAnswerSheet();if(isLiveSpectatorMode)updateSpectatorRoomFromRealtime(liveExamsDataMap[spectatingSessionKey]);}
+        showToast('Đã tính lại '+result.graded+' bài đã nộp; cập nhật '+result.active+' lượt đang làm.'+(result.skipped?' Bỏ qua '+result.skipped+' lượt cũ khác cấu trúc hoặc thiếu dữ liệu.':''));
+      } catch(err){presentStorageError(err);}finally{btn.disabled=false;}
     }
 
     function renderLiveExamAnswerSheet() {
@@ -6400,7 +6410,7 @@
       if (isAdminEditingExamKeys) {
         const editNote = document.createElement('div');
         editNote.className = 'admin-key-edit-banner';
-        editNote.innerHTML = `🔑 <strong>CHẾ ĐỘ SỬA ĐÁP ÁN TOÀN ĐỀ:</strong> Bấm trực tiếp vào đáp án đúng mới (A/B/C/D, Đúng/Sai hoặc nhập ô Trả lời ngắn), sau đó bấm nút <strong>"Lưu đáp án cho lượt mới"</strong> ở thanh trên cùng.`;
+        editNote.innerHTML = `🔑 <strong>CHẾ ĐỘ SỬA ĐÁP ÁN TOÀN ĐỀ:</strong> Bấm trực tiếp vào đáp án đúng mới (A/B/C/D, Đúng/Sai hoặc nhập ô Trả lời ngắn), sau đó bấm nút <strong>"Lưu đáp án & tính lại điểm"</strong> ở thanh trên cùng. Điểm các bài cùng cấu trúc sẽ được cập nhật; lượt đang làm dùng đáp án mới khi nộp.`;
         container.appendChild(editNote);
       }
 
@@ -8375,7 +8385,7 @@
         const cnt = countMediaForClass(cid, mediaType);
         return `<button type="button" class="class-chip-btn ${active ? 'active' : ''}" onclick="${fnName}('${escapeHTML(cid)}')">
           <span>🏫 ${escapeHTML(c.name)}</span>
-          <span class="chip-count">${cnt} ${unitLabel}</span>
+          ${currentUser?.role === 'admin' ? `<span class="chip-count">${cnt} ${unitLabel}</span>` : ''}
         </button>`;
       }).join('');
 

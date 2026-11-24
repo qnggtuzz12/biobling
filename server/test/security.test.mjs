@@ -10,8 +10,8 @@ const bob={id:3,uid:'bob',username:'bob',fullName:'Bob',role:'student',status:'a
 const exam={code:'BIO_1',title:'Biology',targetClassIds:['a'],targetClassId:'a',timeLimit:50,isUnlimited:false,practiceOnly:false,deadline:'',rawDocsUrl:'https://docs.google.com/document/d/test/preview',embedUrl:'https://docs.google.com/document/d/test/preview',mcqKeys:{1:'B',2:'C'},tfKeys:{1:{a:'Đ',b:'S',c:'Đ',d:'S'}},saKeys:{1:'0',2:'1,5'},rawMcq:'SECRET',rawTf:'SECRET',rawSa:'SECRET',revision:'r1'};
 class MemoryStore {
   constructor(){this.data={accounts:{1:copy(teacher),2:copy(alice),3:copy(bob)},exams:{BIO_1:copy(exam)},catalog:{classes:[{id:'a',name:'A'},{id:'b',name:'B'}],media:[{id:'ma',classIds:['a'],title:'A',url:'https://example.com/a'},{id:'mb',classIds:['b'],title:'B',url:'https://example.com/b'}],sessions:[{id:'sa',classId:'a'},{id:'sb',classId:'b'}]},legacySubmissions:{s1:{id:'s1',userId:2,gradingKeys:{secret:'KEY'},score:5},s2:{id:'s2',userId:3,score:7}}};}
-  async get(path){return copy(path.split('/').reduce((v,k)=>v?.[k],this.data)??null);}
-  async put(path,value){const keys=path.split('/');let p=this.data;for(const k of keys.slice(0,-1))p=p[k]??={};p[keys.at(-1)]=copy(value);return copy(value);}
+  async get(path){if(!path)return copy(this.data);return copy(path.split('/').reduce((v,k)=>v?.[k],this.data)??null);}
+  async put(path,value){if(!path){this.data=copy(value);return copy(value);}const keys=path.split('/');let p=this.data;for(const k of keys.slice(0,-1))p=p[k]??={};p[keys.at(-1)]=copy(value);return copy(value);}
   async patch(path,value){return this.put(path,{...await this.get(path),...value});}
   async transaction(path,fn){return this.put(path,await fn(await this.get(path)));}
   async request(path){return {value:await this.get(path),etag:'etag'};}
@@ -19,6 +19,21 @@ class MemoryStore {
 const env={OWNER_UID:'teacher',FIREBASE_PROJECT:'biobling',RELEASE_ENABLED:'true',ALLOWED_ORIGINS:'https://qnggtuzz12.github.io'};
 const as=uid=>({uid,email:uid+'@example.com',name:uid});
 const answers={mcq:{1:'B',2:'C'},tf:{1:{a:'Đ',b:'S',c:'Đ',d:'S'}},sa:{1:'0',2:'1.50'}};
+test('admin key correction atomically regrades submitted work and active attempts, preserves answers, and rejects stale edits',async()=>{
+ const s=new MemoryStore();
+ await dispatch('/attempt/start',{code:'BIO_1',attemptId:'done'},as('alice'),env,s);
+ const before=(await dispatch('/attempt/submit',{attemptId:'done',answers},as('alice'),env,s)).result;
+ await dispatch('/attempt/start',{code:'BIO_1',attemptId:'ongoing'},as('alice'),env,s);
+ const correction={code:'BIO_1',revision:'r1',mcqKeys:{1:'A',2:'C'},tfKeys:exam.tfKeys,saKeys:exam.saKeys};
+ await assert.rejects(dispatch('/exam/regrade',correction,as('alice'),env,s));
+ const r=await dispatch('/exam/regrade',correction,as('teacher'),env,s);assert.equal(r.graded,1);assert.equal(r.active,1);
+ const graded=s.data.attempts.alice.done.result;assert.equal(graded.score,before.score-.25);assert.deepEqual(graded.answers,before.answers);assert.equal(graded.previousScore,before.score);
+ assert.equal(s.data.attempts.alice.ongoing.examSnapshot.mcqKeys[1],'A');assert.equal(Object.keys(s.data.regradeHistory).length,1);
+ assert.equal((await dispatch('/snapshot',{},as('alice'),env,s)).submissions.find(x=>x.id==='done').feedback.mcq[1],'wrong');
+ await assert.rejects(dispatch('/exam/regrade',correction,as('teacher'),env,s));assert.equal(Object.keys(s.data.regradeHistory).length,1);
+ await assert.rejects(dispatch('/exam/regrade',{...correction,revision:r.exam.revision,mcqKeys:{1:'A'}},as('teacher'),env,s));
+ const submitted=(await dispatch('/attempt/submit',{attemptId:'ongoing',answers},as('alice'),env,s)).result;assert.equal(submitted.score,graded.score);
+});
 test('submitted review reports correct, wrong and blank using the original exam without disclosing keys',async()=>{
  const s=new MemoryStore();await dispatch('/attempt/start',{code:'BIO_1',attemptId:'review'},as('alice'),env,s);
  const input={mcq:{1:'B',2:'A'},tf:{1:{a:'Đ',b:'Đ'}},sa:{1:'0'}};

@@ -118,6 +118,35 @@ export async function dispatch(path,body,identity,env,store){
     await store.put(`catalog/${body.kind}`,rows,current.etag);return {ok:true};
   }
   if(path==='/catalog/read') {requireAdmin(user);requireValue(['classes','sessions','media'].includes(body.kind));return store.request(`catalog/${body.kind}`);}
+  if(path==='/exam/regrade') {
+    requireAdmin(user);const code=id(body.code),keys={mcqKeys:body.mcqKeys,tfKeys:body.tfKeys,saKeys:body.saKeys};validateKeys(keys);
+    const shape=e=>JSON.stringify(['mcqKeys','tfKeys','saKeys'].map(k=>Object.keys(e[k]||{}).sort()));
+    const revision=crypto.randomUUID(),at=new Date().toISOString();let graded=0,active=0,skipped=0;
+    const root=await store.transaction('',data=>{
+      requireAdmin(uidUser(data?.accounts,identity.uid));graded=0;active=0;skipped=0;
+      const exam=data.exams?.[code];requireValue(exam,'Không tìm thấy đề.',404);
+      requireValue(exam.revision===body.revision,'Đáp án đã thay đổi. Hãy đóng và mở lại bài trước khi sửa.',409);
+      requireValue(shape(exam)===shape(keys),'Cấu trúc đề đã thay đổi; không thể chấm lại bằng bộ đáp án này.',409);
+      data.regradeHistory??={};data.regradeHistory[revision]={code,at,by:identity.uid,previousRevision:exam.revision||null,previousKeys:{mcqKeys:exam.mcqKeys||{},tfKeys:exam.tfKeys||{},saKeys:exam.saKeys||{}},newKeys:keys};
+      data.exams[code]={...exam,...keys,revision,updatedAt:at};
+      const regrade=(result,e)=>({...result,...grade(result.answers||{mcq:{},tf:{},sa:{}},e),previousScore:result.score??null,regradedAt:at,regradedBy:identity.uid,questionStructure:publicExam(e)});
+      for(const attempts of Object.values(data.attempts||{}))for(const a of Object.values(attempts||{})){
+        if(a.examCode!==code)continue;
+        if(shape(a.examSnapshot)!==shape(keys)){skipped++;continue;}
+        a.examSnapshot={...a.examSnapshot,...keys,revision,updatedAt:at};
+        if(a.result){a.result=regrade(a.result,a.examSnapshot);graded++;}else active++;
+      }
+      for(const [sid,s] of Object.entries(data.legacySubmissions||{})){
+        if(s.examCode!==code)continue;
+        const old=data.legacyPrivateKeys?.[sid];
+        if(!old||!s.answers||shape({mcqKeys:old.mcq,tfKeys:old.tf,saKeys:old.sa})!==shape(keys)){skipped++;continue;}
+        const e={...exam,...keys,practiceOnly:!!s.practiceOnly};data.legacySubmissions[sid]=regrade(s,e);
+        data.legacyPrivateKeys[sid]={mcq:keys.mcqKeys,tf:keys.tfKeys,sa:keys.saKeys};graded++;
+      }
+      data.regradeHistory[revision].counts={graded,active,skipped};return data;
+    });
+    return {exam:root.exams[code],graded,active,skipped};
+  }
   if(path==='/exam/save') {
     requireAdmin(user);const e=validateExam(body.exam);const current=await store.get(`exams/${e.code}`);
     requireValue(body.creating?!current:!!current,body.creating?'Mã đề đã tồn tại.':'Không tìm thấy đề.',409);

@@ -44,7 +44,7 @@ export class Store {
   constructor(env){this.env=env;}
   async request(path,method='GET',body,etag) {
     const token=await accessToken(this.env);
-    const r=await fetch(`${this.env.FIREBASE_DATABASE}/secure/${path}.json`,{method,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(method==='GET'?{'X-Firebase-ETag':'true'}:{}),...(etag?{'if-match':etag}:{})},...(body!==undefined?{body:JSON.stringify(body)}:{})});
+    const r=await fetch(`${this.env.FIREBASE_DATABASE}/secure${path?'/'+path:''}.json`,{method,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(method==='GET'?{'X-Firebase-ETag':'true'}:{}),...(etag?{'if-match':etag}:{})},...(body!==undefined?{body:JSON.stringify(body)}:{})});
     if(r.status===412)throw new HttpError(409,'Dữ liệu đã thay đổi, hãy tải lại và thử lại.');
     if(!r.ok)throw new HttpError(503,'Không thể đồng bộ dữ liệu.');
     return {value:normalizeFirebase(await r.json()),etag:r.headers.get('etag')};
