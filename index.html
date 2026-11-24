@@ -763,6 +763,15 @@
       height: 100vh;
     }
     #liveExamModal.open { display: flex !important; }
+    #examWorkspace, #examDocumentPanel, #liveExamRightPanel { min-height:0; }
+    #liveExamRightPanel { flex-shrink:0; }
+    @media(max-width:760px) {
+      #examWorkspace { flex-direction:column; }
+      #examDocumentPanel { min-height:180px; flex:1 1 52% !important; }
+      #liveExamRightPanel { width:100% !important; min-width:0 !important; flex:1 1 48%; border-top:1px solid #cbd5e1; }
+      #liveExamRightPanel.collapsed { height:0; flex:0 0 0; }
+      #examDocumentPanel > div:first-child { flex-wrap:wrap; gap:6px; }
+    }
 
     .cropper-container {
       width: 100%;
@@ -3810,9 +3819,9 @@
     </div>
 
     <!-- Vùng Làm Bài (Chia 2 Cột) -->
-    <div style="flex:1; display:flex; overflow:hidden; position:relative;">
+    <div id="examWorkspace" style="flex:1; display:flex; overflow:hidden; position:relative;">
       <!-- Trái: Đọc Docs + Tô vẽ -->
-      <div style="flex:1; display:flex; flex-direction:column; background:#e2e8f0; border-right:1px solid #cbd5e1; position:relative; min-width:0;">
+      <div id="examDocumentPanel" style="flex:1; display:flex; flex-direction:column; background:#e2e8f0; border-right:1px solid #cbd5e1; position:relative; min-width:0;">
         <div style="background:#fff; border-bottom:1px solid #e2e8f0; padding:6px 16px; display:flex; justify-content:space-between; align-items:center; font-size:12px; z-index:15;">
           <div style="display:flex; align-items:center; gap:8px;">
             <span style="color:#64748b; font-weight:600;">Công cụ:</span>
@@ -3826,6 +3835,7 @@
             <button onclick="clearExamCanvas()" class="speed-btn" style="padding:4px 8px; color:#dc2626;"><i class="fa-solid fa-trash-can"></i></button>
           </div>
           <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <button type="button" onclick="reloadLiveExamDocument()" class="speed-btn" style="padding:4px 9px;" title="Tải lại tài liệu nếu khung đề bị trắng"><i class="fa-solid fa-rotate-right"></i> Tải lại đề</button>
             <button type="button" onclick="openCurrentExamPreviewModal()" class="speed-btn" style="padding:4px 9px; color:#0369a1; border-color:#bae6fd; background:#f0f9ff;" title="Mở đề toàn màn hình cực rộng">
               <i class="fa-solid fa-up-right-and-down-left-from-center"></i> Xem đề cỡ lớn
             </button>
@@ -3901,7 +3911,7 @@
           <i class="fa-solid fa-house"></i> Thoát phòng thi
         </button>
         <button class="primary" onclick="reviewExamQuestionsOnly()">
-          <i class="fa-solid fa-eye"></i> Xem lại bài làm
+          <i class="fa-solid fa-eye"></i> Xem câu đúng / sai
         </button>
       </div>
     </div>
@@ -5111,6 +5121,7 @@
 
       const reviewExam = {
         ...exam,
+        feedback: submission.feedback || null,
         ...(submission.questionStructure || {}),
         mcqKeys: JSON.parse(JSON.stringify(masterMcq)),
         tfKeys: JSON.parse(JSON.stringify(masterTf)),
@@ -5196,6 +5207,11 @@
       openDocViewer(rawUrl, `Xem đề: ${exam.title} (${exam.code})`);
     }
 
+    function reloadLiveExamDocument() {
+      const frame=document.getElementById('liveExamIframe');
+      const url=frame?.getAttribute('data-loaded-url');
+      if(url && activeExam)frame.src=url;
+    }
     function openCurrentExamPreviewModal() {
       if (!activeExam) return;
       const rawUrl = activeExam.rawDocsUrl || activeExam.embedUrl || '';
@@ -5396,18 +5412,26 @@
     }
 
     // Mentor bấm "👁️ Vào xem Live (Đề + Phiếu)" -> Mở trực tiếp giao diện Phòng Thi với Đề thi bên trái + Phiếu trả lời của học viên tự nhảy trực tiếp bên phải
-    function openLiveSpectatorRoom(sessionKey) {
+    let liveOpenRequest = 0;
+    async function openLiveSpectatorRoom(sessionKey) {
+      if (!requireAdmin()) return;
+      const request = ++liveOpenRequest;
       const sData = liveExamsDataMap[sessionKey];
       if (!sData) return safeAlert('Không tìm thấy phiên làm bài này!');
-      const exam = examsList.find(e => String(e.code) === String(sData.examCode));
-      if (!exam) return safeAlert('Không tìm thấy đề thi tương ứng!');
+      let view;
+      try { view = await BioBling.call('/live/view', {userId:String(sData.userId),examCode:String(sData.examCode)}); }
+      catch(error) { if(request===liveOpenRequest)safeAlert(error.message); return; }
+      if(request!==liveOpenRequest)return;
+      const exam = view.exam;
+      Object.assign(sData, view.session);
+      currentResultSubmissionId = null;
 
       closeLiveProctorModal();
       spectatingSessionKey = sessionKey;
       isLiveSpectatorMode = true;
       studentLiveAnswers = JSON.parse(JSON.stringify(sData.answers || { mcq: {}, tf: {}, sa: {} }));
 
-      startExamRoom(exam, true);
+      await startExamRoom(exam, true);
 
       const bar = document.getElementById('adminSpectatorControlBar');
       if (bar) bar.style.display = 'flex';
@@ -5417,7 +5441,9 @@
     function updateSpectatorRoomFromRealtime(sData) {
       if (!isLiveSpectatorMode || !activeExam || !sData) return;
       studentLiveAnswers = JSON.parse(JSON.stringify(sData.answers || { mcq: {}, tf: {}, sa: {} }));
+      const sheet=document.getElementById('liveAnswerSheetList'), scroll=sheet?.scrollTop || 0;
       renderLiveExamAnswerSheet();
+      if(sheet)sheet.scrollTop=scroll;
 
       const mcqKeys = activeExam.mcqKeys || {};
       const tfKeys = activeExam.tfKeys || {};
@@ -6138,7 +6164,7 @@
       const btnKeyEdit = document.getElementById('btnAdminInlineKeyEdit');
       const btnKeySave = document.getElementById('btnSaveInlineKeyChanges');
       if (btnKeyEdit) {
-        btnKeyEdit.style.display = isAdmin && reviewOnly ? 'inline-flex' : 'none';
+        btnKeyEdit.style.display = isAdmin && reviewOnly && !isLiveSpectatorMode ? 'inline-flex' : 'none';
         btnKeyEdit.innerHTML = '<i class="fa-solid fa-key"></i> Sửa đáp án toàn đề';
         btnKeyEdit.style.background = '#fffbeb';
         btnKeyEdit.style.color = '#b45309';
@@ -6186,7 +6212,7 @@
           docIframe.src = 'about:blank';
           docIframe.setAttribute('data-loaded-url', embedUrl);
           setTimeout(() => {
-            docIframe.src = embedUrl;
+            if(activeExam === exam && docIframe.getAttribute('data-loaded-url') === embedUrl)docIframe.src = embedUrl;
           }, 35);
         }
       }
@@ -6215,7 +6241,7 @@
         examDraftHeartbeat = setInterval(persistExamDraft, 15000);
       } else {
         stopExamDraftHeartbeat();
-        showExamDraftStatus('Chế độ xem lại bài đã nộp');
+        showExamDraftStatus(isLiveSpectatorMode ? 'Đang theo dõi bài làm trực tiếp' : (exam.feedback || !exam.answersHidden ? 'Xem lại từng câu: ✓ Đúng · ✕ Sai · ⚪ Chưa làm' : 'Bài cũ chưa có dữ liệu chấm chi tiết từng câu.'));
       }
 
       renderLiveExamAnswerSheet();
@@ -6355,7 +6381,9 @@
     }
 
     function renderLiveExamAnswerSheet() {
-      const showCorrectAnswers=isLiveReviewMode && !activeExam?.answersHidden;
+      const feedback = activeExam?.feedback;
+      const revealKeys = isLiveReviewMode && !activeExam?.answersHidden;
+      const showCorrectAnswers = isLiveReviewMode && (revealKeys || !!feedback);
       const container = document.getElementById('liveAnswerSheetList');
       const statsBanner = document.getElementById('liveReviewStatsBanner');
       if (!container || !activeExam) return;
@@ -6391,7 +6419,7 @@
         Object.keys(mcqKeys).sort((a,b)=>Number(a)-Number(b)).forEach(q => {
           const userPick = studentLiveAnswers.mcq[q] || null;
           const isUnanswered = !userPick;
-          const isQuestionCorrect = userPick === mcqKeys[q];
+          const isQuestionCorrect = feedback ? feedback.mcq?.[q] === 'correct' : userPick === mcqKeys[q];
 
           if (showCorrectAnswers) {
             if (isUnanswered) reviewBlankCount++;
@@ -6423,7 +6451,7 @@
             const isCorrect = mcqKeys[q] === opt;
 
             let st = "width:28px; height:28px; border-radius:50%; font-weight:700; border:1px solid #cbd5e1; display:inline-flex; align-items:center; justify-content:center; font-size:12px; margin-left:3px; transition:0.15s; cursor:pointer;";
-            if (showCorrectAnswers || isAdminEditingExamKeys) {
+            if (revealKeys || isAdminEditingExamKeys) {
               if (isCorrect) st += "background:#16a34a; color:#fff; border-color:#16a34a; box-shadow:0 0 0 2px rgba(22,163,74,.25);";
               else if (isSelected && !isCorrect) st += "background:#dc2626; color:#fff; border-color:#dc2626;";
               else st += "color:#94a3b8; background:#fff;";
@@ -6467,7 +6495,7 @@
             const userPick = (studentLiveAnswers.tf[q] && studentLiveAnswers.tf[q][sub]) || null;
             const correctPick = tfKeys[q] ? tfKeys[q][sub] : null;
             const isSubBlank = !userPick;
-            const isSubCorrect = userPick === correctPick;
+            const isSubCorrect = feedback ? feedback.tf?.[q]?.[sub] === 'correct' : userPick === correctPick;
 
             if (showCorrectAnswers) {
               if (isSubBlank) { reviewBlankCount++; blankSubsInQ++; }
@@ -6484,7 +6512,7 @@
 
             const getStyle = (val) => {
               const sel = userPick === val;
-              if (showCorrectAnswers || isAdminEditingExamKeys) {
+              if (revealKeys || isAdminEditingExamKeys) {
                 if (correctPick === val) return "background:#16a34a; color:#fff; border-color:#16a34a; font-weight:700;";
                 if (sel && correctPick !== val) return "background:#dc2626; color:#fff; border-color:#dc2626; font-weight:700;";
                 return "color:#94a3b8; border-color:#e2e8f0; background:#fff;";
@@ -6535,7 +6563,7 @@
           const val = studentLiveAnswers.sa[q] || "";
           const isBlank = String(val).trim() === "";
           const correctVal = saKeys[q];
-          const isCorrect = !isBlank && (normalizeShortExamAnswer(val) === normalizeShortExamAnswer(correctVal));
+          const isCorrect = feedback ? feedback.sa?.[q] === 'correct' : !isBlank && (normalizeShortExamAnswer(val) === normalizeShortExamAnswer(correctVal));
 
           if (showCorrectAnswers) {
             if (isBlank) reviewBlankCount++;
@@ -6578,7 +6606,7 @@
             rightControlHtml = `
               <div style="display:flex; align-items:center; gap:6px;">
                 <input type="text" value="${escapeHTML(displayVal)}" ${isLiveReviewMode ? 'disabled' : ''} oninput="pickLiveSaAnswer('${q}', this.value)" style="${inputSt}" placeholder="Đáp án...">
-                ${showCorrectAnswers ? `<span style="font-size:11px; font-weight:800; color:#15803d; font-family:monospace; background:#dcfce7; padding:2px 6px; border-radius:5px;">Đ/A: ${escapeHTML(correctVal)}</span>` : ''}
+                ${revealKeys ? `<span style="font-size:11px; font-weight:800; color:#15803d; font-family:monospace; background:#dcfce7; padding:2px 6px; border-radius:5px;">Đ/A: ${escapeHTML(correctVal)}</span>` : ''}
               </div>
             `;
           }
@@ -6759,6 +6787,9 @@
       try{
         const result=await BioBling.submit(activeDraftAttemptId,studentLiveAnswers);
         if(!result)throw Error('Máy chủ chưa xác nhận bài nộp.');
+        studentSubmissions = studentSubmissions.filter(s => String(s.id)!==String(result.id));
+        studentSubmissions.push(result);
+        studentLiveAnswers = JSON.parse(JSON.stringify(result.answers));
         clearInterval(examCountdownTimer);stopExamDraftHeartbeat();clearExamDraft();examDraftCompleted=true;currentResultSubmissionId=result.id;
         document.getElementById('resultModalExamTitle').textContent=activeExam.title;
         document.getElementById('resultScoreNumber').textContent=result.practiceOnly?'HOÀN THÀNH':result.score;
@@ -6770,6 +6801,7 @@
     }
 
     function exitExamToHome() {
+      liveOpenRequest++;
       detachStudentLiveMentorChatListener();
       exitExamFullscreenIfActive();
       isAdminEditingExamKeys = false;
@@ -6796,8 +6828,8 @@
     function reviewExamQuestionsOnly() {
       document.getElementById('examResultScoreModal').classList.remove('open');
       isLiveReviewMode = true;
-      // Bài vừa nộp: dùng câu trả lời đang hiển thị, tránh nhảy sang lượt cũ do listener trễ.
-      startExamRoom(activeExam, true);
+      // Use the accepted server result, including late-submission answers and feedback.
+      openReviewExamDirectly(activeExam.code, currentUser.id, currentResultSubmissionId);
     }
 
     // Canvas Tô vẽ & Ghi chú trên đề

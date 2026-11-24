@@ -19,6 +19,30 @@ class MemoryStore {
 const env={OWNER_UID:'teacher',FIREBASE_PROJECT:'biobling',RELEASE_ENABLED:'true',ALLOWED_ORIGINS:'https://qnggtuzz12.github.io'};
 const as=uid=>({uid,email:uid+'@example.com',name:uid});
 const answers={mcq:{1:'B',2:'C'},tf:{1:{a:'Đ',b:'S',c:'Đ',d:'S'}},sa:{1:'0',2:'1.50'}};
+test('submitted review reports correct, wrong and blank using the original exam without disclosing keys',async()=>{
+ const s=new MemoryStore();await dispatch('/attempt/start',{code:'BIO_1',attemptId:'review'},as('alice'),env,s);
+ const input={mcq:{1:'B',2:'A'},tf:{1:{a:'Đ',b:'Đ'}},sa:{1:'0'}};
+ const {result}=await dispatch('/attempt/submit',{attemptId:'review',answers:input},as('alice'),env,s);
+ assert.deepEqual(result.feedback,{mcq:{1:'correct',2:'wrong'},tf:{1:{a:'correct',b:'wrong',c:'blank',d:'blank'}},sa:{1:'correct',2:'blank'}});
+ assert.equal(result.gradingKeys,undefined);assert.equal(result.questionStructure.mcqKeys[1],'');
+ s.data.exams.BIO_1.mcqKeys[1]='A';
+ const snapshot=await dispatch('/snapshot',{},as('alice'),env,s);
+ assert.deepEqual(snapshot.submissions.find(x=>x.id==='review').feedback,result.feedback);
+ assert.ok(!(await dispatch('/snapshot',{},as('bob'),env,s)).submissions.some(x=>x.id==='review'));
+});
+test('live viewer uses the exact attempt even when the original exam is archived or changed; students cannot access it',async()=>{
+ const s=new MemoryStore();await dispatch('/attempt/start',{code:'BIO_1',attemptId:'live1'},as('alice'),env,s);
+ await dispatch('/attempt/draft',{attemptId:'live1',answers},as('alice'),env,s);
+ await dispatch('/live',{examCode:'BIO_1',attemptId:'live1',data:{}},as('alice'),env,s);
+ assert.equal(s.data.live[2].BIO_1.totalCount,5);
+ s.data.exams.BIO_1.archived=true;s.data.exams.BIO_1.mcqKeys[1]='A';
+ const r=await dispatch('/live/view',{userId:'2',examCode:'BIO_1'},as('teacher'),env,s);
+ assert.equal(r.exam.mcqKeys[1],'B');assert.deepEqual(r.session.answers,answers);
+ await assert.rejects(dispatch('/live/view',{userId:'2',examCode:'BIO_1'},as('alice'),env,s));
+ await assert.rejects(dispatch('/live/view',{userId:'3',examCode:'BIO_1'},as('teacher'),env,s));
+ delete s.data.live[2].BIO_1.attemptId;
+ assert.equal((await dispatch('/live/view',{userId:'2',examCode:'BIO_1'},as('teacher'),env,s)).exam.mcqKeys[1],'B');
+});
 test('presence expires, visible snapshots renew it, hidden snapshots do not; class access remains restricted',async()=>{
  const s=new MemoryStore();const old=Date.now()-100000;
  s.data.status={alice:{state:'online',lastChanged:old},bob:{state:'online',lastChanged:Date.now()},admin1:{state:'online'}};

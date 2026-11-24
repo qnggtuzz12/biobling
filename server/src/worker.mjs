@@ -39,7 +39,7 @@ async function snapshot(store,user,active=false){
   if(active)await store.put(`status/${user.username}`,{state:'online',lastChanged:Date.now()});
   const elevated=admin(user);
   const [catalog,exams,accounts,attempts,legacy,live,status,legacyKeys]=await Promise.all([
-    store.get('catalog'),store.get('exams'),store.get('accounts'),store.get(elevated?'attempts':`attempts/${user.uid}`),store.get('legacySubmissions'),store.get(elevated?'live':`live/${user.id}`),store.get('status'),elevated?store.get('legacyPrivateKeys'):null
+    store.get('catalog'),store.get('exams'),store.get('accounts'),store.get(elevated?'attempts':`attempts/${user.uid}`),store.get('legacySubmissions'),store.get(elevated?'live':`live/${user.id}`),store.get('status'),store.get('legacyPrivateKeys')
   ]);
   const submissions=elevated?Object.values(attempts||{}).flatMap(x=>Object.values(x||{})):Object.values(attempts||{});
   const mine=classesOf(user);
@@ -49,7 +49,7 @@ async function snapshot(store,user,active=false){
   return {profile:safeUser(user,true),classes:list(catalog?.classes).filter(c=>elevated||mine.includes(String(c.id))),
     sessions:list(catalog?.sessions).filter(s=>canAccess(user,s)),media:list(catalog?.media).filter(m=>canAccess(user,m)),users,
     exams:Object.values(exams||{}).filter(e=>!e.archived && canAccess(user,e,true)).map(e=>elevated?e:publicExam(e)),
-    submissions:[...submissions.filter(a=>a.result).map(a=>elevated?{...a.result,gradingKeys:{mcq:a.examSnapshot.mcqKeys||{},tf:a.examSnapshot.tfKeys||{},sa:a.examSnapshot.saKeys||{}}}:studentSubmission(a.result)),...Object.values(legacy||{}).filter(s=>elevated||String(s.userId)===String(user.id)).map(s=>elevated?{...s,...(legacyKeys?.[s.id]?{gradingKeys:legacyKeys[s.id]}:{})}:studentSubmission(s))],
+    submissions:[...submissions.filter(a=>a.result).map(a=>elevated?{...a.result,gradingKeys:{mcq:a.examSnapshot.mcqKeys||{},tf:a.examSnapshot.tfKeys||{},sa:a.examSnapshot.saKeys||{}}}:studentSubmission(a.result,a.examSnapshot)),...Object.values(legacy||{}).filter(s=>elevated||String(s.userId)===String(user.id)).map(s=>elevated?{...s,...(legacyKeys?.[s.id]?{gradingKeys:legacyKeys[s.id]}:{})}:studentSubmission(s,legacyKeys?.[s.id]?{...s,mcqKeys:legacyKeys[s.id].mcq,tfKeys:legacyKeys[s.id].tf,saKeys:legacyKeys[s.id].sa}:null))],
     live_exams:Object.fromEntries(liveRows.filter(Boolean).map(s=>[s.sessionKey,s])),status:Object.fromEntries(Object.entries(status||{}).filter(([k])=>userNames.has(k)).map(([k,s])=>[k.toLowerCase(),{state:s?.state==='online'&&Number.isFinite(s.lastChanged)&&Date.now()-s.lastChanged>=0&&Date.now()-s.lastChanged<90000?'online':'offline',lastChanged:s?.lastChanged||0}])),serverTime:Date.now()};
 }
 export async function dispatch(path,body,identity,env,store){
@@ -134,7 +134,7 @@ export async function dispatch(path,body,identity,env,store){
       const timer=exam.isUnlimited?null:now+exam.timeLimit*60000;
       return {id:attemptId,uid:identity.uid,userId:user.id,examCode:code,examSnapshot:exam,startedAt:now,expiresAt:deadline&&timer?Math.min(timer,deadline):(deadline||timer),draft:{mcq:{},tf:{},sa:{}},draftSavedAt:now};
     });
-    return {attemptId,startedAt:attempt.startedAt,expiresAt:attempt.expiresAt,answers:attempt.draft||{},exam:publicExam(attempt.examSnapshot),result:attempt.result?studentSubmission(attempt.result):null,serverTime:Date.now()};
+    return {attemptId,startedAt:attempt.startedAt,expiresAt:attempt.expiresAt,answers:attempt.draft||{},exam:publicExam(attempt.examSnapshot),result:attempt.result?studentSubmission(attempt.result,attempt.examSnapshot):null,serverTime:Date.now()};
   }
   if(path==='/attempt/draft'||path==='/attempt/submit'){
     const attemptId=id(body.attemptId),slot=`attempts/${identity.uid}/${attemptId}`,submit=path.endsWith('/submit'),now=Date.now();
@@ -149,13 +149,23 @@ export async function dispatch(path,body,identity,env,store){
       if(!submit)return {...old,draft:answers,draftSavedAt:now};
       const e=old.examSnapshot,result={...grade(answers,e),id:attemptId,attemptId,userId:user.id,username:user.username,fullName:user.fullName,classId:user.classId||'',examCode:e.code,examTitle:e.title,rawDocsUrl:e.rawDocsUrl,embedUrl:e.embedUrl,practiceOnly:!!e.practiceOnly,startedAt:new Date(old.startedAt).toISOString(),submittedAt:new Date(now).toISOString(),examUpdatedAt:e.updatedAt,gradedBy:'server',lateSubmission:!!expired,questionStructure:publicExam(e)};
       return {...old,result,draft:answers};
-    });return {result:a.result?studentSubmission(a.result):null,savedAt:a.draftSavedAt};
+    });return {result:a.result?studentSubmission(a.result,a.examSnapshot):null,savedAt:a.draftSavedAt};
+  }
+  if(path==='/live/view'){
+    requireAdmin(user);const target=id(body.userId),code=id(body.examCode);
+    const session=await store.get('live/'+target+'/'+code);requireValue(session,'Phiên theo dõi không còn tồn tại.',404);
+    const account=Object.values(accounts).find(u=>String(u.id)===target);
+    const attempts=account?.uid?await store.get('attempts/'+account.uid):null;
+    const attempt=Object.values(attempts||{}).find(a=>a.examCode===code&&(session.attemptId?a.id===session.attemptId:a.startedAt===session.startedAt));
+    requireValue(attempt,'Không tìm thấy lượt làm bài tương ứng. Hãy tải lại danh sách live.',404);
+    return {exam:attempt.examSnapshot,session:{...session,answers:attempt.result?.answers||attempt.draft||{},status:attempt.result?'submitted':session.status}};
   }
   if(path==='/live'){
     id(body.examCode);const data=body.data||{},key=`${user.id}_${body.examCode}`;
     const mine=await store.get(`attempts/${identity.uid}/${id(body.attemptId)}`);requireValue(mine&&mine.examCode===body.examCode,'Lượt thi không hợp lệ.',403);
-    const next={sessionKey:key,userId:user.id,username:user.username,fullName:user.fullName,classNames:classesOf(user).join(', '),examCode:mine.examCode,examTitle:mine.examSnapshot.title,status:mine.result?'submitted':(data.status==='paused'?'paused':'active'),startedAt:mine.startedAt,expiresAt:mine.expiresAt,answers:mine.draft||{},updatedAt:Date.now(),totalItems:0};
+    const next={attemptId:mine.id,sessionKey:key,userId:user.id,username:user.username,fullName:user.fullName,classNames:classesOf(user).join(', '),examCode:mine.examCode,examTitle:mine.examSnapshot.title,status:mine.result?'submitted':(data.status==='paused'?'paused':'active'),startedAt:mine.startedAt,expiresAt:mine.expiresAt,answers:mine.draft||{},updatedAt:Date.now(),totalItems:0};
     const e=mine.examSnapshot;next.totalItems=Object.keys(e.mcqKeys||{}).length+Object.keys(e.tfKeys||{}).length+Object.keys(e.saKeys||{}).length;
+    next.totalCount=next.totalItems;
     next.answeredCount=Object.keys(next.answers.mcq||{}).length+Object.values(next.answers.tf||{}).filter(x=>Object.keys(x).length===4).length+Object.keys(next.answers.sa||{}).length;
     await store.patch(`live/${user.id}/${body.examCode}`,next);return {ok:true};
   }

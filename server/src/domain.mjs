@@ -100,7 +100,15 @@ export function deadlineMs(value) {
   const normalized=/^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(value)?value+':00+07:00':value;
   const n=Date.parse(normalized); requireValue(Number.isFinite(n),'Hạn làm bài không hợp lệ.');return n;
 }
-export function studentSubmission(s) {
+export function answerFeedback(answers,exam) {
+  const a=answers||{},out={mcq:{},tf:{},sa:{}};
+  const verdict=(v,key,short=false)=>v===undefined||v===null||String(v).trim()===''?'blank':(short?normalizeShort(v)===normalizeShort(key):v===key)?'correct':'wrong';
+  for(const [q,key] of Object.entries(exam.mcqKeys||{}))out.mcq[q]=verdict(a.mcq?.[q],key);
+  for(const [q,keys] of Object.entries(exam.tfKeys||{}))out.tf[q]=Object.fromEntries(Object.entries(keys).map(([sub,key])=>[sub,verdict(a.tf?.[q]?.[sub],key)]));
+  for(const [q,key] of Object.entries(exam.saKeys||{}))out.sa[q]=verdict(a.sa?.[q],key,true);
+  return out;
+}
+export function studentSubmission(s,exam=null) {
   const {gradingKeys,examSnapshot,privateKeys, ...safe}=s;
-  return safe;
+  return exam?{...safe,questionStructure:publicExam(exam),feedback:answerFeedback(s.answers,exam)}:safe;
 }
