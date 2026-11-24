@@ -198,10 +198,13 @@ export async function dispatch(path,body,identity,env,store){
     next.answeredCount=Object.keys(next.answers.mcq||{}).length+Object.values(next.answers.tf||{}).filter(x=>Object.keys(x).length===4).length+Object.keys(next.answers.sa||{}).length;
     await store.patch(`live/${user.id}/${body.examCode}`,next);return {ok:true};
   }
+  if(path==='/signals'){
+    const code=id(body.examCode);return {signals:await store.get(`live/${user.id}/${code}/signals`)||{}};
+  }
   if(path==='/signal'){
     requireAdmin(user);const target=id(body.userId),code=id(body.examCode),s=await store.get(`live/${target}/${code}`);requireValue(s,'Lượt thi không còn hoạt động.',404);
-    const signals=Object.entries(s.signals||{}).slice(-19);signals.push([crypto.randomUUID(),{senderName:user.fullName||user.username,kind:body.kind==='emote'?'emote':'banner',content:text(body.content,500,true),time:Date.now()}]);
-    await store.put(`live/${target}/${code}/signals`,Object.fromEntries(signals));return {ok:true};
+    const signalId=crypto.randomUUID(),signal={senderName:user.fullName||user.username,kind:body.kind==='emote'?'emote':'banner',content:text(body.content,500,true),time:Date.now()};
+    await store.transaction(`live/${target}/${code}/signals`,old=>Object.fromEntries([...Object.entries(old||{}).sort((a,b)=>a[1].time-b[1].time).slice(-19),[signalId,signal]]));return {ok:true};
   }
   if(path==='/live/remove'){requireAdmin(user);id(body.userId);id(body.examCode);await store.put(`live/${body.userId}/${body.examCode}`,null);return {ok:true};}
   if(path==='/presence') {await store.put(`status/${user.username}`,{state:body.state==='offline'?'offline':'online',lastChanged:Date.now()});return {ok:true};}

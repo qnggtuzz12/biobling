@@ -5084,7 +5084,7 @@
         submission = examSubmissionsFor(examCode, uid).slice(-1)[0];
       }
       // Nếu là Admin bấm xem đề mà chưa chỉ định học viên, có thể mở ngay chế độ Xem & Sửa đáp án của đề đó
-      if (!submission && currentUser.role === 'admin' && exam) {
+      if (!submission && targetUserId === null && !submissionId && currentUser.role === 'admin' && exam) {
         currentResultSubmissionId = null;
         isLiveSpectatorMode = false;
         spectatingSessionKey = '';
@@ -5126,8 +5126,8 @@
         mcqKeys: JSON.parse(JSON.stringify(masterMcq)),
         tfKeys: JSON.parse(JSON.stringify(masterTf)),
         saKeys: JSON.parse(JSON.stringify(masterSa)),
-        rawDocsUrl: exam.rawDocsUrl || submission.rawDocsUrl || '',
-        embedUrl: exam.embedUrl || submission.embedUrl || ''
+        rawDocsUrl: submission.rawDocsUrl || submission.questionStructure?.rawDocsUrl || exam.rawDocsUrl || '',
+        embedUrl: submission.embedUrl || submission.questionStructure?.embedUrl || exam.embedUrl || ''
       };
       if(currentUser.role!=='admin' && submission.questionStructure)Object.assign(reviewExam,submission.questionStructure);
       if(currentUser.role==='admin' && submission.gradingKeys){
@@ -5260,6 +5260,7 @@
     let isLiveSpectatorMode = false;
     let _studentSignalRef = null;
     let _seenSignalIds = new Set();
+    let signalPollTimer, signalPollGeneration=0;
 
     function getLiveExamSessionKey(userId = null, examCode = null) {
       const uid = userId || (currentUser ? currentUser.id : '');
@@ -5313,7 +5314,7 @@
       let initialLoadDone = false;
 
       _studentSignalRef = rtdb.ref('/live_exams/' + sessionKey + '/signals');
-      _studentSignalRef.on('value', (snap) => {
+      const listener = (snap) => {
         const raw = snap.val() || {};
         const entries = Object.entries(raw);
         if (!initialLoadDone) {
@@ -5324,13 +5325,22 @@
         entries.forEach(([id, sig]) => {
           if (!_seenSignalIds.has(id)) {
             _seenSignalIds.add(id);
-            displayIncomingMentorSignal(sig);
+            if(document.getElementById('liveExamModal')?.classList.contains('open') && !isLiveReviewMode)displayIncomingMentorSignal(sig);
           }
         });
-      });
+      };
+      _studentSignalRef.on('value', listener);
+      const generation=signalPollGeneration,code=activeExam.code;
+      const poll=async()=>{
+        if(generation!==signalPollGeneration || !currentUser || isLiveReviewMode)return;
+        try{const result=await BioBling.call('/signals',{examCode:code});if(generation===signalPollGeneration)listener({val:()=>result.signals});}catch{}
+        if(generation===signalPollGeneration)signalPollTimer=setTimeout(poll,2500);
+      };
+      signalPollTimer=setTimeout(poll,2500);
     }
 
     function detachStudentLiveMentorChatListener() {
+      signalPollGeneration++;clearTimeout(signalPollTimer);
       if (_studentSignalRef) {
         try { _studentSignalRef.off(); } catch (e) {}
         _studentSignalRef = null;
@@ -5338,10 +5348,10 @@
     }
 
     // Mentor gửi Tín hiệu hoặc Emote tới 1 học viên
-    function sendMentorSignalToTarget(sessionKey, content, kind = 'banner') {
-      if (!sessionKey || !content || !currentUser) return;
+    async function sendMentorSignalToTarget(sessionKey, content, kind = 'banner') {
+      if (!sessionKey || !String(content||'').trim() || !requireAdmin()) return false;
       try {
-        rtdb.ref('/live_exams/' + sessionKey + '/signals').push({
+        await rtdb.ref('/live_exams/' + sessionKey + '/signals').push({
           senderName: currentUser.fullName || currentUser.username,
           kind,
           content: String(content).trim(),
@@ -5350,55 +5360,45 @@
         showToast(kind === 'emote'
           ? `Đã thả biểu tượng ${content} tới màn hình học viên!`
           : `📡 Đã phát tín hiệu chạy qua màn hình học viên!`);
-      } catch (e) {}
+        return true;
+      } catch (e) { safeAlert('Chưa gửi được: '+e.message); return false; }
     }
 
-    function sendCustomCardSignal(event, sessionKey) {
+    async function sendCustomCardSignal(event, sessionKey) {
       event.preventDefault();
       const inp = document.getElementById('inpCardSignal_' + sessionKey);
       const text = (inp?.value || '').trim();
       if (!text) return;
-      sendMentorSignalToTarget(sessionKey, text, 'banner');
-      if (inp) inp.value = '';
+      if(await sendMentorSignalToTarget(sessionKey, text, 'banner'))if(inp && inp.value.trim()===text)inp.value='';
     }
 
-    function handleSpectatorSignalSubmit(e) {
+    async function handleSpectatorSignalSubmit(e) {
       e.preventDefault();
       if (!spectatingSessionKey) return;
       const inp = document.getElementById('inpSpectatorSignalText');
       const text = (inp?.value || '').trim();
       if (!text) return;
-      sendMentorSignalToTarget(spectatingSessionKey, text, 'banner');
-      if (inp) inp.value = '';
+      if(await sendMentorSignalToTarget(spectatingSessionKey, text, 'banner'))if(inp && inp.value.trim()===text)inp.value='';
     }
 
     // Phát tín hiệu hoặc thả Emote đồng loạt tới tất cả học viên đang làm bài
-    function broadcastSignalToAllActive(content, kind = 'banner') {
-      const filterExam = document.getElementById('proctorExamFilterSelect')?.value || 'all';
-      const targets = Object.values(liveExamsDataMap).filter(s =>
-        s && s.status === 'active' && (filterExam === 'all' || String(s.examCode) === String(filterExam))
-      );
-      if (!targets.length) return safeAlert('Hiện không có học viên nào đang làm bài để nhận tín hiệu.');
-      targets.forEach(s => {
-        try {
-          rtdb.ref('/live_exams/' + s.sessionKey + '/signals').push({
-            senderName: currentUser?.fullName || currentUser?.username || 'Mentor',
-            kind,
-            content: String(content).trim(),
-            time: Date.now()
-          });
-        } catch (e) {}
-      });
-      showToast(`📡 Đã phát ${kind === 'emote' ? 'Emote ' + content : 'tín hiệu'} tới ${targets.length} học viên đang làm bài!`);
+    async function broadcastSignalToAllActive(content, kind = 'banner') {
+      if(!requireAdmin())return false;
+      const filterExam=document.getElementById('proctorExamFilterSelect')?.value||'all';
+      const targets=Object.values(liveExamsDataMap).filter(s=>s&&s.status==='active'&&(filterExam==='all'||String(s.examCode)===String(filterExam)));
+      if(!targets.length){safeAlert('Hiện không có học viên đang làm bài để nhận thông báo.');return false;}
+      let sent=0;
+      for(const s of targets){try{await rtdb.ref('/live_exams/'+s.sessionKey+'/signals').push({kind,content:String(content).trim()});sent++;}catch{}}
+      showToast('Đã gửi tới '+sent+'/'+targets.length+' học viên.'+(sent<targets.length?' Một số lượt gửi thất bại, hãy thử lại.':''));
+      return sent===targets.length;
     }
 
-    function handleBroadcastCustomSignal(e) {
+    async function handleBroadcastCustomSignal(e) {
       e.preventDefault();
       const inp = document.getElementById('inpBroadcastSignalAll');
       const text = (inp?.value || '').trim();
       if (!text) return;
-      broadcastSignalToAllActive(text, 'banner');
-      if (inp) inp.value = '';
+      if(await broadcastSignalToAllActive(text,'banner'))if(inp&&inp.value.trim()===text)inp.value='';
     }
 
     async function clearFinishedLiveSessions() {
@@ -6138,6 +6138,14 @@
     });
 
     async function startExamRoom(exam, reviewOnly = false, restoredDraft = null) {
+      try { return await prepareExamRoom(exam, reviewOnly, restoredDraft); }
+      catch(error) {
+        console.error('Không mở được phòng xem bài', error);
+        showExamDraftStatus('Không mở được bài. Hãy đóng phòng xem rồi thử lại.', true);
+        safeAlert('Chưa mở được bài học sinh. Vui lòng đóng phòng xem rồi thử lại.');
+      }
+    }
+    async function prepareExamRoom(exam, reviewOnly = false, restoredDraft = null) {
       if(!reviewOnly){
         try{
           const attemptId=restoredDraft?.attemptId||makeExamAttemptId();
@@ -6172,7 +6180,7 @@
       if (btnKeySave) btnKeySave.style.display = 'none';
 
       // Tự động kích hoạt Toàn màn hình (Fullscreen) nếu chế độ phòng thi đang BẬT
-      enterExamFullscreenIfNeeded();
+      if (!reviewOnly) enterExamFullscreenIfNeeded();
 
       examSubmitting = false;
       clearInterval(examCountdownTimer);
@@ -6394,6 +6402,8 @@
       const feedback = activeExam?.feedback;
       const revealKeys = isLiveReviewMode && !activeExam?.answersHidden;
       const showCorrectAnswers = isLiveReviewMode && (revealKeys || !!feedback);
+      // Firebase omits empty maps; an unanswered section is valid, including old attempts.
+      studentLiveAnswers = {mcq:{...(studentLiveAnswers?.mcq || {})},tf:{...(studentLiveAnswers?.tf || {})},sa:{...(studentLiveAnswers?.sa || {})}};
       const container = document.getElementById('liveAnswerSheetList');
       const statsBanner = document.getElementById('liveReviewStatsBanner');
       if (!container || !activeExam) return;
@@ -6900,7 +6910,7 @@
     function clearExamCanvas() {
       const cv = document.getElementById('liveExamCanvas');
       if (cv) {
-        cv.getContext('2d').clearRect(0, 0, cv.width, cv.height);
+        cv.getContext('2d')?.clearRect(0, 0, cv.width, cv.height);
       }
     }
 

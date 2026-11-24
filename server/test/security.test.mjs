@@ -19,6 +19,16 @@ class MemoryStore {
 const env={OWNER_UID:'teacher',FIREBASE_PROJECT:'biobling',RELEASE_ENABLED:'true',ALLOWED_ORIGINS:'https://qnggtuzz12.github.io'};
 const as=uid=>({uid,email:uid+'@example.com',name:uid});
 const answers={mcq:{1:'B',2:'C'},tf:{1:{a:'Đ',b:'S',c:'Đ',d:'S'}},sa:{1:'0',2:'1.50'}};
+test('mentor emotes and banners reach only the intended student and survive draft updates',async()=>{
+ const s=new MemoryStore();await dispatch('/attempt/start',{code:'BIO_1',attemptId:'signals'},as('alice'),env,s);
+ await dispatch('/live',{examCode:'BIO_1',attemptId:'signals',data:{}},as('alice'),env,s);
+ for(const [kind,content] of [['emote','🔥'],['banner','Kiểm tra lại câu 2 nhé']])await dispatch('/signal',{userId:'2',examCode:'BIO_1',kind,content},as('teacher'),env,s);
+ await dispatch('/live',{examCode:'BIO_1',attemptId:'signals',data:{}},as('alice'),env,s);
+ const received=Object.values((await dispatch('/signals',{examCode:'BIO_1'},as('alice'),env,s)).signals);
+ assert.equal(received.length,2);assert.ok(received.some(x=>x.kind==='emote'&&x.content==='🔥'));assert.ok(received.some(x=>x.kind==='banner'));
+ assert.deepEqual((await dispatch('/signals',{examCode:'BIO_1',userId:'2'},as('bob'),env,s)).signals,{});
+ await assert.rejects(dispatch('/signal',{userId:'2',examCode:'BIO_1',kind:'emote',content:'🔥'},as('alice'),env,s));
+});
 test('admin key correction atomically regrades submitted work and active attempts, preserves answers, and rejects stale edits',async()=>{
  const s=new MemoryStore();
  await dispatch('/attempt/start',{code:'BIO_1',attemptId:'done'},as('alice'),env,s);
